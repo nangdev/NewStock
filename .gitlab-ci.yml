@@ -14,7 +14,7 @@ build:
   script:
     - docker-compose build
   only:
-    - main
+    - feat/infra
 
 deploy:
   stage: deploy
@@ -28,6 +28,31 @@ deploy:
     - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - ssh ubuntu@$SERVER_IP "cd /home/ubuntu/S12P21A304 && git pull && docker-compose down && docker-compose up -d"
+    - |
+      ssh ubuntu@$SERVER_IP "
+        cd /home/ubuntu/S12P21A304 && 
+        git pull && 
+        
+        # 환경 변수 파일 생성
+        echo \"APP_NAME=$APP_NAME\" > backend/.env &&
+        echo \"MYSQL_HOST=$MYSQL_HOST\" >> backend/.env &&
+        echo \"MYSQL_PORT=$MYSQL_PORT\" >> backend/.env &&
+        echo \"MYSQL_DATABASE=$MYSQL_DATABASE\" >> backend/.env &&
+        echo \"MYSQL_USERNAME=$MYSQL_USERNAME\" >> backend/.env &&
+        echo \"MYSQL_PASSWORD=$MYSQL_PASSWORD\" >> backend/.env &&
+        echo \"JPA_DDL_AUTO=$JPA_DDL_AUTO\" >> backend/.env &&
+        echo \"JPA_SHOW_SQL=$JPA_SHOW_SQL\" >> backend/.env &&
+        echo \"JPA_FORMAT_SQL=$JPA_FORMAT_SQL\" >> backend/.env &&
+        echo \"SERVER_CONTEXT_PATH=$SERVER_CONTEXT_PATH\" >> backend/.env &&
+        
+        # 루트 .env 파일도 생성 (docker-compose에서 사용)
+        echo \"MYSQL_DATABASE=$MYSQL_DATABASE\" > .env &&
+        echo \"MYSQL_USER=$MYSQL_USERNAME\" >> .env &&
+        echo \"MYSQL_PASSWORD=$MYSQL_PASSWORD\" >> .env &&
+        echo \"MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD\" >> .env &&
+        
+        docker-compose down && 
+        docker-compose up -d
+      "
   only:
-    - master
+    - feat/infra
