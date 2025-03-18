@@ -3,25 +3,24 @@ stages:
   - deploy
 
 variables:
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""  # DinD TLS 비활성화
+  # Docker 관련 변수 제거 (Runner의 Docker를 사용)
 
 build:
   stage: build
   tags:
     - newstock
   image: docker/compose:latest
-  services:
-    - name: docker:dind
-      command: ["--tls=false"]  # TLS 비활성화
+  # DinD 서비스 제거 (호스트의 Docker 소켓 사용)
   before_script:
     # 빌드에 필요한 최소한의 .env 파일 생성
     - echo "MYSQL_DATABASE=${MYSQL_DATABASE:-newstock}" > .env
     - echo "MYSQL_USER=${MYSQL_USERNAME:-jjeon}" >> .env
     - echo "MYSQL_PASSWORD=${MYSQL_PASSWORD:-1234}" >> .env
     - echo "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}" >> .env
+    # Docker 정보 출력
+    - docker info || echo "Docker 연결 불가"
   script:
+    # 호스트의 Docker를 사용하여 빌드
     - docker-compose build
   only:
     - feat/infra
@@ -56,6 +55,12 @@ deploy:
         echo \"JPA_SHOW_SQL=$JPA_SHOW_SQL\" >> backend/.env &&
         echo \"JPA_FORMAT_SQL=$JPA_FORMAT_SQL\" >> backend/.env &&
         echo \"SERVER_CONTEXT_PATH=$SERVER_CONTEXT_PATH\" >> backend/.env &&
+        
+        # 루트 .env 파일도 생성 (docker-compose에서 사용)
+        echo \"MYSQL_DATABASE=$MYSQL_DATABASE\" > .env &&
+        echo \"MYSQL_USER=$MYSQL_USERNAME\" >> .env &&
+        echo \"MYSQL_PASSWORD=$MYSQL_PASSWORD\" >> .env &&
+        echo \"MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD\" >> .env &&
         
         docker-compose down && 
         docker-compose up -d
