@@ -30,4 +30,4 @@ deploy:
   script:
     - ssh ubuntu@$SERVER_IP "cd /home/ubuntu/S12P21A304 && git pull && docker-compose down && docker-compose up -d"
   only:
-    - main
+    - master

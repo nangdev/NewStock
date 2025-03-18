@@ -1,16 +1,16 @@
 version: '3'
 
 services:
-  frontend:
+  nginx:
     build:
-      context: ./frontend
+      context: ./nginx
       dockerfile: Dockerfile
     ports:
       - "80:80"
     depends_on:
       - backend
     restart: always
-
+    
   backend:
     build:
       context: ./backend
@@ -19,6 +19,22 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+    env_file:
+      - ./.env
+    restart: always
+    depends_on:
+      - mysql
+  
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     restart: always
 
 volumes:

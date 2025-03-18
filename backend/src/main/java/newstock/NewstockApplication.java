@@ -1,4 +1,4 @@
-package a304.newstock;
+package newstock;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

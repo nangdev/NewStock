@@ -1,4 +1,4 @@
-package a304.newstock;
+package newstock;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

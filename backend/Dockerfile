@@ -5,5 +5,6 @@ RUN gradle build --no-daemon
 
 FROM openjdk:17-jre-slim
 COPY --from=build /app/build/libs/*.jar app.jar
+COPY .env /.env
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app.jar"]
