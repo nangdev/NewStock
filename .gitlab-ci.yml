@@ -8,6 +8,8 @@ variables:
 
 build:
   stage: build
+  tag:
+    - newstock
   image: docker/compose:latest
   services:
     - docker:dind
