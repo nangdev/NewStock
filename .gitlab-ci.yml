@@ -37,7 +37,7 @@ deploy:
         
         # 루트 .env 파일도 생성 (docker-compose에서 사용)
         echo \"MYSQL_DATABASE=$MYSQL_DATABASE\" > .env &&
-        echo \"MYSQL_USER=$MYSQL_USERNAME\" >> .env &&
+        echo \"MYSQL_USERNAME=$MYSQL_USERNAME\" >> .env &&
         echo \"MYSQL_PASSWORD=$MYSQL_PASSWORD\" >> .env &&
         echo \"MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD\" >> .env &&
         
