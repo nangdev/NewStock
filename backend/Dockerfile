@@ -1,4 +1,4 @@
-FROM gradle:7.4.2-jdk17 AS build
+FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
 COPY . .
 RUN gradle clean build --no-daemon --refresh-dependencies --stacktrace
