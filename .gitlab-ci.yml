@@ -4,8 +4,6 @@ stages:
 # 배포 작업 (브랜치별 서비스 배포)
 deploy:
   stage: deploy
-  tags:
-    - newstock
   image: alpine:latest
   before_script:
     - apk add --no-cache openssh-client
