@@ -22,6 +22,9 @@ deploy:
     - |
       ssh -i ~/.ssh/id_rsa ubuntu@$SERVER_IP "
         cd /home/ubuntu/S12P21A304 && 
+
+        git fetch &&
+        git checkout $CI_COMMIT_REF_NAME &&
         git pull &&
         
         # 환경 변수 파일 생성
