@@ -3,7 +3,9 @@ stages:
 
 variables:
   # Docker 관련 변수 제거 (Runner의 Docker를 사용)
+  # 공통 변수 설정
 
+# 배포 작업 (브랜치별 서비스 배포)
 deploy:
   stage: deploy
   tags:
@@ -19,31 +21,72 @@ deploy:
   script:
     - |
       ssh -i ~/.ssh/id_rsa ubuntu@$SERVER_IP "
-        cd /home/ubuntu/S12P21A304 &&
+        cd /home/ubuntu/S12P21A304 && 
         git pull &&
-
+        
         # 환경 변수 파일 생성
-        echo \\"APP_NAME=$APP_NAME\\" > backend/.env &&
-        echo \\"MYSQL_HOST=$MYSQL_HOST\\" >> backend/.env &&
-        echo \\"MYSQL_PORT=$MYSQL_PORT\\" >> backend/.env &&
-        echo \\"MYSQL_DATABASE=$MYSQL_DATABASE\\" >> backend/.env &&
-        echo \\"MYSQL_USERNAME=$MYSQL_USERNAME\\" >> backend/.env &&
-        echo \\"MYSQL_PASSWORD=$MYSQL_PASSWORD\\" >> backend/.env &&
-        echo \\"JPA_DDL_AUTO=$JPA_DDL_AUTO\\" >> backend/.env &&
-        echo \\"JPA_SHOW_SQL=$JPA_SHOW_SQL\\" >> backend/.env &&
-        echo \\"JPA_FORMAT_SQL=$JPA_FORMAT_SQL\\" >> backend/.env &&
-        echo \\"SERVER_CONTEXT_PATH=$SERVER_CONTEXT_PATH\\" >> backend/.env &&
-
-        # 루트 .env 파일도 생성 (docker-compose에서 사용)
-        echo \\"MYSQL_DATABASE=$MYSQL_DATABASE\\" > .env &&
-        echo \\"MYSQL_USERNAME=$MYSQL_USERNAME\\" >> .env &&
-        echo \\"MYSQL_PASSWORD=$MYSQL_PASSWORD\\" >> .env &&
-        echo \\"MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD\\" >> .env &&
-
-        # 서버에서 직접 빌드 및 배포
-        docker-compose build &&
-        docker-compose down &&
-        docker-compose up -d
+        # 공통 환경 변수
+        echo \"MYSQL_DATABASE=$MYSQL_DATABASE\" > .env &&
+        echo \"MYSQL_USERNAME=$MYSQL_USERNAME\" >> .env &&
+        echo \"MYSQL_PASSWORD=$MYSQL_PASSWORD\" >> .env &&
+        echo \"MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD\" >> .env &&
+        echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> .env &&
+        
+        # 브랜치별 배포 처리
+        if [[ \"$CI_COMMIT_REF_NAME\" == \"dev/service\" ]]; then
+          # 백엔드 환경 변수
+          echo \"APP_NAME=$APP_NAME\" > backend/.env &&
+          echo \"MYSQL_HOST=$MYSQL_HOST\" >> backend/.env &&
+          echo \"MYSQL_PORT=$MYSQL_PORT\" >> backend/.env &&
+          echo \"MYSQL_DATABASE=$MYSQL_DATABASE\" >> backend/.env &&
+          echo \"MYSQL_USERNAME=$MYSQL_USERNAME\" >> backend/.env &&
+          echo \"MYSQL_PASSWORD=$MYSQL_PASSWORD\" >> backend/.env &&
+          echo \"JPA_DDL_AUTO=$JPA_DDL_AUTO\" >> backend/.env &&
+          echo \"JPA_SHOW_SQL=$JPA_SHOW_SQL\" >> backend/.env &&
+          echo \"JPA_FORMAT_SQL=$JPA_FORMAT_SQL\" >> backend/.env &&
+          echo \"SERVER_CONTEXT_PATH=$SERVER_CONTEXT_PATH\" >> backend/.env &&
+          
+          # API 서버와 Nginx 재배포
+          echo \"서비스 브랜치: API 서버와 Nginx 배포 중...\"
+          docker-compose build backend nginx
+          docker-compose up -d --no-deps backend nginx
+          
+        elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/crawl\" ]]; then
+          # 크롤러 환경 변수
+          # echo \"CRAWLER_SCHEDULE=$CRAWLER_SCHEDULE\" > crawler/.env &&
+          # echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> crawler/.env &&
+          # echo \"KAFKA_TOPIC=$KAFKA_TOPIC\" >> crawler/.env &&
+          
+          # 크롤러만 재배포
+          echo \"크롤링 브랜치: 크롤러 서비스 배포 중...\"
+          docker-compose build crawler
+          docker-compose up -d --no-deps crawler
+          
+        elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/be\" ]]; then
+          # 모든 환경 변수 설정
+          echo \"APP_NAME=$APP_NAME\" > backend/.env &&
+          echo \"MYSQL_HOST=$MYSQL_HOST\" >> backend/.env &&
+          echo \"MYSQL_PORT=$MYSQL_PORT\" >> backend/.env &&
+          echo \"MYSQL_DATABASE=$MYSQL_DATABASE\" >> backend/.env &&
+          echo \"MYSQL_USERNAME=$MYSQL_USERNAME\" >> backend/.env &&
+          echo \"MYSQL_PASSWORD=$MYSQL_PASSWORD\" >> backend/.env &&
+          echo \"JPA_DDL_AUTO=$JPA_DDL_AUTO\" >> backend/.env &&
+          echo \"JPA_SHOW_SQL=$JPA_SHOW_SQL\" >> backend/.env &&
+          echo \"JPA_FORMAT_SQL=$JPA_FORMAT_SQL\" >> backend/.env &&
+          echo \"SERVER_CONTEXT_PATH=$SERVER_CONTEXT_PATH\" >> backend/.env &&
+          
+          # echo \"CRAWLER_SCHEDULE=$CRAWLER_SCHEDULE\" > crawler/.env &&
+          # echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> crawler/.env &&
+          # echo \"KAFKA_TOPIC=$KAFKA_TOPIC\" >> crawler/.env &&
+          
+          # 전체 서비스 재배포
+          echo \"마스터 브랜치: 모든 서비스 배포 중...\"
+          docker-compose down
+          docker-compose build
+          docker-compose up -d
+        fi
       "
-  only:
-    - feat/infra
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "dev/service"'
+    - if: '$CI_COMMIT_REF_NAME == "dev/crawl"'
+    - if: '$CI_COMMIT_REF_NAME == "dev/be"'
