@@ -1,40 +1,9 @@
 stages:
-  - build
   - deploy
 
 variables:
   # Docker 관련 변수 제거 (Runner의 Docker를 사용)
   # 공통 변수 설정
-
-# API 서버 빌드 (dev/service 브랜치 트리거)
-build:api:
-  stage: build
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "dev/service"'
-  script:
-    - cd backend
-    - ./gradlew build -x test
-    # 빌드 작업
-
-# Nginx 빌드 (dev/service 브랜치 트리거)
-build:nginx:
-  stage: build
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "dev/service"'
-  script:
-    - cd nginx
-    # Nginx 빌드 작업 (필요한 경우)
-    - echo "Nginx 설정 준비 완료"
-
-# 크롤링 서버 빌드 (dev/crawl 브랜치 트리거)
-build:crawler:
-  stage: build
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "dev/crawl"'
-  script:
-    - cd crawler
-    - ./gradlew build -x test
-    # 빌드 작업
 
 # 배포 작업 (브랜치별 서비스 배포)
 deploy:
@@ -44,15 +13,14 @@ deploy:
   image: alpine:latest
   before_script:
     - apk add --no-cache openssh-client
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
     - |
-      ssh ubuntu@$SERVER_IP "
+      ssh -i ~/.ssh/id_rsa ubuntu@$SERVER_IP "
         cd /home/ubuntu/S12P21A304 && 
         git pull &&
         
