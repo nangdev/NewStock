@@ -29,18 +29,18 @@ services:
     depends_on:
       - mysql
   
-  crawler:
-    build:
-      context: ./crawler
-      dockerfile: Dockerfile
-    ports:
-      - "8081:8081"
-    env_file:
-      - ./crawler/.env
-    restart: unless-stopped
-    depends_on:
-      - mysql
-      - kafka
+  # crawler:
+  #   build:
+  #     context: ./crawler
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8081:8081"
+  #   env_file:
+  #     - ./crawler/.env
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - mysql
+  #     - kafka
   
   mysql:
     image: mysql:8.0
@@ -56,13 +56,13 @@ services:
     restart: unless-stopped
 
 
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    environment:
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-    ports:
-      - "9092:9092"
+  # kafka:
+  #   image: confluentinc/cp-kafka:latest
+  #   environment:
+  #     - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+  #     - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+  #   ports:
+  #     - "9092:9092"
 
 volumes:
   db-data:
