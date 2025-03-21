@@ -1,9 +1,79 @@
 stages:
+  - detect_changes
+  - build
   - deploy
 
 variables:
   # Docker 관련 변수 제거 (Runner의 Docker를 사용)
+  # 공통 변수 설정
 
+# 변경된 파일 감지
+detect_changes:
+  stage: detect_changes
+  image: alpine:latest
+  script:
+    - |
+      # 이전 커밋과 비교하여 변경 파일 확인
+      BE_CHANGED=false
+      CRAWLER_CHANGED=false
+      
+      if [ -z "$CI_COMMIT_BEFORE_SHA" ]; then
+        # 첫 커밋이거나 새 브랜치인 경우 모든 서비스 빌드
+        BE_CHANGED=true
+        CRAWLER_CHANGED=true
+      else
+        # 변경된 파일 확인
+        CHANGED_FILES=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA)
+        
+        # backend 디렉토리 변경 여부
+        if echo "$CHANGED_FILES" | grep -q "^backend/"; then
+          BE_CHANGED=true
+        fi
+        
+        # crawler 디렉토리 변경 여부
+        if echo "$CHANGED_FILES" | grep -q "^crawler/"; then
+          CRAWLER_CHANGED=true
+        fi
+        
+        # docker-compose.yml 파일 변경 여부
+        if echo "$CHANGED_FILES" | grep -q "docker-compose.yml"; then
+          BE_CHANGED=true
+          CRAWLER_CHANGED=true
+        fi
+      fi
+      
+      # 결과 저장
+      echo "BE_CHANGED=$BE_CHANGED" > changes.env
+      echo "CRAWLER_CHANGED=$CRAWLER_CHANGED" >> changes.env
+  artifacts:
+    reports:
+      dotenv: changes.env
+
+# API 서버 빌드
+build:api:
+  stage: build
+  needs:
+    - detect_changes
+  rules:
+    - if: $BE_CHANGED == "true"
+  script:
+    - cd backend
+    - ./gradlew build -x test
+    # 빌드 작업
+
+# 크롤링 서버 빌드
+build:crawler:
+  stage: build
+  needs:
+    - detect_changes
+  rules:
+    - if: $CRAWLER_CHANGED == "true"
+  script:
+    - cd crawler
+    - ./gradlew build -x test
+    # 빌드 작업
+
+# 배포 작업
 deploy:
   stage: deploy
   tags:
@@ -21,9 +91,9 @@ deploy:
     - |
       ssh ubuntu@$SERVER_IP "
         cd /home/ubuntu/S12P21A304 && 
-        git pull && 
+        git pull &&
         
-        # 환경 변수 파일 생성
+        # 환경 변수 파일 생성 (기존 코드 유지)
         echo \"APP_NAME=$APP_NAME\" > backend/.env &&
         echo \"MYSQL_HOST=$MYSQL_HOST\" >> backend/.env &&
         echo \"MYSQL_PORT=$MYSQL_PORT\" >> backend/.env &&
@@ -35,16 +105,33 @@ deploy:
         echo \"JPA_FORMAT_SQL=$JPA_FORMAT_SQL\" >> backend/.env &&
         echo \"SERVER_CONTEXT_PATH=$SERVER_CONTEXT_PATH\" >> backend/.env &&
         
-        # 루트 .env 파일도 생성 (docker-compose에서 사용)
+        # 크롤러 환경 변수 추가
+        echo \"CRAWLER_SCHEDULE=$CRAWLER_SCHEDULE\" > crawler/.env &&
+        echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> crawler/.env &&
+        echo \"KAFKA_TOPIC=$KAFKA_TOPIC\" >> crawler/.env &&
+        
+        # 루트 .env 파일 생성 (docker-compose에서 사용)
         echo \"MYSQL_DATABASE=$MYSQL_DATABASE\" > .env &&
         echo \"MYSQL_USERNAME=$MYSQL_USERNAME\" >> .env &&
         echo \"MYSQL_PASSWORD=$MYSQL_PASSWORD\" >> .env &&
         echo \"MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD\" >> .env &&
+        echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> .env &&
         
-        # 서버에서 직접 빌드 및 배포
-        docker-compose build &&
-        docker-compose down && 
-        docker-compose up -d
+        # 변경 감지에 따른 선택적 배포
+        if [ \"$BE_CHANGED\" = \"true\" ] && [ \"$CRAWLER_CHANGED\" = \"true\" ]; then
+          # 모든 서비스 재배포
+          docker-compose down &&
+          docker-compose build &&
+          docker-compose up -d
+        elif [ \"$BE_CHANGED\" = \"true\" ]; then
+          # API 서버만 재배포
+          docker-compose build backend &&
+          docker-compose up -d --no-deps backend
+        elif [ \"$CRAWLER_CHANGED\" = \"true\" ]; then
+          # 크롤러만 재배포
+          docker-compose build crawler &&
+          docker-compose up -d --no-deps crawler
+        fi
       "
-  only:
-    - feat/infra
+  rules:
+    - if: $BE_CHANGED == "true" || $CRAWLER_CHANGED == "true"

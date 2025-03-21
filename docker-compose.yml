@@ -28,6 +28,16 @@ services:
     restart: always
     depends_on:
       - mysql
+      - kafka
+  
+  crawler:
+    build:
+      context: ./crawler
+      dockerfile: Dockerfile
+    env_file:
+      - ./crawler/.env
+    depends_on:
+      - kafka
   
   mysql:
     image: mysql:8.0
@@ -41,6 +51,15 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     restart: always
+
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+    ports:
+      - "9092:9092"
 
 volumes:
   db-data:
