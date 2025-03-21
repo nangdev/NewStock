@@ -10,7 +10,7 @@ variables:
 build:api:
   stage: build
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev/service"'
+    - if: '$CI_COMMIT_REF_NAME == "dev/service"'
   script:
     - cd backend
     - ./gradlew build -x test
@@ -20,7 +20,7 @@ build:api:
 build:nginx:
   stage: build
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev/service"'
+    - if: '$CI_COMMIT_REF_NAME == "dev/service"'
   script:
     - cd nginx
     # Nginx 빌드 작업 (필요한 경우)
@@ -30,7 +30,7 @@ build:nginx:
 build:crawler:
   stage: build
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev/crawl"'
+    - if: '$CI_COMMIT_REF_NAME == "dev/crawl"'
   script:
     - cd crawler
     - ./gradlew build -x test
@@ -65,7 +65,7 @@ deploy:
         echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> .env &&
         
         # 브랜치별 배포 처리
-        if [[ \"$CI_MERGE_REQUEST_TARGET_BRANCH_NAME\" == \"dev/service\" ]]; then
+        if [[ \"$CI_COMMIT_REF_NAME\" == \"dev/service\" ]]; then
           # 백엔드 환경 변수
           echo \"APP_NAME=$APP_NAME\" > backend/.env &&
           echo \"MYSQL_HOST=$MYSQL_HOST\" >> backend/.env &&
@@ -83,7 +83,7 @@ deploy:
           docker-compose build backend nginx
           docker-compose up -d --no-deps backend nginx
           
-        elif [[ \"$CI_MERGE_REQUEST_TARGET_BRANCH_NAME\" == \"dev/crawl\" ]]; then
+        elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/crawl\" ]]; then
           # 크롤러 환경 변수
           # echo \"CRAWLER_SCHEDULE=$CRAWLER_SCHEDULE\" > crawler/.env &&
           # echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> crawler/.env &&
@@ -119,6 +119,6 @@ deploy:
         fi
       "
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev/service"'
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev/crawl"'
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev/be"'
+    - if: '$CI_COMMIT_REF_NAME == "dev/service"'
+    - if: '$CI_COMMIT_REF_NAME == "dev/crawl"'
+    - if: '$CI_COMMIT_REF_NAME == "dev/be"'
