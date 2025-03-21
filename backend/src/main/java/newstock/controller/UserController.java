@@ -2,33 +2,37 @@ package newstock.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import newstock.controller.request.UserRequest;
 import newstock.controller.response.UserResponse;
 import newstock.domain.user.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
+@Slf4j
 public class UserController {
 
     private final UserService userService;
 
     /**
-     * ID로 User 조회
-     * @param id 조회할 User의 ID
-     * @return User 정보
+     * 회원가입 API
+     *
+     * @param userRequest 회원가입 요청 DTO
+     * @return 생성된 사용자 정보
      */
-    @GetMapping("/{id}")
-    @Operation(summary = "ID로 사용자 조회", description = "고유 ID를 사용하여 사용자의 상세 정보를 조회합니다.")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable int id) {
+    @PostMapping("/")
+    public ResponseEntity<UserResponse> signupUser(@RequestBody UserRequest userRequest) {
+        log.info("회원가입 요청: {}", userRequest.getEmail());
 
-        UserResponse userResponse = userService.getUserById(id);
-
-        return ResponseEntity.ok(userResponse);
+        try {
+            UserResponse userResponse = userService.signupUser(userRequest);
+            return ResponseEntity.ok(userResponse);
+        } catch (IllegalArgumentException e) {
+            log.warn("회원가입 실패 - 중복 이메일: {}", userRequest.getEmail());
+            return ResponseEntity.badRequest().body(null);
+        }
     }
-
 }

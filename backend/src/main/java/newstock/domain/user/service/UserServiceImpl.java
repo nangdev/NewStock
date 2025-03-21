@@ -1,13 +1,13 @@
 package newstock.domain.user.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import newstock.controller.request.UserRequest;
 import newstock.controller.response.UserResponse;
 import newstock.domain.user.entity.User;
-import newstock.domain.user.repository.UserCustomRepository;
 import newstock.domain.user.repository.UserRepository;
-import newstock.exception.ExceptionCode;
-import newstock.exception.type.DbException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,20 +16,32 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserCustomRepository userCustomRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
-    public UserResponse getUserById(int id) {
+    @Transactional
+    public UserResponse signupUser(UserRequest userRequest) {
 
+        // 비밀번호 해싱
+        String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
 
-        // UserCustomRepository 사용 경우 ( QueryDsl )
-        User user = userCustomRepository.findById(id)
-                .orElseThrow(()-> new DbException(ExceptionCode.USER_NOT_FOUND));
+        // User 엔티티 생성 및 저장
+        User newUser = User.builder()
+                .email(userRequest.getEmail())
+                .password(encodedPassword)
+                .username(userRequest.getUsername())
+                .nickname(userRequest.getNickname())
+                .build();
 
-        // UserRepository 사용 경우 ( JPA )
-        User user2 = userRepository.findById(id)
-                .orElseThrow(()-> new DbException(ExceptionCode.USER_NOT_FOUND));
+        User savedUser = userRepository.save(newUser);
 
-        return UserResponse.of(user.getName(), user.getNickname(), user.getEmail());
+        // UserResponse 반환
+        return UserResponse.builder()
+                .userId(savedUser.getUserId())
+                .email(savedUser.getEmail())
+                .username(savedUser.getUsername())
+                .nickname(savedUser.getNickname())
+                .build();
     }
 }

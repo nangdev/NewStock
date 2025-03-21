@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,16 +13,34 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long userId; // 유저 고유 아이디
+
+    @Column(unique = true)
+    private String email; // 유저 로그인 아이디(이메일)
+
+    @Column
+    private String password; // 유저 비밀번호
 
     @Column(nullable = false)
-    private String name;
+    private String username; // 유저 실명
 
     @Column(nullable = false)
-    private String nickname;
+    private String nickname; // 유저 닉네임
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Column
+    private String accessToken; // 어세스토큰
 
+    @Column
+    private String refreshToken; // 리프레시 토큰
 
+    @Column
+    private String refreshTokenExpires; // 리프레시 토큰 만료 기간
+
+    @Column
+    private String socialProvider; // 소셜 로그인 여부
+
+    @Column
+    private String fcmToken; // 알림 토큰
 }
+
+
