@@ -29,14 +29,14 @@ services:
     depends_on:
       - mysql
   
-  crawler:
+  crawl:
     build:
-      context: ./crawler
+      context: ./crawl
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
     env_file:
-      - ./crawler/.env
+      - ./crawl/.env
     restart: unless-stopped
     depends_on:
       - mysql
