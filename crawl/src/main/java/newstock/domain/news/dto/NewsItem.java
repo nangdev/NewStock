@@ -33,4 +33,5 @@ public class NewsItem {
 
     String keyword;
 
+
 }

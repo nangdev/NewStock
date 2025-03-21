@@ -30,14 +30,20 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
     private static final Duration WAIT_TIMEOUT = Duration.ofSeconds(10);
     private static final Duration OLDER_THAN_DURATION = Duration.ofMinutes(1); // 테스트용 1분 전 기준
 
+    /**
+     * 주어진 종목명에 대한 뉴스들을 수집한 후 리스트로 반환합니다.
+     * 나중에 AI 필터링 등의 추가 처리를 위해 이 리스트를 활용할 수 있습니다.
+     */
     @Override
-    public void fetchNews(String stockName) throws InterruptedException {
+    public List<NewsItem> fetchNews(String stockName) throws InterruptedException {
+        // WebDriver 설정
         WebDriverManager.chromedriver().browserVersion("134.0.6998.89").setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
         WebDriver driver = new ChromeDriver(options);
         WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
 
+        // 뉴스 목록 페이지 URL 구성
         String baseUrl = "https://search.naver.com/search.naver?where=news&query=" + stockName +
                 "&sm=tab_opt&sort=1&photo=0&field=0&pd=0&ds=&de=&docid=&related=0&mynews=0" +
                 "&office_type=0&office_section_code=0&news_office_checked=&nso=so%3Add%2Cp%3Aall" +
@@ -45,10 +51,13 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
         int start = 1;
         boolean isLastPage = false;
         boolean stopCrawling = false;
+        // 임계 시간: 현재 시간 기준 OLDER_THAN_DURATION 이전인 뉴스는 수집하지 않음
         Instant thresholdTime = Instant.now().minus(OLDER_THAN_DURATION);
 
+        // 수집된 뉴스 항목들을 저장할 리스트
         List<NewsItem> collectedNews = new ArrayList<>();
 
+        // 목록 페이지를 순회하며 뉴스 수집
         while (!isLastPage && !stopCrawling) {
             String listPageUrl = baseUrl + "&start=" + start;
             log.info("목록 페이지 URL: {}", listPageUrl);
@@ -68,12 +77,15 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
                 break;
             }
 
+            // 1단계: 목록 페이지에서 기본 정보(제목, 네이버뉴스 링크) 추출
             List<NewsItem> basicNewsItems = extractBasicNewsItems(liElements);
 
+            // 2단계: 각 뉴스 항목별로 개별 기사 페이지에서 추가 정보 수집
             for (NewsItem item : basicNewsItems) {
                 enrichNewsItem(driver, wait, item);
                 log.info("수집 뉴스: 제목: {}, 작성시간: {}", item.getTitle(), item.getPublishedDate());
 
+                // 필수 추가 정보가 없으면 건너뜁니다.
                 if (!isNewsItemValid(item)) {
                     log.info("필수 추가 정보 부족으로 뉴스 건너뜀: {}", item.getUrl());
                     continue;
@@ -104,13 +116,19 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
         for (NewsItem news : collectedNews) {
             log.info(news.toString());
         }
+        return collectedNews;
     }
 
+    /**
+     * 목록 페이지에서 li 태그들을 순회하며 기본 정보(제목, 네이버뉴스 링크)를 추출하여 리스트로 반환합니다.
+     */
     private List<NewsItem> extractBasicNewsItems(List<WebElement> liElements) {
         List<NewsItem> basicNewsItems = new ArrayList<>();
         for (WebElement li : liElements) {
             try {
-                List<WebElement> infoLinkElems = li.findElements(By.xpath(".//div[contains(@class, 'info_group')]//a[contains(text(), '네이버뉴스')]"));
+                List<WebElement> infoLinkElems = li.findElements(
+                        By.xpath(".//div[contains(@class, 'info_group')]//a[contains(text(), '네이버뉴스')]")
+                );
                 if (infoLinkElems.isEmpty()) {
                     continue;
                 }
@@ -137,32 +155,37 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
         return basicNewsItems;
     }
 
+    /**
+     * 개별 뉴스 기사 페이지로 이동하여 추가 정보를 수집합니다.
+     */
     private void enrichNewsItem(WebDriver driver, WebDriverWait wait, NewsItem item) {
         try {
             driver.get(item.getUrl());
             wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
             String articleHtml = driver.getPageSource();
-            org.jsoup.nodes.Document doc = org.jsoup.Jsoup.parse(articleHtml);
+            var doc = org.jsoup.Jsoup.parse(articleHtml);
 
+            // 본문 추출: ArticleCleaner를 사용하고, 내용이 없으면 <article id="dic_area">에서 직접 추출
             String content = ArticleCleaner.extractMeaningfulContent(articleHtml);
             if (content == null || content.trim().isEmpty()) {
-                org.jsoup.nodes.Element articleElem = doc.getElementById("dic_area");
+                var articleElem = doc.getElementById("dic_area");
                 if (articleElem != null) {
                     content = articleElem.text().trim();
                 }
             }
             item.setContent(content);
 
-            org.jsoup.nodes.Element metaDesc = doc.selectFirst("meta[property=og:description]");
+            // 메타 태그에서 설명과 대표 이미지 추출
+            var metaDesc = doc.selectFirst("meta[property=og:description]");
             if (metaDesc != null) {
                 item.setDescription(metaDesc.attr("content"));
             }
-
-            org.jsoup.nodes.Element metaImage = doc.selectFirst("meta[property=og:image]");
+            var metaImage = doc.selectFirst("meta[property=og:image]");
             if (metaImage != null) {
                 item.setNewsImage(metaImage.attr("content"));
             }
 
+            // 언론사 로고 및 이름 추출
             List<WebElement> logoElems = driver.findElements(By.cssSelector("img.media_end_head_top_logo_img.light_type"));
             if (!logoElems.isEmpty()) {
                 WebElement logoElem = logoElems.get(0);
@@ -178,7 +201,10 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
                 item.setPress(pressName);
             }
 
-            List<WebElement> timeElems = driver.findElements(By.cssSelector("span.media_end_head_info_datestamp_time._ARTICLE_DATE_TIME"));
+            // 작성 시간 추출
+            List<WebElement> timeElems = driver.findElements(
+                    By.cssSelector("span.media_end_head_info_datestamp_time._ARTICLE_DATE_TIME")
+            );
             if (!timeElems.isEmpty()) {
                 String publishedStr = timeElems.get(0).getAttribute("data-date-time");
                 item.setPublishedDate(publishedStr);
@@ -189,6 +215,9 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
         }
     }
 
+    /**
+     * 필수 추가 정보(본문, 설명, 대표 이미지, 언론사, 로고, 작성시간)가 모두 존재하는지 검증합니다.
+     */
     private boolean isNewsItemValid(NewsItem item) {
         return !((item.getContent() == null || item.getContent().trim().isEmpty()) &&
                 (item.getDescription() == null || item.getDescription().trim().isEmpty()) &&
