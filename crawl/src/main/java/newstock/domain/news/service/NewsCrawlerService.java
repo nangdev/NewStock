@@ -1,4 +1,4 @@
-package newstock.domain.crawl.service;
+package newstock.domain.news.service;
 
 public interface NewsCrawlerService {
 

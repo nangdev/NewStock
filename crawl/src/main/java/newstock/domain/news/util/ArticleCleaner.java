@@ -1,4 +1,4 @@
-package newstock.domain.crawl.util;
+package newstock.domain.news.util;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

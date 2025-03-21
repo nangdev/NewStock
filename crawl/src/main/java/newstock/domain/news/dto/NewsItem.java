@@ -1,4 +1,4 @@
-package newstock.domain.crawl.dto;
+package newstock.domain.news.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

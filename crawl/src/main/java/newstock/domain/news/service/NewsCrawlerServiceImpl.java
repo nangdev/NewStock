@@ -1,9 +1,9 @@
-package newstock.domain.crawl.service;
+package newstock.domain.news.service;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
-import newstock.domain.crawl.dto.NewsItem;
-import newstock.domain.crawl.util.ArticleCleaner;
+import newstock.domain.news.dto.NewsItem;
+import newstock.domain.news.util.ArticleCleaner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
