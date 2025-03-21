@@ -1,39 +1,43 @@
 package newstock.external.kis;
 
-import lombok.RequiredArgsConstructor;
-import newstock.external.kis.request.KisWebSocketKeyRequest;
-import newstock.external.kis.response.KisWebSocketKeyResponse;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import jakarta.websocket.*;
+import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
 
-@Service
-@RequiredArgsConstructor
+@ClientEndpoint
+@Slf4j
 public class KisWebSocketClient {
-    @Value("${kis.app-key}")
-    private String appKey;
-    @Value("${kis.secret-key}")
-    private String secretKey;
+    private Session session;
 
-    private final WebClient webClient;
-
-    private static final String BASE_URL = "https://openapi.koreainvestment.com";
-    private static final int PORT = 9443;   // 실전투자계좌포트
-    private static final String GRANT_TYPE = "client_credentials";
-
-    public KisWebSocketKeyResponse getWebSocketKey() {
-        String endPoint = "/oauth2/Approval";
-
-        KisWebSocketKeyRequest requestDto = new KisWebSocketKeyRequest();
-        requestDto.setGrantType(GRANT_TYPE);
-        requestDto.setAppkey(appKey);
-        requestDto.setSecretkey(secretKey);
-
-        return webClient.post()
-                .uri(BASE_URL+":"+PORT+endPoint)
-                .bodyValue(requestDto)
-                .retrieve()
-                .bodyToMono(KisWebSocketKeyResponse.class)
-                .block();
+    public boolean isConnected() {
+        return session != null && session.isOpen();
     }
+
+    public void connect() throws Exception {
+        try {
+            URI endpointURI = new URI("ws://ops.koreainvestment.com:21000");
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            container.connectToServer(this, endpointURI);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @OnOpen
+    public void onOpen(Session session) {
+        this.session = session;
+        log.info("한투 웹소켓 연결 성공");
+    }
+
+    @OnMessage
+    public void onMessage(String message) {
+        log.info(message);
+    }
+
+    @OnClose
+    public void onClose(Session session) {
+        this.session = null;
+        log.info("한투 웹소켓 연결 종료");
+    }
+
 }
