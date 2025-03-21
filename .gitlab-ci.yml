@@ -7,7 +7,7 @@ variables:
 deploy:
   stage: deploy
   tags:
-    - success
+    - newstock
   image: alpine:latest
   before_script:
     - apk add --no-cache openssh-client
