@@ -2,34 +2,34 @@ package newstock.domain.news.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import newstock.domain.news.enums.KospiStock;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class NewsCrawlerScheduler {
 
-    // KafkaTemplate을 주입받아서 메시지 전송에 사용합니다.
     private final KafkaTemplate<String, String> kafkaTemplate;
     private static final String TOPIC = "news-crawl-topic";
 
-    // 크롤링할 종목 리스트 정의
-    private final List<String> stockNames = List.of("삼성전자", "현대자동차", "LG전자", "네이버", "카카오");
-
-    // 매 분 0초마다 실행 (cron expression: "0 * * * * *")
+    // 스케줄러가 매 분 0초마다 실행됩니다.
+    // 여기서는 각 종목에 대해 stockName, stockCode를 전송합니다.
     @Scheduled(cron = "0 * * * * *")
     public void scheduleNewsCrawling() {
-        for (String stock : stockNames) {
+        for (KospiStock stock : KospiStock.values()) {
             try {
-                // 각 종목명을 Kafka 토픽으로 전송
-                kafkaTemplate.send(TOPIC, stock);
-                log.info("Kafka 메시지 전송 완료: {}", stock);
+                String message = String.format(
+                        "{\"stockName\":\"%s\", \"stockCode\":\"%s\"}",
+                        stock.getName(), stock.getCode());
+
+                // stock.getCode()를 key로 지정하여 메시지가 파티셔닝되도록 합니다.
+                kafkaTemplate.send(TOPIC, stock.getCode(), message);
+                log.info("Kafka 메시지 전송 완료: {}", message);
             } catch (Exception e) {
-                log.error("Kafka 메시지 전송 중 오류 발생 ({}): {}", stock, e.getMessage());
+                log.error("Kafka 메시지 전송 중 오류 발생 ({}): {}", stock.getName(), e.getMessage());
             }
         }
     }
