@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
+
 public class KisOAuthClient {
     @Value("${kis.app-key}")
     private String appKey;

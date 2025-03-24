@@ -1,5 +1,7 @@
 package newstock.common.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import newstock.external.kis.KisOAuthClient;
 import newstock.external.kis.KisWebSocketClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,8 +9,6 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-
-import java.net.URI;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -27,7 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     @Bean
-    public KisWebSocketClient kisWebSocketClient() throws Exception {
-        return new KisWebSocketClient();
+    public KisWebSocketClient kisWebSocketClient(KisOAuthClient authClient, ObjectMapper objectMapper) throws Exception {
+        return new KisWebSocketClient(authClient, objectMapper);
     }
 }
