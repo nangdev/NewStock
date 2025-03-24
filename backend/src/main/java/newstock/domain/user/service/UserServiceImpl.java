@@ -1,13 +1,13 @@
 package newstock.domain.user.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import newstock.controller.request.UserRequest;
 import newstock.controller.response.UserResponse;
 import newstock.domain.user.entity.User;
-import newstock.domain.user.repository.UserCustomRepository;
 import newstock.domain.user.repository.UserRepository;
-import newstock.exception.ExceptionCode;
-import newstock.exception.type.DbException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,20 +16,31 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserCustomRepository userCustomRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
-    public UserResponse getUserById(int id) {
+    @Transactional
+    public UserResponse signupUser(UserRequest userRequest) {
+        // 이메일 중복 체크
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
 
+        // 비밀번호 해싱
+        String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
 
-        // UserCustomRepository 사용 경우 ( QueryDsl )
-        User user = userCustomRepository.findById(id)
-                .orElseThrow(()-> new DbException(ExceptionCode.USER_NOT_FOUND));
+        // User 엔티티 생성 및 저장
+        User newUser = User.of(userRequest, encodedPassword);
+        User savedUser = userRepository.save(newUser);
 
-        // UserRepository 사용 경우 ( JPA )
-        User user2 = userRepository.findById(id)
-                .orElseThrow(()-> new DbException(ExceptionCode.USER_NOT_FOUND));
+        // UserResponse 반환
+        return UserResponse.of(savedUser);
+    }
 
-        return UserResponse.of(user.getName(), user.getNickname(), user.getEmail());
+    // 이메일 중복 체크 기능
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

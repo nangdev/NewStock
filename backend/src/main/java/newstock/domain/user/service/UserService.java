@@ -1,8 +1,14 @@
 package newstock.domain.user.service;
 
+import newstock.controller.request.UserRequest;
 import newstock.controller.response.UserResponse;
 
 public interface UserService {
 
-    UserResponse getUserById(int id);
+    // 회원가입
+    UserResponse signupUser(UserRequest userRequest);
+
+    // 이메일 중복체크
+    boolean existsByEmail(String email);
+
 }
