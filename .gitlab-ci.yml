@@ -73,8 +73,8 @@ deploy:
           
           # 크롤러만 재배포
           echo \"dev/crawl 브랜치: 크롤러 서비스 배포 중...\"
-          docker-compose build crawl kafka zookeeper chrome selenium-hub
-          docker-compose up -d --no-deps crawl kafka zookeeper chrome selenium-hub
+          docker-compose build crawl 
+          docker-compose up -d --no-deps crawl
           
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/be\" ]]; then
           # 모든 환경 변수 설정
