@@ -2,6 +2,7 @@ package newstock.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import newstock.controller.request.UserRequest;
 
 @Entity
 @Data
@@ -22,7 +23,7 @@ public class User {
     private String password; // 유저 비밀번호
 
     @Column(nullable = false)
-    private String username; // 유저 실명
+    private String userName; // 유저 실명
 
     @Column(nullable = false)
     private String nickname; // 유저 닉네임
@@ -41,6 +42,21 @@ public class User {
 
     @Column
     private String fcmToken; // 알림 토큰
+
+    @Column(nullable = false)
+    private Byte role; // 유저 권한 0이면 NEW(신규 회원), 1이면 USER(기존 유저)
+
+    public static User of(UserRequest userRequest, String encodedPassword) {
+        return User.builder()
+                .email(userRequest.getEmail())
+                .password(encodedPassword)
+                .userName(userRequest.getUserName() )
+                .nickname(userRequest.getNickname())
+                .role((byte) 0)
+                .build();
+    }
 }
+
+
 
 

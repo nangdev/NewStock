@@ -26,16 +26,13 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/v1/users",
-                                "/api/v1/users/check-email",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html," +
-                                    HttpMethod.OPTIONS, "/**"  // preflight 요청 허용).permitAll() // 인증 없이 허용
-                        ).permitAll()// 나머지는 인증 필요
-                        .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/check-email").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().permitAll()
                 );
+
         return http.build();
     }
 }

@@ -10,7 +10,7 @@ import lombok.Data;
 public class UserDto {
 
     private String email;
-    private String username;
+    private String userName;
     private String nickname;
 
 }

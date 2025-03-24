@@ -8,6 +8,7 @@ import newstock.controller.request.UserRequest;
 import newstock.controller.response.UserResponse;
 import newstock.domain.user.service.UserService;
 import newstock.exception.ExceptionCode;
+import newstock.exception.type.DuplicateEmailException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,18 +27,11 @@ public class UserController {
      * @return 생성된 사용자 정보
      */
     @PostMapping("")
-    public ResponseEntity<?> signupUser(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<UserResponse> signupUser(@RequestBody UserRequest userRequest) {
         log.info("회원가입 요청: {}", userRequest.getEmail());
-// 이메일 중복 시 예외 대신 메시지 직접 반환
+        // 이메일 중복
         if (userService.existsByEmail(userRequest.getEmail())) {
-            ExceptionCode code = ExceptionCode.VALIDATION_ERROR;
-            log.warn("회원가입 실패 - 중복 이메일: {}", code.getCode(), userRequest.getEmail());
-
-            ExceptionResponse errorResponse = ExceptionResponse.builder()
-                    .code(1001) // VALIDATION_ERROR
-                    .message("이미 사용 중인 이메일입니다.")
-                    .build();
-            return ResponseEntity.badRequest().body(errorResponse);
+            throw new DuplicateEmailException();
         }
 
         UserResponse userResponse = userService.signupUser(userRequest);

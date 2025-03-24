@@ -2,10 +2,7 @@ package newstock.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import newstock.common.dto.ExceptionResponse;
-import newstock.exception.type.BusinessException;
-import newstock.exception.type.DbException;
-import newstock.exception.type.ExternalApiException;
-import newstock.exception.type.ValidationException;
+import newstock.exception.type.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

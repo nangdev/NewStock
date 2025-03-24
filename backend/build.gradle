@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.4.3'
+	id 'org.springframework.boot' version '3.3.9'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -36,7 +36,7 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka'
 
 	// swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
 	// QueryDsl
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"

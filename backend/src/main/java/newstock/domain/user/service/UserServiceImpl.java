@@ -31,22 +31,11 @@ public class UserServiceImpl implements UserService {
         String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
 
         // User 엔티티 생성 및 저장
-        User newUser = User.builder()
-                .email(userRequest.getEmail())
-                .password(encodedPassword)
-                .username(userRequest.getUsername())
-                .nickname(userRequest.getNickname())
-                .build();
-
+        User newUser = User.of(userRequest, encodedPassword);
         User savedUser = userRepository.save(newUser);
 
         // UserResponse 반환
-        return UserResponse.builder()
-                .userId(savedUser.getUserId())
-                .email(savedUser.getEmail())
-                .username(savedUser.getUsername())
-                .nickname(savedUser.getNickname())
-                .build();
+        return UserResponse.of(savedUser);
     }
 
     // 이메일 중복 체크 기능
@@ -54,6 +43,4 @@ public class UserServiceImpl implements UserService {
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
-
-
 }
