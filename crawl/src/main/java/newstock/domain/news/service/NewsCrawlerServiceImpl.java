@@ -3,6 +3,7 @@ package newstock.domain.news.service;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
 import newstock.domain.news.dto.NewsItem;
+import newstock.domain.news.dto.StockMessage;
 import newstock.domain.news.util.ArticleCleaner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -35,7 +36,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
      * 나중에 AI 필터링 등의 추가 처리를 위해 이 리스트를 활용할 수 있습니다.
      */
     @Override
-    public List<NewsItem> fetchNews(String stockName) throws InterruptedException {
+    public List<NewsItem> fetchNews(StockMessage stockMessage) throws InterruptedException {
         // WebDriver 설정
         WebDriverManager.chromedriver().browserVersion("134.0.6998.89").setup();
         ChromeOptions options = new ChromeOptions();
@@ -44,7 +45,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
         WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
 
         // 뉴스 목록 페이지 URL 구성
-        String baseUrl = "https://search.naver.com/search.naver?where=news&query=" + stockName +
+        String baseUrl = "https://search.naver.com/search.naver?where=news&query=" + stockMessage.getStockName() +
                 "&sm=tab_opt&sort=1&photo=0&field=0&pd=0&ds=&de=&docid=&related=0&mynews=0" +
                 "&office_type=0&office_section_code=0&news_office_checked=&nso=so%3Add%2Cp%3Aall" +
                 "&is_sug_officeid=0&office_category=0&service_area=0";
@@ -60,7 +61,6 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
         // 목록 페이지를 순회하며 뉴스 수집
         while (!isLastPage && !stopCrawling) {
             String listPageUrl = baseUrl + "&start=" + start;
-            log.info("목록 페이지 URL: {}", listPageUrl);
             driver.get(listPageUrl);
 
             try {
@@ -71,7 +71,6 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
             }
 
             List<WebElement> liElements = driver.findElements(By.cssSelector("ul.list_news li.bx"));
-            log.info("페이지 {}에서 뉴스 개수: {}", start, liElements.size());
             if (liElements.isEmpty()) {
                 isLastPage = true;
                 break;
@@ -87,19 +86,18 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 
                 // 필수 추가 정보가 없으면 건너뜁니다.
                 if (!isNewsItemValid(item)) {
-                    log.info("필수 추가 정보 부족으로 뉴스 건너뜀: {}", item.getUrl());
                     continue;
                 }
 
                 if (item.getPublishedDate() != null) {
                     LocalDateTime publishedTime = LocalDateTime.parse(item.getPublishedDate(), DATE_FORMATTER);
-                    Instant publishedInstant = publishedTime.atZone(ZoneId.systemDefault()).toInstant();
+                    Instant publishedInstant = publishedTime.atZone(ZoneId.of("Asia/Seoul")).toInstant();
                     if (publishedInstant.isBefore(thresholdTime)) {
-                        log.info("오래된 뉴스 발견 (작성시간: {}) -> 이후 기사들은 수집하지 않습니다.", item.getPublishedDate());
                         stopCrawling = true;
                         break;
                     }
                 }
+                item.setStockCode(stockMessage.getStockCode());
                 collectedNews.add(item);
             }
 
@@ -112,7 +110,6 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
         }
         driver.quit();
 
-        log.info("수집된 뉴스 항목:");
         for (NewsItem news : collectedNews) {
             log.info(news.toString());
         }
