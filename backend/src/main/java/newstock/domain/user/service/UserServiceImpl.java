@@ -22,6 +22,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse signupUser(UserRequest userRequest) {
+        // 이메일 중복 체크
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
 
         // 비밀번호 해싱
         String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
@@ -44,4 +48,12 @@ public class UserServiceImpl implements UserService {
                 .nickname(savedUser.getNickname())
                 .build();
     }
+
+    // 이메일 중복 체크 기능
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+
 }
