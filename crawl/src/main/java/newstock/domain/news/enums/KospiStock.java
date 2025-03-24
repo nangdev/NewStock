@@ -1,5 +1,8 @@
 package newstock.domain.news.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum KospiStock {
     SAMSUNG_ELECTRONICS("삼성전자", "005930"),
     SK_HYUNIX("SK하이닉스", "000660"),
@@ -58,14 +61,6 @@ public enum KospiStock {
     KospiStock(String name, String code) {
         this.name = name;
         this.code = code;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getCode() {
-        return code;
     }
 
 }
