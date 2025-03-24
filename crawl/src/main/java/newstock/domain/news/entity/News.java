@@ -2,6 +2,7 @@ package newstock.domain.news.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import newstock.domain.news.dto.NewsItem;
 
 @Setter
 @Getter
@@ -41,18 +42,17 @@ public class News {
 
     String keyword;
 
-    public static News of(newstock.domain.news.dto.NewsItem dto) {
+    public static News of(NewsItem newsItem) {
         return News.builder()
-                .stockCode(dto.getStockCode())
-                .title(dto.getTitle())
-                .description(dto.getDescription())
-                .content(dto.getContent())
-                .newsImage(dto.getNewsImage())
-                .url(dto.getUrl())
-                .press(dto.getPress())
-                .pressLogo(dto.getPressLogo())
-                .publishedDate(dto.getPublishedDate())
-                // 추후 AI 처리 후 업데이트할 정보는 null로 설정
+                .stockCode(newsItem.getStockCode())
+                .title(newsItem.getTitle())
+                .description(newsItem.getDescription())
+                .content(newsItem.getContent())
+                .newsImage(newsItem.getNewsImage())
+                .url(newsItem.getUrl())
+                .press(newsItem.getPress())
+                .pressLogo(newsItem.getPressLogo())
+                .publishedDate(newsItem.getPublishedDate())
                 .newsSummary(null)
                 .score(null)
                 .keyword(null)
