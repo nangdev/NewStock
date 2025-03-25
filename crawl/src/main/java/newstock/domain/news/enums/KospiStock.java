@@ -43,17 +43,7 @@ public enum KospiStock {
     WOORI_FINANCIAL("우리금융지주", "316140"),
     KT("KT", "030200"),
     POSCO_FUTURE_M("포스코퓨처엠", "003670"),
-    SK_SQUARE("SK스퀘어", "402340"),
-    SAMSUNG_HEAVY_INDUSTRIES("삼성중공업", "010140"),
-    KAKAO_BANK("카카오뱅크", "323410"),
-    HYUNDAI_GLOVIS("현대글로비스", "086280"),
-    SK("SK", "034730"),
-    SAMSUNG_SDS("삼성에스디에스", "018260"),
-    YUHAN("유한양행", "000100"),
-    SAMSUNG_ELECTRO_MECHANICS("삼성전기", "009150"),
-    KOREAN_AIR("대한항공", "003490"),
-    SK_BIOPHARM("SK바이오팜", "326030"),
-    HANMI_SEMICON("한미반도체", "042700");
+    SK_SQUARE("SK스퀘어", "402340");
 
     private final String name;
     private final String code;
