@@ -1,6 +1,7 @@
 package newstock.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import newstock.domain.stock.service.StockPriceService;
 import newstock.external.kis.KisOAuthClient;
 import newstock.external.kis.KisWebSocketClient;
 import org.springframework.context.annotation.Bean;
@@ -21,13 +22,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws/topic/rtp")
-                .setAllowedOrigins("*")
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
 
     @Bean
-    public KisWebSocketClient kisWebSocketClient(KisOAuthClient authClient, ObjectMapper objectMapper) throws Exception {
-        return new KisWebSocketClient(authClient, objectMapper);
+    public KisWebSocketClient kisWebSocketClient(
+            KisOAuthClient authClient, ObjectMapper objectMapper, StockPriceService stockPriceService
+    ) throws Exception {
+        return new KisWebSocketClient(authClient, objectMapper, stockPriceService);
     }
 }
