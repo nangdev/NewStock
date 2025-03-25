@@ -1,5 +1,6 @@
 package newstock.external.kis;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.websocket.*;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class KisWebSocketClient {
     private Session session;
-
+    private RemoteEndpoint.Basic remote = null;
     private final KisOAuthClient authClient;
     private final ObjectMapper objectMapper;
     private final StockPriceService stockPriceService;
@@ -44,8 +45,7 @@ public class KisWebSocketClient {
         this.session = session;
         log.info("한투 웹소켓 연결 성공");
 
-        RemoteEndpoint.Basic remote = session.getBasicRemote();
-
+        this.remote = session.getBasicRemote();
 
         try {
             String approvalKey = authClient.getWebSocketKey().getApprovalKey();
@@ -74,7 +74,7 @@ public class KisWebSocketClient {
                 msg.setBody(body);
                 String jsonString = objectMapper.writeValueAsString(msg);
 
-                remote.sendText(jsonString);
+//                remote.sendText(jsonString);
                 log.info("subscribe {}", code);
             }
 
@@ -90,12 +90,18 @@ public class KisWebSocketClient {
 
     @OnMessage
     public void onMessage(String message) {
+
         log.info(message);
         // 파싱
         try {
             // 구독 성공, pingpong -> json 형태
             if (isJson(message)) {
-
+                JsonNode node = objectMapper.readTree(message);
+                // pinppong
+                if (node.get("header").get("tr_id").asText().equals("PINGPONG")) {
+                    remote.sendText(message);   // 그대로 응답
+                    log.info(message);
+                }
             }
             // 주가 데이터
             else {
@@ -141,11 +147,5 @@ public class KisWebSocketClient {
     private boolean isJson(String message) {
         return message.trim().startsWith("{");
     }
-
-
-
-
-
-
 
 }
