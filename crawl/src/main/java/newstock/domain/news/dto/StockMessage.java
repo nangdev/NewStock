@@ -11,4 +11,6 @@ public class StockMessage {
 
     private String stockCode;
 
+    private String schedulerTime;
+
 }

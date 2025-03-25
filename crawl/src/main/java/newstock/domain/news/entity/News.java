@@ -36,6 +36,7 @@ public class News {
 
     String publishedDate;
 
+    @Lob
     String newsSummary;
 
     String score;
@@ -53,7 +54,7 @@ public class News {
                 .press(newsItem.getPress())
                 .pressLogo(newsItem.getPressLogo())
                 .publishedDate(newsItem.getPublishedDate())
-                .newsSummary(null)
+                .newsSummary(newsItem.getNewsSummary())
                 .score(null)
                 .keyword(null)
                 .build();

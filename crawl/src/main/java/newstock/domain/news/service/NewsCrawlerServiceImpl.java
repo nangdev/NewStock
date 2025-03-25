@@ -32,9 +32,9 @@ import java.util.List;
 public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final Duration WAIT_TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration WAIT_TIMEOUT = Duration.ofSeconds(3);
     private static final Duration OLDER_THAN_DURATION = Duration.ofMinutes(1); // 테스트용 1분 전 기준
-    
+
     // Selenium Grid URL을 환경 변수에서 가져옴
     @Value("${selenium.remote.url:http://selenium-hub:4444/wd/hub}")
     private String remoteUrl;
@@ -54,7 +54,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");
             options.addArguments("--disable-gpu");
-            
+
             // RemoteWebDriver 사용
             driver = new RemoteWebDriver(new URL(remoteUrl), options);
             log.info("RemoteWebDriver 초기화 성공");
@@ -67,9 +67,14 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
             options.addArguments("--headless");
             driver = new ChromeDriver(options);
         }
-        
-        WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
 
+        WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
+        // 로컬 테스트용
+//        WebDriverManager.chromedriver().browserVersion("134.0.6998.89").setup();
+//        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("--headless");
+//        WebDriver driver = new ChromeDriver(options);
+//        WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
         // 뉴스 목록 페이지 URL 구성
         String baseUrl = "https://search.naver.com/search.naver?where=news&query=" + stockMessage.getStockName() +
                 "&sm=tab_opt&sort=1&photo=0&field=0&pd=0&ds=&de=&docid=&related=0&mynews=0" +
@@ -78,8 +83,11 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
         int start = 1;
         boolean isLastPage = false;
         boolean stopCrawling = false;
-        // 임계 시간: 현재 시간 기준 OLDER_THAN_DURATION 이전인 뉴스는 수집하지 않음
-        Instant thresholdTime = Instant.now().minus(OLDER_THAN_DURATION);
+
+        // 스케줄러에서 전달받은 시간을 기준으로 파싱
+        Instant schedulerTime = Instant.parse(stockMessage.getSchedulerTime());
+        // OLDER_THAN_DURATION 이전의 뉴스는 수집하지 않도록 기준 시간을 계산
+        Instant thresholdTime = schedulerTime.minus(OLDER_THAN_DURATION);
 
         // 수집된 뉴스 항목들을 저장할 리스트
         List<NewsItem> collectedNews = new ArrayList<>();
@@ -109,7 +117,6 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
                 // 2단계: 각 뉴스 항목별로 개별 기사 페이지에서 추가 정보 수집
                 for (NewsItem item : basicNewsItems) {
                     enrichNewsItem(driver, wait, item);
-                    log.info("수집 뉴스: 제목: {}, 작성시간: {}", item.getTitle(), item.getPublishedDate());
 
                     // 필수 추가 정보가 없으면 건너뜁니다.
                     if (!isNewsItemValid(item)) {
@@ -132,8 +139,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
                     break;
                 }
                 start += 10;
-                int sleepTime = 1000 + (int) (Math.random() * 1000);
-                Thread.sleep(sleepTime);
+                Thread.sleep(500 + (int)(Math.random() * 500)); // 500ms ~ 1000ms 사이
             }
         } finally {
             // 항상 WebDriver를 종료하도록 보장
@@ -146,9 +152,6 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
             }
         }
 
-        for (NewsItem news : collectedNews) {
-            log.info(news.toString());
-        }
         return collectedNews;
     }
 
