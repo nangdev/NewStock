@@ -4,17 +4,13 @@ import lombok.Getter;
 import newstock.exception.ExceptionCode;
 
 @Getter
-public class BusinessException extends RuntimeException {
-
-    private final ExceptionCode exceptionCode;
+public class BusinessException extends InternalException {
 
     public BusinessException(ExceptionCode exceptionCode) {
-        super(exceptionCode.getMessage());
-        this.exceptionCode = exceptionCode;
+        super(exceptionCode);
     }
 
     public BusinessException(ExceptionCode exceptionCode, String message) {
-        super(message);
-        this.exceptionCode = exceptionCode;
+        super(exceptionCode, message);
     }
 }
