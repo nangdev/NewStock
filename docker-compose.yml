@@ -25,6 +25,8 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
     env_file:
       - ./.env
+    volumes:
+      - /home/ubuntu/imgs/stock_images:/app/uploads
     restart: unless-stopped
     depends_on:
       - mysql
