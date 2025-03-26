@@ -1,6 +1,7 @@
 import BlurOverlay from 'components/BlurOverlay';
 import CustomButton from 'components/CustomButton';
 import InputField from 'components/user/InputField';
+import { ROUTE } from 'constants/routes';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
@@ -33,7 +34,7 @@ export default function SignUp() {
         </View>
       </View>
 
-      <BlurOverlay className="gap-4">
+      <BlurOverlay className="items-center gap-4">
         <View className="w-full flex-row gap-4">
           <InputField
             value={email}
@@ -71,12 +72,12 @@ export default function SignUp() {
 
         <CustomButton
           variant="semiRounded"
-          className="mt-4 shadow-lg shadow-black"
-          onPress={onSubmitSignUp}>
+          onPress={onSubmitSignUp}
+          className="mt-4 h-[45px] w-full flex-row items-center justify-center rounded-lg bg-primary shadow-lg shadow-black">
           회원가입
         </CustomButton>
 
-        <Link className="text-right text-sm text-text_gray underline" href="/user/signin">
+        <Link className="self-end text-sm text-text_gray underline" href={ROUTE.USER.LOGIN}>
           이미 회원이신가요? 로그인하기
         </Link>
       </BlurOverlay>
