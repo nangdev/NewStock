@@ -14,7 +14,7 @@ public class News {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int newsId;
+    private long newsId;
 
     private int stockCode;
 

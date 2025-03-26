@@ -6,24 +6,25 @@ import newstock.domain.news.entity.News;
 
 @Data
 @Builder
-public class TopNewsDto {
+public class StockNewsDto {
 
     private long newsId;
 
     private String title;
 
-    private String publishedDate;
+    private String description;
 
     private String score;
 
-    public static TopNewsDto of(News news) {
-        return TopNewsDto.builder()
+    private String publishedDate;
+
+    public static StockNewsDto of(News news) {
+        return StockNewsDto.builder()
                 .newsId(news.getNewsId())
                 .title(news.getTitle())
+                .description(news.getDescription())
                 .publishedDate(news.getPublishedDate())
                 .score(news.getScore())
                 .build();
     }
-
-
 }

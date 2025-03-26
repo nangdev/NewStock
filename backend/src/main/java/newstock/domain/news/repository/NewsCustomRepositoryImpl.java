@@ -22,7 +22,7 @@ public class NewsCustomRepositoryImpl implements NewsCustomRepository {
 
 
     @Override
-    public Optional<List<News>> getTopNewsByStockCode(int stockCode) {
+    public Optional<List<News>> getTopNewsListByStockCode(int stockCode) {
         return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(news)
                 .where(
@@ -33,5 +33,10 @@ public class NewsCustomRepositoryImpl implements NewsCustomRepository {
                 .limit(5)
                 .fetch());
 
+    }
+
+    @Override
+    public Optional<List<News>> getNewsListByStockCode(int stockCode) {
+        return Optional.empty();
     }
 }
