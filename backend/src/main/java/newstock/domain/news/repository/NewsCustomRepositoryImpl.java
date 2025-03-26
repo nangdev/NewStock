@@ -20,7 +20,6 @@ public class NewsCustomRepositoryImpl implements NewsCustomRepository {
         this.jpaQueryFactory = new JPAQueryFactory(entityManager);
     }
 
-
     @Override
     public Optional<List<News>> getTopNewsListByStockCode(int stockCode) {
         return Optional.ofNullable(jpaQueryFactory
@@ -33,10 +32,5 @@ public class NewsCustomRepositoryImpl implements NewsCustomRepository {
                 .limit(5)
                 .fetch());
 
-    }
-
-    @Override
-    public Optional<List<News>> getNewsListByStockCode(int stockCode) {
-        return Optional.empty();
     }
 }

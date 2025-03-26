@@ -7,8 +7,6 @@ import java.util.Optional;
 
 public interface NewsCustomRepository {
 
-    public Optional<List<News>> getTopNewsListByStockCode(int stockCode);
-
-    public Optional<List<News>> getNewsListByStockCode(int stockCode);
+    Optional<List<News>> getTopNewsListByStockCode(int stockCode);
 
 }

@@ -44,7 +44,7 @@ public class NewsController {
      * @return 개별 종목 뉴스
      */
     @GetMapping
-    @Operation(summary = "stockCode로 개별 종목 뉴스 조회", description = "종목코드를 사용하여 개별 종목 뉴스를 조회합니다.")
+    @Operation(summary = "stockCode로 개별 종목 뉴스 조회", description = "종목코드를 사용하여 개별 종목 뉴스 목록을 조회합니다.")
     public Api<StockNewsResponse> getNewsListByStockCode(
             @RequestParam(name = "stockCode") int stockCode,
             @RequestParam(name = "page") int page,
@@ -70,8 +70,13 @@ public class NewsController {
         return Api.ok(newsDetailResponse);
     }
 
+    /**
+     * stockCode로 Scraped News 조회
+     * @param stockCode 조회할 주식의 stockCode
+     * @return 스크랩 뉴스 리스트
+     */
     @GetMapping("/v1/news/scrap")
-    @Operation(summary = "stockCode로 개별 종목 뉴스 조회", description = "종목코드를 사용하여 개별 종목 뉴스를 조회합니다.")
+    @Operation(summary = "stockCode,userId로 스크랩 뉴스 조회", description = "종목코드와 유저 아이디를 사용하여 유저가 스크랩한 뉴스 목록을 조회합니다.")
     public Api<NewsScrapResponse> getNewsScrapListByStockCode(
             @RequestParam(name = "stockCode") int stockCode,
             @RequestParam(name = "page") int page,
