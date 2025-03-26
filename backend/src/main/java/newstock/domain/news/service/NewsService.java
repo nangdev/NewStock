@@ -6,6 +6,7 @@ import newstock.controller.request.StockNewsRequest;
 import newstock.controller.response.NewsDetailResponse;
 import newstock.controller.response.NewsScrapResponse;
 import newstock.controller.response.StockNewsResponse;
+import newstock.domain.news.dto.NewsScrapDto;
 import newstock.domain.news.dto.TopNewsDto;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface NewsService {
     NewsDetailResponse getNewsDetailByNewsId(NewsDetailRequest newsDetailRequest);
 
     NewsScrapResponse getNewsScrapListByStockCode(NewsScrapRequest newsScrapRequest);
+
+    void addNewsScrapByNewsId(NewsScrapDto newsScrapDto);
 }

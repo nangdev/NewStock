@@ -9,9 +9,11 @@ import newstock.controller.response.NewsDetailResponse;
 import newstock.controller.response.NewsScrapResponse;
 import newstock.controller.response.StockNewsResponse;
 import newstock.domain.news.dto.NewsDetailDto;
+import newstock.domain.news.dto.NewsScrapDto;
 import newstock.domain.news.dto.StockNewsDto;
 import newstock.domain.news.dto.TopNewsDto;
 import newstock.domain.news.entity.News;
+import newstock.domain.news.entity.NewsScrap;
 import newstock.domain.news.repository.NewsCustomRepository;
 import newstock.domain.news.repository.NewsRepository;
 import newstock.domain.news.repository.NewsScrapCustomRepository;
@@ -109,6 +111,9 @@ public class NewsServiceImpl implements NewsService {
         );
     }
 
-
+    @Override
+    public void addNewsScrapByNewsId(NewsScrapDto newsScrapDto) {
+        newsScrapRepository.save(newsScrapDto.toEntity());
+    }
 
 }

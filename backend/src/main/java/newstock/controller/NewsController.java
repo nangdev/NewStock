@@ -10,6 +10,7 @@ import newstock.controller.response.NewsDetailResponse;
 import newstock.controller.response.NewsScrapResponse;
 import newstock.controller.response.StockNewsResponse;
 import newstock.controller.response.TopNewsResponse;
+import newstock.domain.news.dto.NewsScrapDto;
 import newstock.domain.news.dto.TopNewsDto;
 import newstock.domain.news.service.NewsService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -89,6 +90,14 @@ public class NewsController {
         return Api.ok(newsScrapResponse);
     }
 
+    @PostMapping("/v1/news/scrap/{newsId}")
+    @Operation(summary = "newsId,userId로 뉴스 스크랩 추가", description = "뉴스아이디와 유저아이디를 통해 해당 뉴스를 스크랩합니다.")
+    public Api<Void> addNewsScrapByNewsId(@PathVariable int newsId, @AuthenticationPrincipal int userId){
+
+        newsService.addNewsScrapByNewsId(NewsScrapDto.of(userId,newsId));
+
+        return Api.ok();
+    }
 
 
 
