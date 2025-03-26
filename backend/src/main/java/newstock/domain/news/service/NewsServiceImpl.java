@@ -2,13 +2,22 @@ package newstock.domain.news.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import newstock.controller.request.NewsDetailRequest;
+import newstock.controller.request.NewsScrapRequest;
 import newstock.controller.request.StockNewsRequest;
+import newstock.controller.response.NewsDetailResponse;
+import newstock.controller.response.NewsScrapResponse;
 import newstock.controller.response.StockNewsResponse;
+import newstock.domain.news.dto.NewsDetailDto;
 import newstock.domain.news.dto.StockNewsDto;
 import newstock.domain.news.dto.TopNewsDto;
 import newstock.domain.news.entity.News;
 import newstock.domain.news.repository.NewsCustomRepository;
 import newstock.domain.news.repository.NewsRepository;
+import newstock.domain.news.repository.NewsScrapCustomRepository;
+import newstock.domain.news.repository.NewsScrapRepository;
+import newstock.exception.ExceptionCode;
+import newstock.exception.type.DbException;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +32,12 @@ public class NewsServiceImpl implements NewsService {
 
     private final NewsRepository newsRepository;
 
-    private final NewsCustomRepository newsCustomRepository;
+    private final NewsScrapRepository newsScrapRepository;
 
     @Override
     public List<TopNewsDto> getTopNewsListByStockCode(int stockCode) {
-        List<News> newsList = newsCustomRepository.getTopNewsListByStockCode(stockCode)
+
+        List<News> newsList = newsRepository.getTopNewsListByStockCode(stockCode)
                 .orElse(Collections.emptyList());
 
         return newsList.stream()
@@ -37,6 +47,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public StockNewsResponse getNewsListByStockCode(StockNewsRequest stockNewsRequest) {
+
         Sort sort;
         if ("score".equalsIgnoreCase(stockNewsRequest.getSort())) {
             sort = Sort.by("score").descending();
@@ -57,6 +68,47 @@ public class NewsServiceImpl implements NewsService {
                 .map(StockNewsDto::of)
                 .collect(Collectors.toList()));
     }
+
+    @Override
+    public NewsDetailResponse getNewsDetailByNewsId(NewsDetailRequest newsDetailRequest) {
+
+        News news = newsRepository.findById(newsDetailRequest.getNewsId())
+                .orElseThrow(() -> new DbException(ExceptionCode.NEWS_NOT_FOUND));
+
+        boolean isScraped = newsScrapRepository.existsByNewsIdAndUserId(newsDetailRequest.getNewsId(), newsDetailRequest.getUserId());
+
+        return NewsDetailResponse.of(NewsDetailDto.of(news), isScraped);
+    }
+
+    @Override
+    public NewsScrapResponse getNewsScrapListByStockCode(NewsScrapRequest newsScrapRequest) {
+        Sort sort;
+        if ("score".equalsIgnoreCase(newsScrapRequest.getSort())) {
+            sort = Sort.by("score").descending();
+        } else {
+            sort = Sort.by("publishedDate").descending();
+        }
+
+        Pageable pageable = PageRequest.of(newsScrapRequest.getPage(), newsScrapRequest.getCount(), sort);
+
+        Page<News> newsPage = newsScrapRepository.findScrappedNewsByUserIdAndStockCode(
+                newsScrapRequest.getUserId(),
+                newsScrapRequest.getStockCode(),
+                pageable
+        );
+
+        int totalPage = newsPage.getTotalPages();
+        if (newsPage.isEmpty()) {
+            return NewsScrapResponse.of(0, Collections.emptyList());
+        }
+
+        return NewsScrapResponse.of(totalPage,
+                newsPage.stream()
+                        .map(StockNewsDto::of)
+                        .collect(Collectors.toList())
+        );
+    }
+
 
 
 }

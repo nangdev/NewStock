@@ -8,13 +8,13 @@ import newstock.domain.news.entity.News;
 @Builder
 public class StockNewsDto {
 
-    private long newsId;
+    private int newsId;
 
     private String title;
 
     private String description;
 
-    private String score;
+    private int score;
 
     private String publishedDate;
 

@@ -8,13 +8,13 @@ import newstock.domain.news.entity.News;
 @Builder
 public class TopNewsDto {
 
-    private long newsId;
+    private int newsId;
 
     private String title;
 
     private String publishedDate;
 
-    private String score;
+    private int score;
 
     public static TopNewsDto of(News news) {
         return TopNewsDto.builder()

@@ -7,14 +7,13 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name="news")
 public class News {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long newsId;
+    private int newsId;
 
     private int stockCode;
 
@@ -38,7 +37,7 @@ public class News {
     @Lob
     private String newsSummary;
 
-    private String score;
+    private int score;
 
     private String keyword;
 
