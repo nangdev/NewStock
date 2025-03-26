@@ -1,7 +1,9 @@
 package newstock.exception.type;
 
+import lombok.Getter;
 import newstock.exception.ExceptionCode;
 
+@Getter
 public class InternalException extends RuntimeException {
 
     private final ExceptionCode exceptionCode;
@@ -14,10 +16,6 @@ public class InternalException extends RuntimeException {
     public InternalException(ExceptionCode exceptionCode, String message) {
       super(message);
       this.exceptionCode = exceptionCode;
-    }
-
-    public ExceptionCode getExceptionCode() {
-        return exceptionCode;
     }
 
 }

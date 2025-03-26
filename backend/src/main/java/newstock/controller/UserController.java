@@ -1,13 +1,10 @@
 package newstock.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import newstock.common.dto.ExceptionResponse;
 import newstock.controller.request.UserRequest;
 import newstock.controller.response.UserResponse;
 import newstock.domain.user.service.UserService;
-import newstock.exception.ExceptionCode;
 import newstock.exception.type.DuplicateEmailException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

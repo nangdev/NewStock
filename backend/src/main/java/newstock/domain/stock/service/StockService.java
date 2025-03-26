@@ -5,7 +5,6 @@ import newstock.domain.stock.dto.StockDto;
 import newstock.domain.stock.repository.StockRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -14,9 +13,10 @@ public class StockService {
     private final StockRepository stockRepository;
 
     public List<StockDto> findAll() {
-        List<StockDto> stockList = stockRepository.findAll()
+        return stockRepository.findAll()
                 .stream()
-                .map(stock -> Stock.of)
-
+                .map(StockDto::fromStock)
+                .toList();
     }
+
 }
