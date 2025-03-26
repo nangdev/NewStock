@@ -3,7 +3,6 @@ package newstock.controller.response;
 import lombok.Builder;
 import lombok.Getter;
 import newstock.domain.news.dto.StockNewsDto;
-import newstock.domain.news.dto.TopNewsDto;
 
 import java.util.List;
 

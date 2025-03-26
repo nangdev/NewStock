@@ -2,7 +2,6 @@ package newstock.controller.request;
 
 import lombok.Builder;
 import lombok.Getter;
-import newstock.domain.news.entity.News;
 
 @Getter
 @Builder

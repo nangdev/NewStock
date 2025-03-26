@@ -90,6 +90,10 @@ public class NewsController {
         return Api.ok(newsScrapResponse);
     }
 
+    /**
+     * newsId Scraped News 추가
+     * @param newsId 추가할 스크랩의 newsId
+     */
     @PostMapping("/scrap/{newsId}")
     @Operation(summary = "newsId,userId로 뉴스 스크랩 추가", description = "뉴스아이디와 유저아이디를 통해 해당 뉴스를 스크랩합니다.")
     public Api<Void> addNewsScrapByNewsId(@PathVariable int newsId, @AuthenticationPrincipal int userId){
@@ -99,6 +103,10 @@ public class NewsController {
         return Api.ok();
     }
 
+    /**
+     * newsId Scraped News 삭제
+     * @param newsId 삭제 스크랩의 newsId
+     */
     @DeleteMapping("/scrap/{newsId}")
     @Operation(summary = "newsId,userId로 뉴스 스크랩 삭제", description = "뉴스아이디와 유저아이디를 통해 해당 뉴스 스크랩을 삭제합니다.")
     public Api<Void> deleteNewsScrapByNewsId(@PathVariable int newsId, @AuthenticationPrincipal int userId){
