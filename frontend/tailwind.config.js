@@ -12,7 +12,7 @@ module.exports = {
         overlay: '#FFFFFF4D',
         text: '#000000',
         text_gray: '#857C7C',
-        text_weawk: '#C7C7C7',
+        text_weak: '#C7C7C7',
         stroke: '#D3D3D3',
         good: '#FF7D7D',
         bad: '#8484FF',
