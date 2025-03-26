@@ -21,4 +21,6 @@ public interface NewsService {
     NewsScrapResponse getNewsScrapListByStockCode(NewsScrapRequest newsScrapRequest);
 
     void addNewsScrapByNewsId(NewsScrapDto newsScrapDto);
+
+    void deleteNewsScrapByNewsId(NewsScrapDto newsScrapDto);
 }

@@ -13,18 +13,17 @@ import newstock.domain.news.dto.NewsScrapDto;
 import newstock.domain.news.dto.StockNewsDto;
 import newstock.domain.news.dto.TopNewsDto;
 import newstock.domain.news.entity.News;
-import newstock.domain.news.entity.NewsScrap;
-import newstock.domain.news.repository.NewsCustomRepository;
 import newstock.domain.news.repository.NewsRepository;
-import newstock.domain.news.repository.NewsScrapCustomRepository;
 import newstock.domain.news.repository.NewsScrapRepository;
 import newstock.exception.ExceptionCode;
 import newstock.exception.type.DbException;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,6 +83,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public NewsScrapResponse getNewsScrapListByStockCode(NewsScrapRequest newsScrapRequest) {
+
         Sort sort;
         if ("score".equalsIgnoreCase(newsScrapRequest.getSort())) {
             sort = Sort.by("score").descending();
@@ -111,9 +111,21 @@ public class NewsServiceImpl implements NewsService {
         );
     }
 
+    @Transactional
     @Override
     public void addNewsScrapByNewsId(NewsScrapDto newsScrapDto) {
+
         newsScrapRepository.save(newsScrapDto.toEntity());
+    }
+
+    @Override
+    public void deleteNewsScrapByNewsId(NewsScrapDto newsScrapDto) {
+
+        int scrapId = newsScrapRepository
+                .findIdByNewsIdAndUserId(newsScrapDto.getUserId(), newsScrapDto.getNewsId())
+                .orElseThrow(() -> new DbException(ExceptionCode.NEWS_SCRAP_NOT_FOUND));
+
+        newsScrapRepository.deleteById(scrapId);
     }
 
 }

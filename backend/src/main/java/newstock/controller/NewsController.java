@@ -62,7 +62,7 @@ public class NewsController {
      * @param newsId 조회할 주식의 newsId
      * @return 뉴스 상세 내용
      */
-    @GetMapping("/v1/news/{newsId}")
+    @GetMapping("/{newsId}")
     @Operation(summary = "NewsId로 뉴스 상세 내용 조회", description = "뉴스아이디를 사용하여 뉴스 상세 내용을 조회합니다.")
     public Api<NewsDetailResponse> getNewsDetailByNewsId(@PathVariable int newsId, @AuthenticationPrincipal int userId) {
 
@@ -76,7 +76,7 @@ public class NewsController {
      * @param stockCode 조회할 주식의 stockCode
      * @return 스크랩 뉴스 리스트
      */
-    @GetMapping("/v1/news/scrap")
+    @GetMapping("/scrap")
     @Operation(summary = "stockCode,userId로 스크랩 뉴스 조회", description = "종목코드와 유저 아이디를 사용하여 유저가 스크랩한 뉴스 목록을 조회합니다.")
     public Api<NewsScrapResponse> getNewsScrapListByStockCode(
             @RequestParam(name = "stockCode") int stockCode,
@@ -90,11 +90,20 @@ public class NewsController {
         return Api.ok(newsScrapResponse);
     }
 
-    @PostMapping("/v1/news/scrap/{newsId}")
+    @PostMapping("/scrap/{newsId}")
     @Operation(summary = "newsId,userId로 뉴스 스크랩 추가", description = "뉴스아이디와 유저아이디를 통해 해당 뉴스를 스크랩합니다.")
     public Api<Void> addNewsScrapByNewsId(@PathVariable int newsId, @AuthenticationPrincipal int userId){
 
         newsService.addNewsScrapByNewsId(NewsScrapDto.of(userId,newsId));
+
+        return Api.ok();
+    }
+
+    @DeleteMapping("/scrap/{newsId}")
+    @Operation(summary = "newsId,userId로 뉴스 스크랩 삭제", description = "뉴스아이디와 유저아이디를 통해 해당 뉴스 스크랩을 삭제합니다.")
+    public Api<Void> deleteNewsScrapByNewsId(@PathVariable int newsId, @AuthenticationPrincipal int userId){
+
+        newsService.deleteNewsScrapByNewsId(NewsScrapDto.of(userId,newsId));
 
         return Api.ok();
     }
