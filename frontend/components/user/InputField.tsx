@@ -15,7 +15,7 @@ export default function InputField({
       placeholder={placeholder}
       secureTextEntry={secureTextEntry}
       className={cn(
-        'rounded-xl border border-stroke bg-background p-3 shadow-lg shadow-black',
+        'w-full rounded-xl border border-stroke bg-background p-3 shadow-lg shadow-black',
         className
       )}
     />
