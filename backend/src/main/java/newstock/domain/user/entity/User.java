@@ -14,7 +14,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId; // 유저 고유 아이디
+    private Integer userId; // 유저 고유 아이디
 
     @Column(unique = true)
     private String email; // 유저 로그인 아이디(이메일)
