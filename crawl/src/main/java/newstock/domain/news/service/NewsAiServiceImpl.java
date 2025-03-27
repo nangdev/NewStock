@@ -41,7 +41,7 @@ public class NewsAiServiceImpl implements NewsAiService {
                 .build();
 
         Map<String, Object> requestData = new HashMap<>();
-        requestData.put("news_text", newsText);
+        requestData.put("content", newsText);
         requestData.put("max_length", maxLength);
         requestData.put("min_length", minLength);
         requestData.put("do_sample", doSample);
@@ -93,7 +93,7 @@ public class NewsAiServiceImpl implements NewsAiService {
                 .build();
 
         Map<String, String> requestData = new HashMap<>();
-        requestData.put("news_text", keywordRequest.getNewsText());
+        requestData.put("content", keywordRequest.getNewsText());
 
         List<KeywordDto> keywords = webClient.post()
                 .bodyValue(requestData)

@@ -15,7 +15,7 @@ public class News {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer newsId;
 
     private Integer stockId;
 
@@ -53,7 +53,7 @@ public class News {
                 .pressLogo(newsItem.getPressLogo())
                 .publishedDate(newsItem.getPublishedDate())
                 .newsSummary(newsItem.getNewsSummary())
-                .score(0)
+                .score(newsItem.getScore())
                 .build();
     }
 

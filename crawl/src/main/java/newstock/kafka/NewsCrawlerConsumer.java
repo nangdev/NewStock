@@ -3,11 +3,6 @@ package newstock.kafka;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import newstock.domain.keyword.dto.KeywordDto;
-import newstock.domain.keyword.dto.KeywordRequest;
-import newstock.domain.keyword.dto.KeywordResponse;
-import newstock.domain.keyword.entity.Keyword;
-import newstock.domain.keyword.service.KeywordService;
 import newstock.domain.news.dto.*;
 import newstock.domain.news.service.NewsCrawlerService;
 import newstock.domain.news.service.NewsService;
@@ -25,7 +20,6 @@ public class NewsCrawlerConsumer {
 
     private final NewsCrawlerService newsCrawlerService;
     private final NewsService newsService;
-    private final KeywordService keywordService;
     private final NewsAiService newsAiService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -42,6 +36,7 @@ public class NewsCrawlerConsumer {
             for (NewsItem item : newsItemList) {
                 AnalysisResponse analysisResponse = newsAiService.analysis(AnalysisRequest.of(item.getContent()));
                 // 점수가 조건에 부합하지 않으면 바로 다음 항목으로 넘어감
+                log.info("점수 채점 완료! 점수 : {}",analysisResponse.getScore());
                 if (!(analysisResponse.getScore() > 5 || analysisResponse.getScore() < -5)) {
                     continue;
                 }
@@ -50,7 +45,7 @@ public class NewsCrawlerConsumer {
                 item.setContent(analysisResponse.getContent());
                 try {
                     SummarizationResponse summarizationResponse = newsAiService.summarize(item.getContent(), 300, 40, false);
-                    item.setNewsSummary(summarizationResponse.getSummaryText());
+                    item.setNewsSummary(summarizationResponse.getSummaryContent());
                 } catch (Exception e) {
                     item.setNewsSummary("");
                 }

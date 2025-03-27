@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class SummarizationResponse {
 
-    @JsonProperty("summary_text")
-    private String summaryText;
+    @JsonProperty("summary_content")
+    private String summaryContent;
 }
