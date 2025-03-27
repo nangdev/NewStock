@@ -2,11 +2,14 @@ package newstock.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import newstock.common.dto.Api;
 import newstock.controller.request.UserRequest;
 import newstock.controller.response.UserResponse;
+import newstock.domain.user.service.CustomUserDetails;
 import newstock.domain.user.service.UserService;
 import newstock.exception.type.DuplicateEmailException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -52,6 +55,12 @@ public class UserController {
         }
 
         return ResponseEntity.ok(exists);
+    }
+
+    @PutMapping("")
+    public ResponseEntity<Api<Void>> updateUserRole(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.updateUserRole(userDetails.getUser());
+        return ResponseEntity.ok(Api.ok());
     }
 }
 

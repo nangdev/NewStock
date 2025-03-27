@@ -86,5 +86,17 @@ public class UserServiceImpl implements UserService {
                 .refreshToken(token.getRefreshToken())
                 .build();
     }
+
+    @Override
+    @Transactional
+    public void updateUserRole(User user) {
+        if (user.getRole() != 0) {
+            throw new ValidationException(ExceptionCode.VALIDATION_ERROR);
+        }
+
+        user.setRole((byte) 1);
+        userRepository.save(user);
+    }
+
 }
 
