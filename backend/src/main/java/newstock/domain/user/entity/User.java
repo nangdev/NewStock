@@ -14,34 +14,34 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer userId; // 유저 고유 아이디
+    private Integer userId;
 
     @Column(unique = true)
-    private String email; // 유저 로그인 아이디(이메일)
+    private String email;
 
     @Column
-    private String password; // 유저 비밀번호
+    private String password;
 
     @Column(nullable = false)
-    private String userName; // 유저 실명
+    private String userName;
 
     @Column(nullable = false)
-    private String nickname; // 유저 닉네임
+    private String nickname;
 
     @Column
-    private String accessToken; // 어세스토큰
+    private String accessToken;
 
     @Column
-    private String refreshToken; // 리프레시 토큰
+    private String refreshToken;
 
     @Column
-    private String refreshTokenExpires; // 리프레시 토큰 만료 기간
+    private String refreshTokenExpires;
 
     @Column
-    private String socialProvider; // 소셜 로그인 여부
+    private String socialProvider;
 
     @Column
-    private String fcmToken; // 알림 토큰
+    private String fcmToken;
 
     @Column(nullable = false)
     private Byte role; // 유저 권한 0이면 NEW(신규 회원), 1이면 USER(기존 유저)

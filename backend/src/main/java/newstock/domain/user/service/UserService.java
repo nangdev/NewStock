@@ -9,7 +9,7 @@ import newstock.domain.user.entity.User;
 public interface UserService {
 
     // 회원가입
-    UserResponse signupUser(UserRequest userRequest);
+    void addUser(UserRequest userRequest);
 
     // 이메일 중복체크
     boolean existsByEmail(String email);

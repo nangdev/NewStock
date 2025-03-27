@@ -1,21 +1,24 @@
 package newstock.domain.stock.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Stock {
 
-    @Id
-    private Integer stockCode;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer stockId;
+
+    private String stockCode;
 
     private String stockName;
 
@@ -29,12 +32,13 @@ public class Stock {
 
     private String capital;
 
-    private String parValue;
-
-    private String issuePrice;
+    private String lstgStqt;
 
     private String listingDate;
 
     private String stdIccn;
+
+    @OneToMany(mappedBy = "stock", fetch = FetchType.LAZY)
+    private List<UserStock> userStocks;
 
 }
