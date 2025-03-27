@@ -19,6 +19,7 @@ public class StockRepositoryImpl implements StockRepositoryCustom {
     public List<UserStockDto> findUserStocksByUserId(Integer userId) {
         return queryFactory
                 .select(Projections.constructor(UserStockDto.class,
+                        stock.stockId,
                         stock.stockCode,
                         stock.stockName,
                         stock.closingPrice,

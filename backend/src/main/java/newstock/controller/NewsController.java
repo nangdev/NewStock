@@ -24,32 +24,32 @@ public class NewsController {
 
     /**
      * StockCode로 News 조회
-     * @param stockCode 조회할 주식의 stockCode
+     * @param stockId 조회할 주식의 stockCode
      * @return 오늘 상위 뉴스 목록
      */
-    @GetMapping("/top/{stockCode}")
-    @Operation(summary = "stockCode로 상위 5개 뉴스 조회", description = "종목코드를 사용하여 상위 5개 뉴스를 조회합니다.")
-    public Api<TopNewsResponse> getTopNewsListByStockCode(@PathVariable int stockCode) {
+    @GetMapping("/top/{stockId}")
+    @Operation(summary = "stockId 상위 5개 뉴스 조회", description = "종목코드를 사용하여 상위 5개 뉴스를 조회합니다.")
+    public Api<TopNewsResponse> getTopNewsListByStockCode(@PathVariable Integer stockId) {
 
-        TopNewsResponse topNewsResponse = newsService.getTopNewsListByStockCode(stockCode);
+        TopNewsResponse topNewsResponse = newsService.getTopNewsListByStockId(stockId);
 
         return Api.ok(topNewsResponse);
     }
 
     /**
      * StockCode로 News 조회
-     * @param stockCode 조회할 주식의 stockCode
+     * @param stockId 조회할 주식의 stockCode
      * @return 개별 종목 뉴스
      */
     @GetMapping
-    @Operation(summary = "stockCode로 개별 종목 뉴스 조회", description = "종목코드를 사용하여 개별 종목 뉴스 목록을 조회합니다.")
+    @Operation(summary = "stockId 개별 종목 뉴스 조회", description = "종목코드를 사용하여 개별 종목 뉴스 목록을 조회합니다.")
     public Api<StockNewsResponse> getNewsListByStockCode(
-            @RequestParam(name = "stockCode") int stockCode,
+            @RequestParam(name = "stockId") Integer stockId,
             @RequestParam(name = "page") int page,
             @RequestParam(name = "count") int count,
             @RequestParam(name = "sort") String sort) {
 
-        StockNewsResponse stockNewsResponse = newsService.getNewsListByStockCode(StockNewsRequest.of(stockCode, page, count, sort));
+        StockNewsResponse stockNewsResponse = newsService.getNewsListByStockId(StockNewsRequest.of(stockId, page, count, sort));
 
         return Api.ok(stockNewsResponse);
     }
@@ -70,19 +70,19 @@ public class NewsController {
 
     /**
      * stockCode로 Scraped News 조회
-     * @param stockCode 조회할 주식의 stockCode
+     * @param stockId 조회할 주식의 stockCode
      * @return 스크랩 뉴스 리스트
      */
     @GetMapping("/scrap")
-    @Operation(summary = "stockCode,userId로 스크랩 뉴스 조회", description = "종목코드와 유저 아이디를 사용하여 유저가 스크랩한 뉴스 목록을 조회합니다.")
+    @Operation(summary = "stockId,userId로 스크랩 뉴스 조회", description = "종목코드와 유저 아이디를 사용하여 유저가 스크랩한 뉴스 목록을 조회합니다.")
     public Api<NewsScrapResponse> getNewsScrapListByStockCode(
-            @RequestParam(name = "stockCode") int stockCode,
+            @RequestParam(name = "stockId") Integer stockId,
             @RequestParam(name = "page") int page,
             @RequestParam(name = "count") int count,
             @RequestParam(name = "sort") String sort,
-            @AuthenticationPrincipal int userId) {
+            @AuthenticationPrincipal Integer userId) {
 
-        NewsScrapResponse newsScrapResponse = newsService.getNewsScrapListByStockCode(NewsScrapRequest.of(stockCode,page,count,sort,userId));
+        NewsScrapResponse newsScrapResponse = newsService.getNewsScrapListByStockId(NewsScrapRequest.of(stockId,page,count,sort,userId));
 
         return Api.ok(newsScrapResponse);
     }

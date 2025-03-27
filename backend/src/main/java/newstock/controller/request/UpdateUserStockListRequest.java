@@ -11,6 +11,6 @@ import java.util.List;
 @Data
 public class UpdateUserStockListRequest {
 
-    private List<Integer> stockCodeList;
+    private List<Integer> stockIdList;
 
 }

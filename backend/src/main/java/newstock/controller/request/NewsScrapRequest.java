@@ -7,7 +7,7 @@ import lombok.Getter;
 @Builder
 public class NewsScrapRequest {
 
-    private int stockCode;
+    private Integer stockId;
 
     private int page;
 
@@ -17,9 +17,9 @@ public class NewsScrapRequest {
 
     private int userId;
 
-    public static NewsScrapRequest of(int stockCode, int page, int count, String sort, int userId) {
+    public static NewsScrapRequest of(Integer stockId, int page, int count, String sort, int userId) {
         return NewsScrapRequest.builder()
-                .stockCode(stockCode)
+                .stockId(stockId)
                 .page(page)
                 .count(count)
                 .sort(sort)

@@ -10,7 +10,9 @@ import java.io.File;
 @Getter
 public class StockDto {
 
-    private int stockCode;
+    private Integer stockId;
+
+    private String stockCode;
 
     private String stockName;
 
@@ -18,6 +20,7 @@ public class StockDto {
 
     public static StockDto of(Stock stock) {
         return StockDto.builder()
+                .stockId(stock.getStockId())
                 .stockCode(stock.getStockCode())
                 .stockName(stock.getStockName())
                 .stockImage(new File(stock.getImgUrl()))

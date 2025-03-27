@@ -10,13 +10,13 @@ import newstock.controller.response.TopNewsResponse;
 import newstock.domain.news.dto.NewsScrapDto;
 
 public interface NewsService {
-    TopNewsResponse getTopNewsListByStockCode(int stockCode);
+    TopNewsResponse getTopNewsListByStockId(Integer stockId);
 
-    StockNewsResponse getNewsListByStockCode(StockNewsRequest stockNewsRequest);
+    StockNewsResponse getNewsListByStockId(StockNewsRequest stockNewsRequest);
 
     NewsDetailResponse getNewsDetailByNewsId(NewsDetailRequest newsDetailRequest);
 
-    NewsScrapResponse getNewsScrapListByStockCode(NewsScrapRequest newsScrapRequest);
+    NewsScrapResponse getNewsScrapListByStockId(NewsScrapRequest newsScrapRequest);
 
     void addNewsScrapByNewsId(NewsScrapDto newsScrapDto);
 

@@ -7,7 +7,9 @@ import lombok.Getter;
 @Getter
 public class UserStockDto {
 
-    private int stockCode;
+    private Integer stockId;
+
+    private String stockCode;
 
     private String stockName;
 

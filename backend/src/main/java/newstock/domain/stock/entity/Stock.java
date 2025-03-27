@@ -1,9 +1,6 @@
 package newstock.domain.stock.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,8 +15,10 @@ import java.util.List;
 @NoArgsConstructor
 public class Stock {
 
-    @Id
-    private int stockCode;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer stockId;
+
+    private String stockCode;
 
     private String stockName;
 

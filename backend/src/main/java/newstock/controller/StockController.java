@@ -29,13 +29,13 @@ public class StockController {
 
     @PutMapping("/interest")
     public Api<Void> updateUserStockList(@AuthenticationPrincipal Integer userId, @RequestBody UpdateUserStockListRequest req){
-        stockService.updateUserStockList(userId, req.getStockCodeList());
+        stockService.updateUserStockList(userId, req.getStockIdList());
         return Api.ok();
     }
 
-    @GetMapping("/info/{stockCode}")
-    public Api<StockInfoDto> getStockInfo(@PathVariable int stockCode){
-        return Api.ok(stockService.getStockInfo(stockCode));
+    @GetMapping("/info/{stockId}")
+    public Api<StockInfoDto> getStockInfo(@PathVariable Integer stockId){
+        return Api.ok(stockService.getStockInfo(stockId));
     }
 
 }

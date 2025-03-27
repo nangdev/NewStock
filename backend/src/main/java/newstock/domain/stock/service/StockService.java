@@ -35,12 +35,12 @@ public class StockService {
     }
 
     @Transactional
-    public void updateUserStockList(Integer userId, List<Integer> stockCodeList){
+    public void updateUserStockList(Integer userId, List<Integer> stockIdList){
         try {
             userStockRepository.deleteUserStocksByUserId(userId);
 
-            for (Integer stockCode : stockCodeList) {
-                userStockRepository.save(UserStock.of(userId, stockCode));
+            for (Integer stockId : stockIdList) {
+                userStockRepository.save(UserStock.of(userId, stockId));
             }
 
         }catch (Exception e){
@@ -48,8 +48,8 @@ public class StockService {
         }
     }
 
-    public StockInfoDto getStockInfo(int stockCode){
-        Stock stock = stockRepository.findById(stockCode)
+    public StockInfoDto getStockInfo(Integer stockId){
+        Stock stock = stockRepository.findById(stockId)
                 .orElseThrow(() -> new DbException(ExceptionCode.STOCK_NOT_FOUND));
 
         return StockInfoDto.of(stock);

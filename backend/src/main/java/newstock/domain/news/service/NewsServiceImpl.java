@@ -18,7 +18,10 @@ import newstock.domain.news.repository.NewsRepository;
 import newstock.domain.news.repository.NewsScrapRepository;
 import newstock.exception.ExceptionCode;
 import newstock.exception.type.DbException;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,9 +39,9 @@ public class NewsServiceImpl implements NewsService {
     private final NewsScrapRepository newsScrapRepository;
 
     @Override
-    public TopNewsResponse getTopNewsListByStockCode(int stockCode) {
+    public TopNewsResponse getTopNewsListByStockId(Integer stockId) {
 
-        List<News> newsList = newsRepository.getTopNewsListByStockCode(stockCode)
+        List<News> newsList = newsRepository.getTopNewsListByStockId(stockId)
                 .orElse(Collections.emptyList());
 
         return TopNewsResponse.of(newsList.stream()
@@ -47,7 +50,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public StockNewsResponse getNewsListByStockCode(StockNewsRequest stockNewsRequest) {
+    public StockNewsResponse getNewsListByStockId(StockNewsRequest stockNewsRequest) {
 
         Sort sort;
         if ("score".equalsIgnoreCase(stockNewsRequest.getSort())) {
@@ -58,7 +61,7 @@ public class NewsServiceImpl implements NewsService {
 
         Pageable pageable = PageRequest.of(stockNewsRequest.getPage(), stockNewsRequest.getCount(), sort);
 
-        Page<News> newsPage = newsRepository.findByStockCode(stockNewsRequest.getStockCode(), pageable);
+        Page<News> newsPage = newsRepository.findByStockId(stockNewsRequest.getStockId(), pageable);
 
         int totalPage = newsPage.getTotalPages();
         if(newsPage.isEmpty()){
@@ -82,7 +85,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public NewsScrapResponse getNewsScrapListByStockCode(NewsScrapRequest newsScrapRequest) {
+    public NewsScrapResponse getNewsScrapListByStockId(NewsScrapRequest newsScrapRequest) {
 
         Sort sort;
         if ("score".equalsIgnoreCase(newsScrapRequest.getSort())) {
@@ -93,9 +96,9 @@ public class NewsServiceImpl implements NewsService {
 
         Pageable pageable = PageRequest.of(newsScrapRequest.getPage(), newsScrapRequest.getCount(), sort);
 
-        Page<News> newsPage = newsScrapRepository.findScrappedNewsByUserIdAndStockCode(
+        Page<News> newsPage = newsScrapRepository.findScrappedNewsByUserIdAndStockId(
                 newsScrapRequest.getUserId(),
-                newsScrapRequest.getStockCode(),
+                newsScrapRequest.getStockId(),
                 pageable
         );
 

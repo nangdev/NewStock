@@ -10,6 +10,8 @@ import java.io.File;
 @Getter
 public class StockInfoDto {
 
+    private Integer stockId;
+
     private String stockName;
 
     private Integer closingPrice;
@@ -34,6 +36,7 @@ public class StockInfoDto {
 
     public static StockInfoDto of(Stock stock) {
         return StockInfoDto.builder()
+                .stockId(stock.getStockId())
                 .stockName(stock.getStockName())
                 .closingPrice(stock.getClosingPrice())
                 .rcPdcp(stock.getRcPdcp())

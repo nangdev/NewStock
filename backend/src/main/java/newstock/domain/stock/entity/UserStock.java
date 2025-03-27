@@ -18,15 +18,15 @@ public class UserStock {
 
     private Integer userId;
 
-    private int stockCode;
+    private Integer stockId;
 
     @ManyToOne (fetch = FetchType.LAZY)
     private Stock stock;
 
-    public static UserStock of(Integer userId, int stockCode) {
+    public static UserStock of(Integer userId, Integer stockId) {
         return UserStock.builder()
                 .userId(userId)
-                .stockCode(stockCode)
+                .stockId(stockId)
                 .build();
     }
 

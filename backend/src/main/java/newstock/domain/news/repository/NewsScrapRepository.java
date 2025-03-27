@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface NewsScrapRepository extends JpaRepository<NewsScrap,Integer>, NewsScrapCustomRepository {
 
-    boolean existsByNewsIdAndUserId(int newsId, int userId);
+    boolean existsByNewsIdAndUserId(Integer newsId, Integer userId);
 
-    Optional<Integer> findIdByNewsIdAndUserId(int newsId, int userId);
+    Optional<Integer> findIdByNewsIdAndUserId(Integer newsId, Integer userId);
 }

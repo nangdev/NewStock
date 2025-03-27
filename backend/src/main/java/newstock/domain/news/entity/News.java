@@ -18,7 +18,7 @@ public class News {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer newsId;
 
-    private int stockCode;
+    private Integer stockId;
 
     private String title;
 
@@ -41,7 +41,5 @@ public class News {
     private String newsSummary;
 
     private int score;
-
-    private String keyword;
 
 }

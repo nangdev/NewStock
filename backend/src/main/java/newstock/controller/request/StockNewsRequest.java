@@ -7,7 +7,7 @@ import lombok.Getter;
 @Builder
 public class StockNewsRequest {
 
-    private int stockCode;
+    private Integer stockId;
 
     private int page;
 
@@ -15,9 +15,9 @@ public class StockNewsRequest {
 
     private String sort;
 
-    public static StockNewsRequest of(int stockCode, int page, int count, String sort) {
+    public static StockNewsRequest of(Integer stockId, int page, int count, String sort) {
         return StockNewsRequest.builder()
-                .stockCode(stockCode)
+                .stockId(stockId)
                 .page(page)
                 .count(count)
                 .sort(sort)

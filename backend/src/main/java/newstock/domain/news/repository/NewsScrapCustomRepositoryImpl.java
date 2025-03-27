@@ -7,13 +7,13 @@ import newstock.domain.news.entity.News;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import static newstock.domain.news.entity.QNews.news;
-import static newstock.domain.news.entity.QNewsScrap.newsScrap;
-
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+
+import static newstock.domain.news.entity.QNews.news;
+import static newstock.domain.news.entity.QNewsScrap.newsScrap;
 
 @RequiredArgsConstructor
 @Repository
@@ -22,14 +22,14 @@ public class NewsScrapCustomRepositoryImpl implements NewsScrapCustomRepository 
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<News> findScrappedNewsByUserIdAndStockCode(int userId, int stockCode, Pageable pageable) {
+    public Page<News> findScrappedNewsByUserIdAndStockId(Integer userId, Integer stockId, Pageable pageable) {
 
         Long total = jpaQueryFactory
                 .select(news.count())
                 .from(newsScrap)
                 .join(news).on(news.newsId.eq(newsScrap.newsId))
                 .where(newsScrap.userId.eq(userId)
-                        .and(news.stockCode.eq(stockCode)))
+                        .and(news.stockId.eq(stockId)))
                 .fetchOne();
 
         OrderSpecifier<?> orderSpecifier = null;
@@ -48,7 +48,7 @@ public class NewsScrapCustomRepositoryImpl implements NewsScrapCustomRepository 
                 .from(newsScrap)
                 .join(news).on(news.newsId.eq(newsScrap.newsId))
                 .where(newsScrap.userId.eq(userId)
-                        .and(news.stockCode.eq(stockCode)))
+                        .and(news.stockId.eq(stockId)))
                 .orderBy(orderSpecifier)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
