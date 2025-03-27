@@ -1,3 +1,4 @@
+import { useLoginMutation } from 'api/auth/query';
 import BlurOverlay from 'components/BlurOverlay';
 import InputField from 'components/user/InputField';
 import { ROUTE } from 'constants/routes';
@@ -9,14 +10,15 @@ export default function SignUp() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { mutate } = useLoginMutation();
 
   const onPressLogo = () => {
     router.navigate(ROUTE.HOME);
   };
 
   const onPressLogin = () => {
-    // Todo: API 연결
-    console.log('로그인');
+    // Todo: FCM 기능 추가시 fcmToken 수정
+    mutate({ email, password, fcmToken: 'fcmToken123' });
   };
 
   const onPressKakaoLogin = () => {
