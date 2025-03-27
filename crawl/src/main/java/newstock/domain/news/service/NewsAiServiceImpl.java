@@ -70,7 +70,6 @@ public class NewsAiServiceImpl implements NewsAiService {
 
         Map<String, String> requestPayload = new HashMap<>();
         requestPayload.put("content", analysisRequest.getContent());
-        requestPayload.put("title", analysisRequest.getTitle());
 
         AnalysisResponse response = webClient.post()
                 .bodyValue(requestPayload)

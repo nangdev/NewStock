@@ -40,7 +40,7 @@ public class NewsCrawlerConsumer {
             List<NewsItem> filteredNewsItems = new ArrayList<>();
 
             for (NewsItem item : newsItemList) {
-                AnalysisResponse analysisResponse = newsAiService.analysis(AnalysisRequest.of(item.getTitle(), item.getContent()));
+                AnalysisResponse analysisResponse = newsAiService.analysis(AnalysisRequest.of(item.getContent()));
                 // 점수가 조건에 부합하지 않으면 바로 다음 항목으로 넘어감
                 if (!(analysisResponse.getScore() > 5 || analysisResponse.getScore() < -5)) {
                     continue;
