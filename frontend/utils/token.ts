@@ -1,5 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
-import { TokenType } from 'types/user';
+import { TokenType } from 'types/token';
 
 export const setToken = async ({ key, value }: { key: TokenType; value: string }) => {
   await SecureStore.setItemAsync(key, value);
