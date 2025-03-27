@@ -53,8 +53,8 @@ deploy:
           
           # API 서버와 Nginx 재배포
           echo \"dev/service 브랜치: API 서버와 Nginx 배포 중...\"
-          docker-compose build backend nginx mysql redis
-          docker-compose up -d --no-deps backend nginx mysql redis
+          docker-compose build backend nginx
+          docker-compose up -d --no-deps backend nginx
           
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/crawl\" ]]; then
           
