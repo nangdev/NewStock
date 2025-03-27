@@ -15,33 +15,33 @@ public class News {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private int id;
 
-    String stockCode;
+    private String stockCode;
 
-    String title;
+    private String title;
 
-    String description;
-
-    @Lob
-    String content;
-
-    String newsImage;
-
-    String url;
-
-    String press;
-
-    String pressLogo;
-
-    String publishedDate;
+    private String description;
 
     @Lob
-    String newsSummary;
+    private String content;
 
-    String score;
+    private String newsImage;
 
-    String keyword;
+    private String url;
+
+    private String press;
+
+    private String pressLogo;
+
+    private String publishedDate;
+
+    @Lob
+    private String newsSummary;
+
+    private String score;
+
+    private String keyword;
 
     public static News of(NewsItem newsItem) {
         return News.builder()
