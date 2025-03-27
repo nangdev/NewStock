@@ -1,6 +1,7 @@
 package newstock.domain.news.service;
 
 import newstock.domain.keyword.dto.KeywordRequest;
+import newstock.domain.news.dto.AnalysisRequest;
 import newstock.domain.news.dto.AnalysisResponse;
 import newstock.domain.keyword.dto.KeywordDto;
 import newstock.domain.keyword.dto.KeywordResponse;
@@ -61,14 +62,15 @@ public class NewsAiServiceImpl implements NewsAiService {
 
 
     @Override
-    public AnalysisResponse analysis(String newsText) {
+    public AnalysisResponse analysis(AnalysisRequest analysisRequest) {
         WebClient webClient = webClientBuilder
                 .baseUrl(newsAiUrl + "/score")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
         Map<String, String> requestPayload = new HashMap<>();
-        requestPayload.put("newsText", newsText);
+        requestPayload.put("content", analysisRequest.getContent());
+        requestPayload.put("title", analysisRequest.getTitle());
 
         AnalysisResponse response = webClient.post()
                 .bodyValue(requestPayload)
@@ -108,7 +110,7 @@ public class NewsAiServiceImpl implements NewsAiService {
         String today = LocalDate.now().toString();
         List<KeywordDto> updatedKeywords = keywords.stream()
                 .map(dto -> KeywordDto.builder()
-                        .keyword(dto.getKeyword())
+                        .content(dto.getContent())
                         .stockId(keywordRequest.getStockId())
                         .date(today)
                         .count(dto.getCount())
