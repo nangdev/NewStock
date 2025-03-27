@@ -14,6 +14,7 @@ import static newstock.domain.stock.entity.QUserStock.userStock;
 @Repository
 @RequiredArgsConstructor
 public class StockRepositoryImpl implements StockRepositoryCustom {
+
     private final JPAQueryFactory queryFactory;
 
     public List<UserStockDto> findUserStocksByUserId(Integer userId) {
@@ -25,9 +26,10 @@ public class StockRepositoryImpl implements StockRepositoryCustom {
                         stock.closingPrice,
                         stock.rcPdcp,
                         stock.imgUrl))
-                .from(userStock)
-                .join(userStock.stock, stock)
+                .from(userStock,stock)
+                .join(stock).on(userStock.stockId.eq(stock.stockId))
                 .where(userStock.userId.eq(userId))
                 .fetch();
     }
+
 }
