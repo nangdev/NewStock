@@ -33,7 +33,7 @@ public enum ExceptionCode {
     EXTERNAL_API_ERROR("외부 API를 호출하는 과정에서 예외가 발생했습니다.", 4001,HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 인증 및 보안 관련 예외 작성
-    TOKEN_INVALID("유효하지 않은 토큰입니다.", 5001),
+    TOKEN_INVALID("유효하지 않은 토큰입니다.", 5001, HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 원인 미상 에러
     INTERNAL_SERVER_ERROR("비상 비상 !! 개발자에게 문의하세요 !!!", 44444444,HttpStatus.INTERNAL_SERVER_ERROR);
