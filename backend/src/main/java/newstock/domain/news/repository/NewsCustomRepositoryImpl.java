@@ -1,7 +1,6 @@
 package newstock.domain.news.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import newstock.domain.news.entity.News;
 import static newstock.domain.news.entity.QNews.news;
