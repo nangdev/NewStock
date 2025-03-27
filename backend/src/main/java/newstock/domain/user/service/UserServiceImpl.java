@@ -3,12 +3,20 @@ package newstock.domain.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import newstock.controller.request.LoginRequest;
 import newstock.controller.request.UserRequest;
+import newstock.controller.response.LoginResponse;
 import newstock.controller.response.UserResponse;
+import newstock.domain.user.dto.JwtToken;
 import newstock.domain.user.entity.User;
 import newstock.domain.user.repository.UserRepository;
+import newstock.common.jwt.JwtTokenProvider;
+
 import newstock.exception.ExceptionCode;
 import newstock.exception.type.ValidationException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     @Transactional
@@ -46,4 +54,49 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.existsByEmail(email);
     }
+
+    // 로그인
+    @Override
+    @Transactional
+    public LoginResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ValidationException(ExceptionCode.VALIDATION_ERROR, "이메일 또는 비밀번호가 일치하지 않습니다."));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new ValidationException(ExceptionCode.VALIDATION_ERROR, "이메일 또는 비밀번호가 일치하지 않습니다.");
+        }
+
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+
+        JwtToken token = jwtTokenProvider.generateToken(authentication);
+
+        user.setAccessToken(token.getAccessToken());
+        user.setRefreshToken(token.getRefreshToken());
+
+        if (request.getFcmToken() != null && !request.getFcmToken().isBlank()) {
+            user.setFcmToken(request.getFcmToken());
+        }
+        userRepository.save(user);
+
+        return LoginResponse.builder()
+                .accessToken(token.getAccessToken())
+                .refreshToken(token.getRefreshToken())
+                .build();
+    }
+
+    // 회원가입 후 최초 로그인 시, 유저 권한을 1(USER)로 변경
+    @Override
+    @Transactional
+    public void updateUserRole(User user) {
+        if (user.getRole() != 0) {
+            throw new ValidationException(ExceptionCode.VALIDATION_ERROR);
+        }
+
+        user.setRole((byte) 1);
+        userRepository.save(user);
+    }
+
 }
+

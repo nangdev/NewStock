@@ -6,8 +6,11 @@ import newstock.common.dto.Api;
 import newstock.controller.request.UserRequest;
 import newstock.controller.response.EmailCheckResponse;
 import newstock.controller.response.UserResponse;
+import newstock.domain.user.entity.User;
+import newstock.domain.user.service.CustomUserDetails;
 import newstock.domain.user.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -39,6 +42,21 @@ public class UserController {
         boolean exists = userService.existsByEmail(email);
 
         return ResponseEntity.ok(Api.ok(new EmailCheckResponse(exists)));
+    }
+
+    @PutMapping("")
+    public Api<Void> updateUserRole(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.updateUserRole(userDetails.getUser());
+
+        return Api.ok();
+    }
+
+    @GetMapping("")
+    public Api<UserResponse> getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userDetails.getUser();
+        UserResponse userResponse = UserResponse.of(user);
+
+        return Api.ok(userResponse);
     }
 }
 
