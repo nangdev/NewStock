@@ -12,6 +12,7 @@ import newstock.controller.response.StockNewsResponse;
 import newstock.controller.response.TopNewsResponse;
 import newstock.domain.news.dto.NewsScrapDto;
 import newstock.domain.news.service.NewsService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,11 +30,11 @@ public class NewsController {
      */
     @GetMapping("/top/{stockId}")
     @Operation(summary = "stockId 상위 5개 뉴스 조회", description = "종목코드를 사용하여 상위 5개 뉴스를 조회합니다.")
-    public Api<TopNewsResponse> getTopNewsListByStockCode(@PathVariable Integer stockId) {
+    public ResponseEntity<Api<TopNewsResponse>> getTopNewsListByStockCode(@PathVariable Integer stockId) {
 
         TopNewsResponse topNewsResponse = newsService.getTopNewsListByStockId(stockId);
 
-        return Api.ok(topNewsResponse);
+        return ResponseEntity.ok(Api.ok(topNewsResponse));
     }
 
     /**
@@ -43,7 +44,7 @@ public class NewsController {
      */
     @GetMapping
     @Operation(summary = "stockId 개별 종목 뉴스 조회", description = "종목코드를 사용하여 개별 종목 뉴스 목록을 조회합니다.")
-    public Api<StockNewsResponse> getNewsListByStockCode(
+    public ResponseEntity<Api<StockNewsResponse>> getNewsListByStockCode(
             @RequestParam(name = "stockId") Integer stockId,
             @RequestParam(name = "page") int page,
             @RequestParam(name = "count") int count,
@@ -51,7 +52,7 @@ public class NewsController {
 
         StockNewsResponse stockNewsResponse = newsService.getNewsListByStockId(StockNewsRequest.of(stockId, page, count, sort));
 
-        return Api.ok(stockNewsResponse);
+        return ResponseEntity.ok(Api.ok(stockNewsResponse));
     }
 
     /**
@@ -61,11 +62,11 @@ public class NewsController {
      */
     @GetMapping("/{newsId}")
     @Operation(summary = "NewsId로 뉴스 상세 내용 조회", description = "뉴스아이디를 사용하여 뉴스 상세 내용을 조회합니다.")
-    public Api<NewsDetailResponse> getNewsDetailByNewsId(@PathVariable Integer newsId, @AuthenticationPrincipal Integer userId) {
+    public ResponseEntity<Api<NewsDetailResponse>> getNewsDetailByNewsId(@PathVariable Integer newsId, @AuthenticationPrincipal Integer userId) {
 
         NewsDetailResponse newsDetailResponse = newsService.getNewsDetailByNewsId(NewsDetailRequest.of(newsId,userId));
 
-        return Api.ok(newsDetailResponse);
+        return ResponseEntity.ok(Api.ok(newsDetailResponse));
     }
 
     /**
@@ -75,7 +76,7 @@ public class NewsController {
      */
     @GetMapping("/scrap")
     @Operation(summary = "stockId,userId로 스크랩 뉴스 조회", description = "종목코드와 유저 아이디를 사용하여 유저가 스크랩한 뉴스 목록을 조회합니다.")
-    public Api<NewsScrapResponse> getNewsScrapListByStockCode(
+    public ResponseEntity<Api<NewsScrapResponse>> getNewsScrapListByStockCode(
             @RequestParam(name = "stockId") Integer stockId,
             @RequestParam(name = "page") int page,
             @RequestParam(name = "count") int count,
@@ -84,7 +85,7 @@ public class NewsController {
 
         NewsScrapResponse newsScrapResponse = newsService.getNewsScrapListByStockId(NewsScrapRequest.of(stockId,page,count,sort,userId));
 
-        return Api.ok(newsScrapResponse);
+        return ResponseEntity.ok(Api.ok(newsScrapResponse));
     }
 
     /**
@@ -93,11 +94,11 @@ public class NewsController {
      */
     @PostMapping("/scrap/{newsId}")
     @Operation(summary = "newsId,userId로 뉴스 스크랩 추가", description = "뉴스아이디와 유저아이디를 통해 해당 뉴스를 스크랩합니다.")
-    public Api<Void> addNewsScrapByNewsId(@PathVariable Integer newsId, @AuthenticationPrincipal Integer userId){
+    public ResponseEntity<Api<Void>> addNewsScrapByNewsId(@PathVariable Integer newsId, @AuthenticationPrincipal Integer userId){
 
         newsService.addNewsScrapByNewsId(NewsScrapDto.of(userId,newsId));
 
-        return Api.ok();
+        return ResponseEntity.ok(Api.ok());
     }
 
     /**
@@ -106,11 +107,11 @@ public class NewsController {
      */
     @DeleteMapping("/scrap/{newsId}")
     @Operation(summary = "newsId,userId로 뉴스 스크랩 삭제", description = "뉴스아이디와 유저아이디를 통해 해당 뉴스 스크랩을 삭제합니다.")
-    public Api<Void> deleteNewsScrapByNewsId(@PathVariable Integer newsId, @AuthenticationPrincipal Integer userId){
+    public ResponseEntity<Api<Void>> deleteNewsScrapByNewsId(@PathVariable Integer newsId, @AuthenticationPrincipal Integer userId){
 
         newsService.deleteNewsScrapByNewsId(NewsScrapDto.of(userId,newsId));
 
-        return Api.ok();
+        return ResponseEntity.ok(Api.ok());
     }
 
 
