@@ -2,22 +2,40 @@ package newstock.controller;
 
 import lombok.RequiredArgsConstructor;
 import newstock.common.dto.Api;
-import newstock.domain.stock.dto.StockDto;
+import newstock.controller.request.UpdateUserStockListRequest;
+import newstock.controller.response.StockListResponse;
+import newstock.controller.response.UserStockListResponse;
+import newstock.domain.stock.dto.StockInfoDto;
 import newstock.domain.stock.service.StockService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/stock")
 public class StockController {
+
     private final StockService stockService;
 
     @GetMapping
-    public Api<List<StockDto>> getAllStocks() {
-        return Api.ok(stockService.findAll());
+    public Api<StockListResponse> getStockList() {
+        return Api.ok(StockListResponse.of(stockService.getStockList()));
     }
+
+    @GetMapping
+    public Api<UserStockListResponse> getUserStockList(@AuthenticationPrincipal int userId) {
+        return Api.ok(UserStockListResponse.of(stockService.getUserStockList(userId)));
+    }
+
+    @PutMapping
+    public Api<Void> updateUserStockList(@AuthenticationPrincipal int userId, @RequestBody UpdateUserStockListRequest req){
+        stockService.updateUserStockList(userId, req.getStockCodeList());
+        return Api.ok();
+    }
+
+    @GetMapping("/info/{stockCode}")
+    public Api<StockInfoDto> getStockInfo(@PathVariable int stockCode){
+        return Api.ok(stockService.getStockInfo(stockCode));
+    }
+
 }
