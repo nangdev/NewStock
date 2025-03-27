@@ -10,7 +10,7 @@ import newstock.domain.user.entity.User;
 @AllArgsConstructor
 public class UserResponse {
 
-    private Long userId;
+    private Integer userId;
     private String email;
     private String userName;
     private String nickname;
