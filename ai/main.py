@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 import torch
 import torch.nn as nn
 from transformers import pipeline, AutoModel
 from utils.model_loader import load_model_and_tokenizer, predict
-from utils.tools import tokenize_sentences, article_cleanser  # preprocessor 함수들 사용
+from utils.tools import article_cleanser, tokenize_sentences  # 전처리 함수들 임포트
 
 app = FastAPI(title="News AI API")
 
@@ -45,21 +45,23 @@ try:
 except Exception as e:
     raise Exception(f"모델 로딩 실패: {str(e)}")
 
-# === 요청/응답 모델 정의 ===
+# === 요청/응답 모델 정의 (Score용 Input/Output) ===
 
-# 클라이언트가 보내는 "newsText" 키를 그대로 사용하도록 alias 처리
-class ArticleInput(BaseModel):
-    article_text: str = Field(..., alias="newsText")
+class ScoreRequest(BaseModel):
+    content: str
 
-# 뉴스 요약 관련 모델
+class ScoreResponse(BaseModel):
+    content: str
+    score: int
+
 class SummarizationRequest(BaseModel):
-    news_text: str
+    content: str
     max_length: int = 300
     min_length: int = 40
     do_sample: bool = False
 
 class SummarizationResponse(BaseModel):
-    summary_text: str
+    summary_content: str
 
 # === API 엔드포인트 ===
 
@@ -67,39 +69,46 @@ class SummarizationResponse(BaseModel):
 async def home():
     return {"message": "Welcome to the News AI API!"}
 
-@app.post("/score")
-async def score_article(input_data: ArticleInput):
+@app.post("/score", response_model=ScoreResponse)
+async def score_article(input_data: ScoreRequest):
     """
-    클라이언트가 전달한 뉴스 텍스트를 preprocessor 과정을 거쳐 정제한 후,
-    tokenize_sentences 함수를 통해 문장 단위로 분할하고 각 문장별 (positive - negative) * 100 값을 계산하여
-    모든 문장의 평균 score를 반올림하여 반환합니다.
+    뉴스 기사 본문(news_text)을 받아 전처리(article_cleanser, tokenize_sentences)한 후,
+    각 문장별 (positive - negative) * 100 값을 계산하여 모든 문장의 평균 점수를 반올림하고,
+    전처리된 본문(content)과 감성 score를 함께 반환합니다.
+    
+    클라이언트 응답 형식:
+    {
+      "content": <전처리된 본문>,
+      "score": <평균 감성 점수>
+    }
     """
     try:
-        # 1. 기사 정제: article_cleanser 함수를 적용하여 불필요한 구문 제거
-        cleaned_text = article_cleanser(input_data.article_text)
-        
-        # 2. 문장 단위 분할: tokenize_sentences 함수를 사용
-        sentences = tokenize_sentences(cleaned_text)
-        
+        # 본문 정제: 불필요한 구문 및 특수문자 제거
+        cleaned_content = article_cleanser(input_data.news_text)
+        # 문장 단위로 분할
+        sentences = tokenize_sentences(cleaned_content)
+        # 전처리된 본문: 각 문장을 줄바꿈 문자로 결합
+        processed_content = "\n".join(s.strip() for s in sentences if s.strip())
+
         scores = []
         for sentence in sentences:
             sentence = sentence.strip()
             if sentence:  # 빈 문장은 건너뜁니다.
                 neg, neu, pos = predict(model, tokenizer, sentence)
-                # (positive - negative) * 100 값 계산
+                # 각 문장의 감성 점수 계산 (positive - negative) * 100
                 score = (pos - neg) * 100
                 scores.append(score)
         if not scores:
             raise HTTPException(status_code=400, detail="유효한 문장이 없습니다.")
         average_score = round(sum(scores) / len(scores))
-        return {"score": average_score}
+        return ScoreResponse(content=processed_content, score=average_score)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/summarize", response_model=SummarizationResponse)
 def summarize(request: SummarizationRequest):
     """
-    입력된 뉴스 텍스트를 요약하여 반환합니다.
+    입력된 뉴스 텍스트(news_text)를 요약하여 반환합니다.
     """
     try:
         result = summarizer(
@@ -109,7 +118,7 @@ def summarize(request: SummarizationRequest):
             do_sample=request.do_sample
         )
         summary_text = result[0]["summary_text"]
-        return SummarizationResponse(summary_text=summary_text)
+        return SummarizationResponse(summary_content=summary_text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
