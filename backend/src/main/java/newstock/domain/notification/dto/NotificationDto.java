@@ -8,7 +8,7 @@ import lombok.Data;
 @Builder
 public class NotificationDto {
 
-    private Integer notificationId;
+    private Integer unId;
 
     private NewsNotificationDto newsInfo;
 

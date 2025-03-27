@@ -26,7 +26,7 @@ public class StockRepositoryImpl implements StockRepositoryCustom {
                         stock.closingPrice,
                         stock.rcPdcp,
                         stock.imgUrl))
-                .from(userStock,stock)
+                .from(userStock)
                 .join(stock).on(userStock.stockId.eq(stock.stockId))
                 .where(userStock.userId.eq(userId))
                 .fetch();
