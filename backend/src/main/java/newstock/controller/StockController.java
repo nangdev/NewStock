@@ -22,12 +22,12 @@ public class StockController {
         return Api.ok(StockListResponse.of(stockService.getStockList()));
     }
 
-    @GetMapping
+    @GetMapping("/interest")
     public Api<UserStockListResponse> getUserStockList(@AuthenticationPrincipal int userId) {
         return Api.ok(UserStockListResponse.of(stockService.getUserStockList(userId)));
     }
 
-    @PutMapping
+    @PutMapping("/interest")
     public Api<Void> updateUserStockList(@AuthenticationPrincipal int userId, @RequestBody UpdateUserStockListRequest req){
         stockService.updateUserStockList(userId, req.getStockCodeList());
         return Api.ok();
