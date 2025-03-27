@@ -84,39 +84,39 @@ def article_cleanser(text):
     result = result1 = re.sub(r'\(서울=연합뉴스\)\s*', '', text)
 
     # [1단계] 기본 전처리
-    result1 = re.sub(r'\[.*?\]', '', result)  # [ ] 제거
-    result2 = re.sub(r'\<.*?\>', '', result1)  # < > 제거
-    result3 = re.sub(r'[a-zA-Z0-9]+@[a-zA-Z]+(\.[a-z]{2,4}){1,2}', '', result2)  # 이메일 제거
-    result4 = re.sub(r'[가-힣]{2,4}\s?(?:인턴)?기자', '', result3)  # 기자 이름 제거
-    result5 = re.sub(r'[▶◆■▲△▲◇▷]', ' ', result4)  # 특수문자 처리
+    result = re.sub(r'\[.*?\]', '', result)  # [ ] 제거
+    result = re.sub(r'\<.*?\>', '', result)  # < > 제거
+    result = re.sub(r'[a-zA-Z0-9]+@[a-zA-Z]+(\.[a-z]{2,4}){1,2}', '', result)  # 이메일 제거
+    result = re.sub(r'[가-힣]{2,4}\s?(?:인턴)?기자', '', result)  # 기자 이름 제거
+    result = re.sub(r'[▶◆■▲△▲◇▷]', ' ', result)  # 특수문자 처리
     
     # [2단계] 콘텐츠 필터링
-    result6 = re.sub(r'네이버.*?구독하기', '', result5)  # 네이버 관련 문구 제거
-    result7 = re.sub(r'[a-z]*\.com', '', result6)  # URL 제거
-    result8 = result7.replace('\xa0', ' ').replace('\t', '').replace('/사진제공=dl', '')
+    result = re.sub(r'네이버.*?구독하기', '', result)  # 네이버 관련 문구 제거
+    result = re.sub(r'[a-z]*\.com', '', result)  # URL 제거
+    result = result.replace('\xa0', ' ').replace('\t', '').replace('/사진제공=dl', '')
     
     # [3단계] 문자 정제
-    result9 = re.sub(r'([一-鿕]|[㐀-䶵]|[豈-龎])+', '', result8)  # 한자 제거
-    result10 = re.sub(r'\(※.*?\)', '', result9)  # ※ 주석 제거
+    result = re.sub(r'([一-鿕]|[㐀-䶵]|[豈-龎])+', '', result)  # 한자 제거
+    result = re.sub(r'\(※.*?\)', '', result)  # ※ 주석 제거
     
     # [4단계] 주식 코드 보존
-    result11 = re.sub(r'\((\d{6})\)', r'\1', result10)  # 6자리 주식코드 괄호 제거 (예: (034220) → 034220)
+    result = re.sub(r'\((\d{6})\)', r'\1', result)  # 6자리 주식코드 괄호 제거 (예: (034220) → 034220)
     
     # [5단계] 특수 기호 처리
-    result12 = re.sub(r'[\"\'\u201c\u201d\u2018\u2019]', '', result11)  # 따옴표 제거
-    result13 = re.sub(r'[()]', '', result12)  # 잔여 괄호 제거
+    result = re.sub(r'[\"\'\u201c\u201d\u2018\u2019]', '', result)  # 따옴표 제거
+    result = re.sub(r'[()]', '', result)  # 잔여 괄호 제거
     
     # [6단계] 숫자 포맷팅
-    result14 = result13.replace('\n', ' ').replace('\r', ' ').replace('-', ' ')
-    result15 = re.sub(r'(\d+(?:\.\d+)?)%', r'\1퍼센트', result14)  # % → 퍼센트 변환 (공백 문제 해결)
-    result16 = re.sub(r'(?<=\d),(?=\d{3})', '', result15)  # 3자리 콤마 패턴 제거 (예: 357,815,700 → 357815700)
+    result = result.replace('\n', ' ').replace('\r', ' ').replace('-', ' ')
+    result = re.sub(r'(\d+(?:\.\d+)?)%', r'\1퍼센트', result)  # % → 퍼센트 변환 (공백 문제 해결)
+    result = re.sub(r'(?<=\d),(?=\d{3})', '', result)  # 3자리 콤마 패턴 제거 (예: 357,815,700 → 357815700)
     
     # [7단계] 최종 정제
-    result17 = re.sub(r'제보는 카카오톡.*?송고\s*|<저작권자.*?송고\s*', '', result16, flags=re.DOTALL)
-    result18 = re.sub(r'/서경뉴스봇', '', result17)
-    result19 = result18.strip()
+    result = re.sub(r'제보는 카카오톡.*?송고\s*|<저작권자.*?송고\s*', '', result, flags=re.DOTALL)
+    result = re.sub(r'/서경뉴스봇', '', result)
+    result = result.strip()
 
-    return result19
+    return result
 
 def preprocess_for_tokenization(text):
     """소수점을 임시 문자열로 대체"""

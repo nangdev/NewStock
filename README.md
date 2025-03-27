@@ -22,3 +22,8 @@ uvicorn main:app --reload
 deactivate
 ```
 
+## 5. 전처리 파일 실행
+```cmd
+cd ai/
+python utils/preprocessor.py
+```
