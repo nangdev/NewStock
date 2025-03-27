@@ -58,10 +58,12 @@ def load_model_and_tokenizer():
                 # 전체 모델이 저장된 경우, 가중치만 추출하여 로드
                 model = checkpoint
         except Exception as e:
-            print(f"state_dict 로드 실패: {str(e)}")
+            print(f"{str(e)}")
+            print()
+            print("모델의 state_dict 정보가 없으므로 모델 전체 로드를 시도합니다.")
             # 다른 방법으로 시도
         model.eval()
-        print("모델을 성공적으로 로드했습니다")
+        print("모델을 성공적으로 로드했습니다.")
         return model, tokenizer
     except Exception as e:
         print(f"오류 상세 내용: {str(e)}")
