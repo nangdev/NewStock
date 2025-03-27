@@ -1,6 +1,8 @@
 package newstock.external.kis;
 
 import lombok.RequiredArgsConstructor;
+import newstock.controller.request.KisAccessTokenRequest;
+import newstock.controller.response.KisAccessTokenResponse;
 import newstock.external.kis.request.KisWebSocketKeyRequest;
 import newstock.external.kis.response.KisWebSocketKeyResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +11,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
-
 public class KisOAuthClient {
     @Value("${kis.app-key}")
     private String appKey;
@@ -20,13 +21,13 @@ public class KisOAuthClient {
 
     private static final String BASE_URL = "https://openapi.koreainvestment.com";
     private static final int PORT = 9443;   // 실전투자계좌포트
+    private static final String GRANT_TYPE = "client_credentials";
 
     public KisWebSocketKeyResponse getWebSocketKey() {
         String endPoint = "/oauth2/Approval";
-        String grantType = "client_credentials";
 
         KisWebSocketKeyRequest requestDto = new KisWebSocketKeyRequest();
-        requestDto.setGrantType(grantType);
+        requestDto.setGrantType(GRANT_TYPE);
         requestDto.setAppkey(appKey);
         requestDto.setSecretkey(secretKey);
 
@@ -38,5 +39,19 @@ public class KisOAuthClient {
                 .block();
     }
 
+    public KisAccessTokenResponse getAccessToken() {
+        String endPoint = "/oauth2/tokenP";
 
+        KisAccessTokenRequest requestDto = new KisAccessTokenRequest();
+        requestDto.setGrantType(GRANT_TYPE);
+        requestDto.setAppkey(appKey);
+        requestDto.setAppsecret(secretKey);
+
+        return webClient.post()
+                .uri(BASE_URL+":"+PORT+endPoint)
+                .bodyValue(requestDto)
+                .retrieve()
+                .bodyToMono(KisAccessTokenResponse.class)
+                .block();
+    }
 }

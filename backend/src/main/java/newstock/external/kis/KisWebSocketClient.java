@@ -74,7 +74,7 @@ public class KisWebSocketClient {
                 msg.setBody(body);
                 String jsonString = objectMapper.writeValueAsString(msg);
 
-//                remote.sendText(jsonString);
+                remote.sendText(jsonString);
                 log.info("subscribe {}", code);
             }
 

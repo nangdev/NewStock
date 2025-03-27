@@ -1,6 +1,7 @@
 package newstock.controller;
 
 import lombok.RequiredArgsConstructor;
+import newstock.controller.response.KisAccessTokenResponse;
 import newstock.external.kis.KisOAuthClient;
 import newstock.external.kis.response.KisWebSocketKeyResponse;
 import org.springframework.http.HttpStatus;
@@ -19,5 +20,10 @@ public class StockController {
     @GetMapping("/key")
     public ResponseEntity<KisWebSocketKeyResponse> getKey() {
         return ResponseEntity.status(HttpStatus.OK).body(client.getWebSocketKey());
+    }
+
+    @GetMapping("/token")
+    public ResponseEntity<KisAccessTokenResponse> getToken() {
+        return ResponseEntity.status(HttpStatus.OK).body(client.getAccessToken());
     }
 }
