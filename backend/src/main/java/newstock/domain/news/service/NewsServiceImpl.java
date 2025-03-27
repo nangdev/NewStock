@@ -8,6 +8,7 @@ import newstock.controller.request.StockNewsRequest;
 import newstock.controller.response.NewsDetailResponse;
 import newstock.controller.response.NewsScrapResponse;
 import newstock.controller.response.StockNewsResponse;
+import newstock.controller.response.TopNewsResponse;
 import newstock.domain.news.dto.NewsDetailDto;
 import newstock.domain.news.dto.NewsScrapDto;
 import newstock.domain.news.dto.StockNewsDto;
@@ -35,14 +36,14 @@ public class NewsServiceImpl implements NewsService {
     private final NewsScrapRepository newsScrapRepository;
 
     @Override
-    public List<TopNewsDto> getTopNewsListByStockCode(int stockCode) {
+    public TopNewsResponse getTopNewsListByStockCode(int stockCode) {
 
         List<News> newsList = newsRepository.getTopNewsListByStockCode(stockCode)
                 .orElse(Collections.emptyList());
 
-        return newsList.stream()
+        return TopNewsResponse.of(newsList.stream()
                 .map(TopNewsDto::of)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     @Override
@@ -117,6 +118,7 @@ public class NewsServiceImpl implements NewsService {
         newsScrapRepository.save(newsScrapDto.toEntity());
     }
 
+    @Transactional
     @Override
     public void deleteNewsScrapByNewsId(NewsScrapDto newsScrapDto) {
 

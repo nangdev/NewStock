@@ -23,6 +23,4 @@ public class StockNewsRequest {
                 .sort(sort)
                 .build();
     }
-
-
 }

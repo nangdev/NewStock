@@ -2,6 +2,7 @@ package newstock.domain.news.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import newstock.domain.news.entity.News;
 import static newstock.domain.news.entity.QNews.news;
 import org.springframework.stereotype.Repository;
@@ -11,14 +12,11 @@ import java.util.List;
 import java.util.Optional;
 
 
+@RequiredArgsConstructor
 @Repository
 public class NewsCustomRepositoryImpl implements NewsCustomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
-
-    public NewsCustomRepositoryImpl(EntityManager entityManager) {
-        this.jpaQueryFactory = new JPAQueryFactory(entityManager);
-    }
 
     @Override
     public Optional<List<News>> getTopNewsListByStockCode(int stockCode) {

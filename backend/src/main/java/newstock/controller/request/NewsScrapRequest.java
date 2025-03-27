@@ -26,6 +26,4 @@ public class NewsScrapRequest {
                 .userId(userId)
                 .build();
     }
-
-
 }

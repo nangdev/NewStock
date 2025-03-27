@@ -6,13 +6,11 @@ import newstock.controller.request.StockNewsRequest;
 import newstock.controller.response.NewsDetailResponse;
 import newstock.controller.response.NewsScrapResponse;
 import newstock.controller.response.StockNewsResponse;
+import newstock.controller.response.TopNewsResponse;
 import newstock.domain.news.dto.NewsScrapDto;
-import newstock.domain.news.dto.TopNewsDto;
-
-import java.util.List;
 
 public interface NewsService {
-    List<TopNewsDto> getTopNewsListByStockCode(int stockCode);
+    TopNewsResponse getTopNewsListByStockCode(int stockCode);
 
     StockNewsResponse getNewsListByStockCode(StockNewsRequest stockNewsRequest);
 

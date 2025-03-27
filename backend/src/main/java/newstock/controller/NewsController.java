@@ -11,12 +11,9 @@ import newstock.controller.response.NewsScrapResponse;
 import newstock.controller.response.StockNewsResponse;
 import newstock.controller.response.TopNewsResponse;
 import newstock.domain.news.dto.NewsScrapDto;
-import newstock.domain.news.dto.TopNewsDto;
 import newstock.domain.news.service.NewsService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,9 +31,9 @@ public class NewsController {
     @Operation(summary = "stockCode로 상위 5개 뉴스 조회", description = "종목코드를 사용하여 상위 5개 뉴스를 조회합니다.")
     public Api<TopNewsResponse> getTopNewsListByStockCode(@PathVariable int stockCode) {
 
-        List<TopNewsDto> topNewsDtoList = newsService.getTopNewsListByStockCode(stockCode);
+        TopNewsResponse topNewsResponse = newsService.getTopNewsListByStockCode(stockCode);
 
-        return Api.ok(TopNewsResponse.of(topNewsDtoList));
+        return Api.ok(topNewsResponse);
     }
 
     /**

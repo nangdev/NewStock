@@ -17,5 +17,4 @@ public class NewsDetailRequest {
                 .userId(userId)
                 .build();
     }
-
 }

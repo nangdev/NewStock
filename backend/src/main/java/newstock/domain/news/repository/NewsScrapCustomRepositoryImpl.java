@@ -2,7 +2,7 @@ package newstock.domain.news.repository;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import newstock.domain.news.entity.News;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,14 +15,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Repository
 public class NewsScrapCustomRepositoryImpl implements NewsScrapCustomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
-
-    public NewsScrapCustomRepositoryImpl(EntityManager entityManager) {
-        this.jpaQueryFactory = new JPAQueryFactory(entityManager);
-    }
 
     @Override
     public Page<News> findScrappedNewsByUserIdAndStockCode(int userId, int stockCode, Pageable pageable) {
