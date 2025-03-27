@@ -2,12 +2,14 @@ package newstock.domain.news.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class NewsItem {
 
-    private int id;
+    private Integer id;
 
     private String stockCode;
 
