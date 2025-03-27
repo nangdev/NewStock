@@ -17,7 +17,7 @@ public class News {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String stockCode;
+    private Integer stockId;
 
     private String title;
 
@@ -39,13 +39,11 @@ public class News {
     @Lob
     private String newsSummary;
 
-    private String score;
-
-    private String keyword;
+    private int score;
 
     public static News of(NewsItem newsItem) {
         return News.builder()
-                .stockCode(newsItem.getStockCode())
+                .stockId(newsItem.getStockId())
                 .title(newsItem.getTitle())
                 .description(newsItem.getDescription())
                 .content(newsItem.getContent())
@@ -55,8 +53,7 @@ public class News {
                 .pressLogo(newsItem.getPressLogo())
                 .publishedDate(newsItem.getPublishedDate())
                 .newsSummary(newsItem.getNewsSummary())
-                .score(null)
-                .keyword(null)
+                .score(0)
                 .build();
     }
 

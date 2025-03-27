@@ -9,7 +9,7 @@ public class StockMessage {
 
     private String stockName;
 
-    private String stockCode;
+    private Integer stockId;
 
     private String schedulerTime;
 

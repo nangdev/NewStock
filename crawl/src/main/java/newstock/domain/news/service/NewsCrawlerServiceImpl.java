@@ -131,7 +131,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
                             break;
                         }
                     }
-                    item.setStockCode(stockMessage.getStockCode());
+                    item.setStockId(stockMessage.getStockId());
                     collectedNews.add(item);
                 }
 

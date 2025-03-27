@@ -11,7 +11,7 @@ public class NewsItem {
 
     private Integer id;
 
-    private String stockCode;
+    private Integer stockId;
 
     private String title;
 
@@ -31,8 +31,6 @@ public class NewsItem {
 
     private String newsSummary;
 
-    private String score;
-
-    private String keyword;
+    private int score;
 
 }

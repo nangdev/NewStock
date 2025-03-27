@@ -2,12 +2,14 @@ package newstock.domain.news.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import newstock.domain.news.enums.KospiStock;
+import newstock.domain.stock.dto.StockDto;
+import newstock.domain.stock.service.StockService;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -15,25 +17,25 @@ import java.time.Instant;
 public class NewsCrawlerScheduler {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final StockService stockService;
     private static final String TOPIC = "news-crawl-topic";
 
     // 스케줄러가 매 분 0초마다 실행됩니다.
     @Scheduled(cron = "0 * * * * *")
     public void scheduleNewsCrawling() {
-        // 스케줄러 실행 시점의 현재 시간을 ISO-8601 형식(UTC)으로 캡처합니다.
+        List<StockDto> stockList = stockService.getAllStocks();
         Instant schedulerTime = Instant.now();
 
-        for (KospiStock stock : KospiStock.values()) {
+        for (StockDto stock : stockList) {
             try {
                 String message = String.format(
-                        "{\"stockName\":\"%s\", \"stockCode\":\"%s\", \"schedulerTime\":\"%s\"}",
-                        stock.getName(), stock.getCode(), schedulerTime.toString());
+                        "{\"stockName\":\"%s\", \"stockId\":\"%s\", \"schedulerTime\":\"%s\"}",
+                        stock.getStockName(), stock.getStockId(), schedulerTime.toString());
 
-                // stock.getCode()를 key로 지정하여 메시지가 파티셔닝되도록 합니다.
-                kafkaTemplate.send(TOPIC, stock.getCode(), message);
+                kafkaTemplate.send(TOPIC, String.valueOf(stock.getStockId()), message);
                 log.info("Kafka 메시지 전송 완료: {}", message);
             } catch (Exception e) {
-                log.error("Kafka 메시지 전송 중 오류 발생 ({}): {}", stock.getName(), e.getMessage());
+                log.error("Kafka 메시지 전송 중 오류 발생 ({}): {}", stock.getStockName(), e.getMessage());
             }
         }
     }
