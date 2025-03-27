@@ -8,11 +8,11 @@ import newstock.domain.news.entity.NewsScrap;
 @Builder
 public class NewsScrapDto {
 
-    private int userId;
+    private Integer userId;
 
-    private int newsId;
+    private Integer newsId;
 
-    public static NewsScrapDto of(int userId, int newsId) {
+    public static NewsScrapDto of(Integer userId, Integer newsId) {
         return NewsScrapDto.builder()
                 .userId(userId)
                 .newsId(newsId)

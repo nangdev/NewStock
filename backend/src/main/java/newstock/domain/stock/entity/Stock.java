@@ -33,9 +33,7 @@ public class Stock {
 
     private String capital;
 
-    private String parValue;
-
-    private String issuePrice;
+    private String lstgStqt;
 
     private String listingDate;
 

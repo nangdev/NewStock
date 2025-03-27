@@ -16,8 +16,8 @@ public class NewsScrap {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int scrapId;
 
-    private int userId;
+    private Integer userId;
 
-    private int newsId;
+    private Integer newsId;
 
 }

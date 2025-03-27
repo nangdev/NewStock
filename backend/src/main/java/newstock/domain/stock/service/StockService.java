@@ -30,12 +30,12 @@ public class StockService {
                 .toList();
     }
 
-    public List<UserStockDto> getUserStockList(int userId) {
+    public List<UserStockDto> getUserStockList(Integer userId) {
         return stockRepository.findUserStocksByUserId(userId);
     }
 
     @Transactional
-    public void updateUserStockList(int userId, List<Integer> stockCodeList){
+    public void updateUserStockList(Integer userId, List<Integer> stockCodeList){
         try {
             userStockRepository.deleteUserStocksByUserId(userId);
 

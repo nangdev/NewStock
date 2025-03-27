@@ -8,7 +8,7 @@ import newstock.domain.news.entity.News;
 @Builder
 public class StockNewsDto {
 
-    private int newsId;
+    private Integer newsId;
 
     private String title;
 

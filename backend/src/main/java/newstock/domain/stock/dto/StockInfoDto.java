@@ -22,6 +22,8 @@ public class StockInfoDto {
 
     private String capital;
 
+    private String lstgStqt;
+
     private String parValue;
 
     private String issuePrice;
@@ -38,10 +40,9 @@ public class StockInfoDto {
                 .stockImage(new File(stock.getImgUrl()))
                 .totalPrice(stock.getTotalPrice())
                 .capital(stock.getCapital())
-                .parValue(stock.getParValue())
-                .issuePrice(stock.getIssuePrice())
                 .listingDate(stock.getListingDate())
                 .stdIccn(stock.getStdIccn())
+                .lstgStqt(stock.getLstgStqt())
                 .build();
     }
 

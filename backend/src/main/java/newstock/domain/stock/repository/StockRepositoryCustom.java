@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface StockRepositoryCustom {
 
-    List<UserStockDto> findUserStocksByUserId(int userId);
+    List<UserStockDto> findUserStocksByUserId(Integer userId);
 
 }

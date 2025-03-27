@@ -16,7 +16,7 @@ import static newstock.domain.stock.entity.QUserStock.userStock;
 public class StockRepositoryImpl implements StockRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
-    public List<UserStockDto> findUserStocksByUserId(int userId) {
+    public List<UserStockDto> findUserStocksByUserId(Integer userId) {
         return queryFactory
                 .select(Projections.constructor(UserStockDto.class,
                         stock.stockCode,

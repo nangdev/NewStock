@@ -1,7 +1,10 @@
 package newstock.domain.news.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -13,7 +16,7 @@ public class News {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int newsId;
+    private Integer newsId;
 
     private int stockCode;
 

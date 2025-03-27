@@ -14,16 +14,16 @@ import lombok.NoArgsConstructor;
 public class UserStock {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
-    private int userId;
+    private Integer userId;
 
     private int stockCode;
 
     @ManyToOne (fetch = FetchType.LAZY)
     private Stock stock;
 
-    public static UserStock of(int userId, int stockCode) {
+    public static UserStock of(Integer userId, int stockCode) {
         return UserStock.builder()
                 .userId(userId)
                 .stockCode(stockCode)
