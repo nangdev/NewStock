@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import newstock.common.dto.Api;
 import newstock.controller.request.UserRequest;
 import newstock.controller.response.UserResponse;
+import newstock.domain.user.entity.User;
 import newstock.domain.user.service.CustomUserDetails;
 import newstock.domain.user.service.UserService;
 import newstock.exception.type.DuplicateEmailException;
@@ -58,9 +59,18 @@ public class UserController {
     }
 
     @PutMapping("")
-    public ResponseEntity<Api<Void>> updateUserRole(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public Api<Void> updateUserRole(@AuthenticationPrincipal CustomUserDetails userDetails) {
         userService.updateUserRole(userDetails.getUser());
-        return ResponseEntity.ok(Api.ok());
+
+        return Api.ok();
+    }
+
+    @GetMapping("")
+    public Api<UserResponse> getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userDetails.getUser();
+        UserResponse userResponse = UserResponse.of(user);
+
+        return Api.ok(userResponse);
     }
 }
 
