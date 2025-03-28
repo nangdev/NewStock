@@ -32,8 +32,8 @@ public class JwtTokenProvider {
 
 
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000L * 60 * 60;           // 1시간
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000L * 60 * 60 * 24 * 7; // 7일
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000L * 60 * 60* 24 * 14;      // 2주
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000L * 60 * 60 * 24 * 30;    // 1달
 
     // JWT 시크릿 키 설정
     public JwtTokenProvider(

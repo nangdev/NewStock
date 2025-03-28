@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         if (user.getRole() != 0) {
-            throw new ValidationException(ExceptionCode.VALIDATION_ERROR);
+            throw new ValidationException(ExceptionCode.USER_ROLE_UPDATE_ERROR);
         }
 
         user.setRole((byte) 1);

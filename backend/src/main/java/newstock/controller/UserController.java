@@ -7,8 +7,6 @@ import newstock.common.dto.Api;
 import newstock.controller.request.UserRequest;
 import newstock.controller.response.EmailCheckResponse;
 import newstock.controller.response.UserResponse;
-import newstock.domain.user.entity.User;
-import newstock.domain.user.service.CustomUserDetails;
 import newstock.domain.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,6 +33,9 @@ public class UserController {
         return ResponseEntity.ok(Api.ok());
     }
 
+    /**
+     * 유저 정보 조회 API
+     */
     @GetMapping("")
     public ResponseEntity<Api<UserResponse>> getUserInfo(@AuthenticationPrincipal Integer userId) {
 
@@ -51,13 +52,14 @@ public class UserController {
         return ResponseEntity.ok(Api.ok(new EmailCheckResponse(exists)));
     }
 
+    /**
+     * 최초 로그인 시 유저 권한 변경 API
+     */
     @PutMapping("/new")
     public ResponseEntity<Api<Void>> updateUserRole(@AuthenticationPrincipal Integer userId) {
         userService.updateUserRole(userId);
 
         return ResponseEntity.ok(Api.ok());
     }
-
-
 }
 
