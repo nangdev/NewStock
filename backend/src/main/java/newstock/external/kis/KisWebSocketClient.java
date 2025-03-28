@@ -6,6 +6,10 @@ import jakarta.websocket.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import newstock.domain.stock.service.StockPriceService;
+import newstock.exception.ExceptionCode;
+import newstock.exception.type.BusinessException;
+import newstock.exception.type.ExternalApiException;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.net.URI;
@@ -28,15 +32,14 @@ public class KisWebSocketClient {
         return session != null && session.isOpen();
     }
 
-    public void connect() throws Exception {
+    public void connect() {
         try {
             URI endpointURI = new URI("ws://ops.koreainvestment.com:21000");
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.connectToServer(this, endpointURI);
-
-
         } catch (Exception e) {
-
+            log.error("한투 웹소켓 연결 실패");
+            throw new ExternalApiException(ExceptionCode.EXTERNAL_API_ERROR);
         }
     }
 
@@ -60,8 +63,7 @@ public class KisWebSocketClient {
                     .map(KospiStock::getCode)
                     .toList();
 
-            for (String code: codes) {
-
+            for (String code : codes) {
                 KisWebSocketSubMsg msg = new KisWebSocketSubMsg();
                 KisBodyDto body = new KisBodyDto();
                 KisInputDto inputDto = new KisInputDto();
@@ -72,27 +74,24 @@ public class KisWebSocketClient {
 
                 msg.setHeader(header);
                 msg.setBody(body);
-                String jsonString = objectMapper.writeValueAsString(msg);
 
+                String jsonString = objectMapper.writeValueAsString(msg);
                 remote.sendText(jsonString);
                 log.info("subscribe {}", code);
             }
 
-
-        } catch (IOException ioe) {
-
+        } catch (IllegalArgumentException | IOException ioe) {
+            log.error("한투 웹소켓 구독 오류");
+            throw new ExternalApiException(ExceptionCode.EXTERNAL_API_ERROR);
         } catch (Exception e) {
-
+            log.error("한투 웹소켓 세션 오류");
+            throw new ExternalApiException(ExceptionCode.BUSINESS_ERROR);
         }
-
-
     }
 
     @OnMessage
     public void onMessage(String message) {
-
         log.info(message);
-        // 파싱
         try {
             // 구독 성공, pingpong -> json 형태
             if (isJson(message)) {
@@ -106,8 +105,7 @@ public class KisWebSocketClient {
             // 주가 데이터
             else {
                 String[] data = message.split("\\|");
-                // 맨 앞자리가 1이면 암호화되어있는데 단순 체결가는 복호화가 필요없다.
-                // 한번에 여러 데이터가 들어오면 페이징되어서 데이터가 들어오는데 1페이지만 사용
+                // 1페이지만 사용
                 boolean isEncoded = data[0].equals("1");
                 int pages = Integer.parseInt(data[2]);
 
@@ -132,10 +130,9 @@ public class KisWebSocketClient {
 
             }
         } catch (Exception e) {
-
+            // 에러 무시하고 웹소켓 연결 유지
+            log.error("한투 웹소켓 파싱 에러");
         }
-
-
     }
 
     @OnClose

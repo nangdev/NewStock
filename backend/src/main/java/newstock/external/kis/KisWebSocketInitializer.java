@@ -14,14 +14,9 @@ public class KisWebSocketInitializer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-        try {
-            if (!webSocketClient.isConnected()) {
-                webSocketClient.connect();
-            }
-        } catch (Exception e) {
-
+        if (!webSocketClient.isConnected()) {
+            webSocketClient.connect();
         }
-
     }
 
 }
