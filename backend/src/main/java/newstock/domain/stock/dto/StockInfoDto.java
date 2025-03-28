@@ -1,12 +1,16 @@
 package newstock.domain.stock.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import newstock.domain.stock.entity.Stock;
 
 import java.io.File;
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 public class StockInfoDto {
 
