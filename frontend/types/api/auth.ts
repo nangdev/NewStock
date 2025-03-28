@@ -12,3 +12,11 @@ export type LoginResType = BaseResType & {
     refreshToken: string;
   };
 };
+
+export type EmailCheckReqType = {
+  email: string;
+};
+
+export type EmailCheckResType = BaseResType & {
+  isDuplicated: boolean;
+};

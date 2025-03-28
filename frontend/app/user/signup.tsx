@@ -1,27 +1,46 @@
+import { AntDesign } from '@expo/vector-icons';
+import { useCheckEmailMutation, useSignInMutation } from 'api/user/query';
 import BlurOverlay from 'components/BlurOverlay';
 import CustomButton from 'components/CustomButton';
 import InputField from 'components/user/InputField';
 import { ROUTE } from 'constants/routes';
 import { Link } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 
+// Todo: 유효성 검사
 export default function SignUp() {
   const [email, setEmail] = useState('');
-  const [emailChecked, setEmailChecked] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [nickname, setNickname] = useState('');
-  const [name, setName] = useState('');
+  const [userName, setUserName] = useState('');
+
+  const { mutate: signInMutate } = useSignInMutation();
+  const { mutate: checkEmailMutate, isSuccess } = useCheckEmailMutation();
+
+  useEffect(() => {
+    if (isSuccess) {
+      setIsChecked(true);
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    setIsChecked(false);
+  }, [email]);
 
   const onCheckEmail = () => {
-    // Todo: API 연결
-    console.log('이메일 중복 체크:', email);
+    checkEmailMutate({ email });
   };
 
   const onSubmitSignUp = () => {
-    // Todo: API 연결
-    console.log('회원가입');
+    signInMutate({
+      email,
+      password,
+      nickname,
+      userName,
+    });
   };
 
   return (
@@ -35,22 +54,29 @@ export default function SignUp() {
       </View>
 
       <BlurOverlay className="items-center gap-4">
-        <View className="w-full flex-row gap-4">
+        <View className="w-full flex-row items-center gap-4">
           <InputField
             value={email}
             onChangeText={setEmail}
             placeholder="이메일"
             keyboardType="email-address"
-            className="flex-1"
+            className={isChecked ? 'flex-[1.2]' : 'flex-1'}
           />
-          <CustomButton
-            variant="semiRounded"
-            onPress={onCheckEmail}
-            // Todo: API 연결시 활성화
-            // disabled={emailChecked}
-            className="shadow-lg shadow-black">
-            중복체크
-          </CustomButton>
+
+          {!isChecked ? (
+            <View>
+              <CustomButton
+                variant="semiRounded"
+                onPress={onCheckEmail}
+                className="h-[40px] shadow-lg shadow-black">
+                중복체크
+              </CustomButton>
+            </View>
+          ) : (
+            <View>
+              <AntDesign name="check" size={24} color="green" />
+            </View>
+          )}
         </View>
 
         <InputField
@@ -68,12 +94,13 @@ export default function SignUp() {
         />
 
         <InputField value={nickname} onChangeText={setNickname} placeholder="닉네임" />
-        <InputField value={name} onChangeText={setName} placeholder="이름" />
+        <InputField value={userName} onChangeText={setUserName} placeholder="이름" />
 
         <CustomButton
           variant="semiRounded"
           onPress={onSubmitSignUp}
-          className="mt-4 h-[45px] w-full flex-row items-center justify-center rounded-lg bg-primary shadow-lg shadow-black">
+          disabled={!isChecked}
+          className="mt-4 h-[45px] w-full flex-row items-center justify-center rounded-lg bg-primary shadow-lg shadow-black disabled:opacity-70">
           회원가입
         </CustomButton>
 
