@@ -55,4 +55,9 @@ public class StockService {
         return StockInfoDto.of(stock);
     }
 
+    @Transactional
+    public void addUserStock(Integer userId, Integer stockId){
+        userStockRepository.save(UserStock.of(userId, stockId));
+    }
+
 }
