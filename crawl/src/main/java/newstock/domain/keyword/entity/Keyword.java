@@ -10,7 +10,7 @@ import newstock.domain.keyword.dto.KeywordDto;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name="news")
+@Table(name="keywords")
 public class Keyword {
 
     @Id
@@ -19,6 +19,7 @@ public class Keyword {
 
     private Integer stockId;
 
+    @Lob
     private String content;
 
     private String date;

@@ -15,4 +15,20 @@ public class KafkaTopicConfig {
                 .replicas(1)
                 .build();
     }
+
+    @Bean
+    public NewTopic newsAiTopic() {
+        return TopicBuilder.name("news-ai-topic")
+                .partitions(10)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic newsDbTopic() {
+        return TopicBuilder.name("news-db-topic")
+                .partitions(10)
+                .replicas(1)
+                .build();
+    }
 }
