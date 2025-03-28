@@ -50,6 +50,7 @@ deploy:
           echo \"SERVER_CONTEXT_PATH=$SERVER_CONTEXT_PATH\" >> backend/.env &&
           echo \"kakao.client-id=$KAKAO_CLIENT_ID\" >> backend/.env &&
           echo \"kakao.redirect-uri=$KAKAO_REDIRECT_URI\" >> backend/.env &&
+          echo \"JWT_SECRET=$JWT_SECRET\" >> backend/.env &&
           
           # API 서버와 Nginx 재배포
           echo \"dev/service 브랜치: API 서버와 Nginx 배포 중...\"
@@ -90,6 +91,7 @@ deploy:
           echo \"SERVER_CONTEXT_PATH=$SERVER_CONTEXT_PATH\" >> backend/.env &&
           echo \"kakao.client-id=$KAKAO_CLIENT_ID\" >> backend/.env &&
           echo \"kakao.redirect-uri=$KAKAO_REDIRECT_URI\" >> backend/.env &&
+          echo \"JWT_SECRET=$JWT_SECRET\" >> backend/.env &&
           
           # 크롤러 환경 변수
           echo \"APP_NAME=$APP_NAME\" > crawl/.env &&

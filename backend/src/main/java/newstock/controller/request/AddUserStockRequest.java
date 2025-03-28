@@ -4,13 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-public class UpdateUserStockListRequest {
+public class AddUserStockRequest {
 
-    private List<Integer> stockIdList;
+    private Integer stockId;
 
 }

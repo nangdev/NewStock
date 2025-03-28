@@ -32,8 +32,8 @@ public class JwtTokenProvider {
 
 
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000L * 60 * 60;           // 1시간
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000L * 60 * 60 * 24 * 7; // 7일
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000L * 60 * 60* 24 * 14;      // 2주
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000L * 60 * 60 * 24 * 30;    // 1달
 
     // JWT 시크릿 키 설정
     public JwtTokenProvider(
@@ -102,7 +102,7 @@ public class JwtTokenProvider {
     }
 
     /**
-     * ✅ JWT AccessToken으로부터 Authentication 추출
+     * JWT AccessToken으로부터 Authentication 추출
      */
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
@@ -127,7 +127,7 @@ public class JwtTokenProvider {
     }
 
     /**
-     * ✅ JWT에서 Claims(내용) 꺼내기
+     * JWT에서 Claims(내용) 꺼내기
      */
     private Claims parseClaims(String token) {
         try {

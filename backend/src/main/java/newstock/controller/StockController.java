@@ -2,6 +2,7 @@ package newstock.controller;
 
 import lombok.RequiredArgsConstructor;
 import newstock.common.dto.Api;
+import newstock.controller.request.AddUserStockRequest;
 import newstock.controller.request.UpdateUserStockListRequest;
 import newstock.controller.response.StockListResponse;
 import newstock.controller.response.UserStockListResponse;
@@ -37,6 +38,12 @@ public class StockController {
     @GetMapping("/info/{stockId}")
     public ResponseEntity<Api<StockInfoDto>> getStockInfo(@PathVariable Integer stockId){
         return ResponseEntity.ok(Api.ok(stockService.getStockInfo(stockId)));
+    }
+
+    @PostMapping("/interest")
+    public ResponseEntity<Api<Void>> addUserStock(@AuthenticationPrincipal Integer userId, @RequestBody AddUserStockRequest req){
+        stockService.addUserStock(userId, req.getStockId());
+        return ResponseEntity.ok(Api.ok());
     }
 
 }

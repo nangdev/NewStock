@@ -9,11 +9,12 @@ import org.springframework.http.HttpStatus;
 public enum ExceptionCode {
 
     // Controller에서 검증시 발생할 수 있는 예외 작성
-    VALIDATION_ERROR("사용자 입력 값이 검증에 실패했습니다.", 1001,HttpStatus.INTERNAL_SERVER_ERROR),
-    DUPLICATE_EMAIL("이미 사용 중인 이메일입니다.", 1002,HttpStatus.BAD_REQUEST),
+    VALIDATION_ERROR("사용자 입력 값이 검증에 실패했습니다.", 1001,HttpStatus.BAD_REQUEST),
 
     // Service에서 비즈니스 로직 처리시 발생할 수 있는 예외 작성
     BUSINESS_ERROR("비즈니스 로직에서 예외가 발생했습니다.", 2001,HttpStatus.INTERNAL_SERVER_ERROR),
+    DUPLICATE_EMAIL("이미 사용 중인 이메일입니다.", 2002,HttpStatus.BAD_REQUEST),
+    USER_ROLE_UPDATE_ERROR("신규 회원이 아닌 경우 권한 변경이 불가능합니다.",  2003, HttpStatus.BAD_REQUEST),
 
     // Repository에서 데이터베이스 조작시 발생할 수 있는 예외 작성
     DATABASE_ERROR("데이터베이스 조작 과정에서 예외가 발생했습니다.", 3001,HttpStatus.INTERNAL_SERVER_ERROR),
@@ -28,12 +29,13 @@ public enum ExceptionCode {
     STOCK_ALREADY_EXISTS("이미 존재하는 주식입니다.", 3010,HttpStatus.BAD_REQUEST),
     USER_STOCK_ALREADY_EXISTS("이미 존재하는 유저 관심 종목입니다.", 3011,HttpStatus.BAD_REQUEST),
     USER_STOCK_UPDATE_FAILED("유저 관심 종목 수정에 실패했습니다", 3012,HttpStatus.BAD_REQUEST),
+    STOCK_IMAGE_CHANGE_FAIELD("종목 이미지 변환 실패",3013,HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 외부 API 사용시 발생할 수 있는 예외 작성
     EXTERNAL_API_ERROR("외부 API를 호출하는 과정에서 예외가 발생했습니다.", 4001,HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 인증 및 보안 관련 예외 작성
-    TOKEN_INVALID("유효하지 않은 토큰입니다.", 5001, HttpStatus.INTERNAL_SERVER_ERROR),
+    TOKEN_INVALID("유효하지 않은 토큰입니다.", 5001, HttpStatus.UNAUTHORIZED),
 
     // 원인 미상 에러
     INTERNAL_SERVER_ERROR("비상 비상 !! 개발자에게 문의하세요 !!!", 44444444,HttpStatus.INTERNAL_SERVER_ERROR);

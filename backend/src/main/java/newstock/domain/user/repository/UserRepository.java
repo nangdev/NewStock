@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long>, UserCustomRepository  {
+public interface UserRepository extends JpaRepository<User, Integer>, UserCustomRepository  {
 
     /**
      * 이메일을 기반으로 사용자 조회
