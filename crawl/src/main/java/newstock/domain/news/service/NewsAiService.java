@@ -4,11 +4,12 @@ import newstock.domain.keyword.dto.KeywordRequest;
 import newstock.domain.news.dto.AnalysisRequest;
 import newstock.domain.news.dto.AnalysisResponse;
 import newstock.domain.keyword.dto.KeywordResponse;
+import newstock.domain.news.dto.SummarizationRequest;
 import newstock.domain.news.dto.SummarizationResponse;
 
 public interface NewsAiService {
 
-    SummarizationResponse summarize(String content, int maxLength, int minLength, boolean doSample);
+    SummarizationResponse summarize(SummarizationRequest summarizationRequest);
 
     AnalysisResponse analysis(AnalysisRequest analysisRequest);
 

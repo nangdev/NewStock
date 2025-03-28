@@ -34,7 +34,7 @@ public class NewsCrawlerConsumer {
             List<NewsItem> filteredNewsItems = new ArrayList<>();
 
             for (NewsItem item : newsItemList) {
-                AnalysisResponse analysisResponse = newsAiService.analysis(AnalysisRequest.of(item.getContent()));
+                AnalysisResponse analysisResponse = newsAiService.analysis(AnalysisRequest.of(item.getTitle(),item.getContent()));
                 // 점수가 조건에 부합하지 않으면 바로 다음 항목으로 넘어감
                 log.info("점수 채점 완료! 점수 : {}",analysisResponse.getScore());
                 if (!(analysisResponse.getScore() > 5 || analysisResponse.getScore() < -5)) {
@@ -44,7 +44,7 @@ public class NewsCrawlerConsumer {
                 // 조건에 맞는 경우 처리
                 item.setContent(analysisResponse.getContent());
                 try {
-                    SummarizationResponse summarizationResponse = newsAiService.summarize(item.getContent(), 300, 40, false);
+                    SummarizationResponse summarizationResponse = newsAiService.summarize(SummarizationRequest.of(item.getContent(), 300, 40, false));
                     item.setNewsSummary(summarizationResponse.getSummaryContent());
                 } catch (Exception e) {
                     item.setNewsSummary("");

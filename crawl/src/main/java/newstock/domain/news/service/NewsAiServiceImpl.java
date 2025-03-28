@@ -5,6 +5,7 @@ import newstock.domain.news.dto.AnalysisRequest;
 import newstock.domain.news.dto.AnalysisResponse;
 import newstock.domain.keyword.dto.KeywordDto;
 import newstock.domain.keyword.dto.KeywordResponse;
+import newstock.domain.news.dto.SummarizationRequest;
 import newstock.domain.news.dto.SummarizationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,17 +35,17 @@ public class NewsAiServiceImpl implements NewsAiService {
     private final WebClient.Builder webClientBuilder;
 
     @Override
-    public SummarizationResponse summarize(String newsText, int maxLength, int minLength, boolean doSample) {
+    public SummarizationResponse summarize(SummarizationRequest summarizationRequest) {
         WebClient webClient = webClientBuilder
                 .baseUrl(newsAiUrl + "/summarize")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
         Map<String, Object> requestData = new HashMap<>();
-        requestData.put("content", newsText);
-        requestData.put("max_length", maxLength);
-        requestData.put("min_length", minLength);
-        requestData.put("do_sample", doSample);
+        requestData.put("content", summarizationRequest.getContent());
+        requestData.put("max_length", summarizationRequest.getMaxLength());
+        requestData.put("min_length", summarizationRequest.getMinLength());
+        requestData.put("do_sample", summarizationRequest.isDoSample());
 
         SummarizationResponse response = webClient.post()
                 .bodyValue(requestData)
@@ -69,6 +70,7 @@ public class NewsAiServiceImpl implements NewsAiService {
                 .build();
 
         Map<String, String> requestPayload = new HashMap<>();
+        requestPayload.put("title", analysisRequest.getTitle());
         requestPayload.put("content", analysisRequest.getContent());
 
         AnalysisResponse response = webClient.post()
