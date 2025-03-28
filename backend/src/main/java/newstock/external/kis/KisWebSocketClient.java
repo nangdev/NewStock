@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import newstock.domain.stock.service.StockPriceService;
 import newstock.exception.ExceptionCode;
-import newstock.exception.type.BusinessException;
 import newstock.exception.type.ExternalApiException;
-import org.springframework.http.HttpStatus;
+import newstock.external.kis.dto.KisBodyDto;
+import newstock.external.kis.dto.KisHeaderDto;
+import newstock.external.kis.dto.KisInputDto;
+import newstock.external.kis.dto.KisStockInfoDto;
 
 import java.io.IOException;
 import java.net.URI;

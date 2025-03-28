@@ -1,4 +1,4 @@
-package newstock.controller.request;
+package newstock.external.kis.request;
 
 import lombok.Data;
 

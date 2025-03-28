@@ -2,8 +2,7 @@ package newstock.domain.stock.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import newstock.external.kis.KisStockInfoDto;
-import org.springframework.messaging.MessagingException;
+import newstock.external.kis.dto.KisStockInfoDto;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 

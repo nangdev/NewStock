@@ -1,4 +1,4 @@
-package newstock.external.kis;
+package newstock.external.kis.dto;
 
 import lombok.*;
 

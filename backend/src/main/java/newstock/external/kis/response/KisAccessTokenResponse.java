@@ -1,4 +1,4 @@
-package newstock.controller.response;
+package newstock.external.kis.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

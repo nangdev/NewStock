@@ -1,8 +1,8 @@
 package newstock.external.kis;
 
 import lombok.RequiredArgsConstructor;
-import newstock.controller.request.KisAccessTokenRequest;
-import newstock.controller.response.KisAccessTokenResponse;
+import newstock.external.kis.request.KisAccessTokenRequest;
+import newstock.external.kis.response.KisAccessTokenResponse;
 import newstock.external.kis.request.KisWebSocketKeyRequest;
 import newstock.external.kis.response.KisWebSocketKeyResponse;
 import org.springframework.beans.factory.annotation.Value;
