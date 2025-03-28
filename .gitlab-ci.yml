@@ -49,6 +49,7 @@ deploy:
           echo \"JPA_FORMAT_SQL=$JPA_FORMAT_SQL\" >> backend/.env &&
           echo \"SERVER_CONTEXT_PATH=$SERVER_CONTEXT_PATH\" >> backend/.env &&
           echo \"kakao.client-id=$KAKAO_CLIENT_ID\" >> backend/.env &&
+          echo \"JWT_SECRET=$JWT_SECRET\" >> backend/.env &&
           echo \"kakao.redirect-uri=$KAKAO_REDIRECT_URI\" >> backend/.env &&
           echo \"KIS_APP_KEY=$KIS_APP_KEY\" >> backend/.env &&
           echo \"KIS_SECRET_KEY=$KIS_SECRET_KEY\" >> backend/.env &&
