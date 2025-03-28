@@ -72,8 +72,6 @@ async def home():
 @app.post("/score", response_model=ScoreResponse)
 async def score_article(input_data: ScoreRequest):
     try:
-        logger.debug("Received content: %s", input_data.content)
-
         news_dict = {
             "title": input_data.title,
             "content": input_data.content
@@ -82,18 +80,22 @@ async def score_article(input_data: ScoreRequest):
         processed = preprocessing_single_news(news_dict)
 
         if not processed:
-            raise HTTPException(status_code=400, detail="전처리 조건에 부합하지 않음")
+            return ScoreResponse(content="", score=0)
 
         sentences = processed["filtered_sentences"]
         cleaned_content = processed["cleaned_content"]
 
+        logger.debug("sentences: %s", sentences)
+        logger.debug("cleaned_content: %s", cleaned_content)  
+
         scores = []
-        for sentence in sentences:
-            sentence = sentence.strip()
-            if sentence:
-                neg, neu, pos = predict(model, tokenizer, sentence)
+        for sent_obj in sentences:
+            sentence_text = sent_obj["sentence"].strip()
+            if sentence_text:
+                neg, neu, pos = predict(model, tokenizer, sentence_text)
                 score = (pos - neg) * 100
                 scores.append(score)
+
 
         if not scores:
             raise HTTPException(status_code=400, detail="유효한 문장이 없습니다.")
