@@ -2,16 +2,14 @@ package newstock.domain.stock.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import newstock.domain.stock.entity.Stock;
-
-import java.io.File;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
+@Data
 public class StockDto {
 
     private Integer stockId;
@@ -20,14 +18,13 @@ public class StockDto {
 
     private String stockName;
 
-    private File stockImage;
+    private boolean isInterested;
 
     public static StockDto of(Stock stock) {
         return StockDto.builder()
                 .stockId(stock.getStockId())
                 .stockCode(stock.getStockCode())
                 .stockName(stock.getStockName())
-                .stockImage(new File(stock.getImgUrl()))
                 .build();
     }
 
