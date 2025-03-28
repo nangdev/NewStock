@@ -19,14 +19,13 @@ public class NotificationService {
 
     public NotificationListResponse getUserNotifications(Integer userId) {
         List<UserNotification> unList = userNotificationRepository.findAllByUserId(userId);
-
+        int a = 1;
 
         return null;
     }
 
     @Transactional
     public void updateUserNotifications(Integer userId, Integer notificationId) {
-
     }
 
     @Transactional
