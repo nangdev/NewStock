@@ -1,11 +1,11 @@
-package newstock.domain.news.dto;
+package newstock.kafka.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class StockMessage {
+public class NewsCrawlerRequest {
 
     private String stockName;
 

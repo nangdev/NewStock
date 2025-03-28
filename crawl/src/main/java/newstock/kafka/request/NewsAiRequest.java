@@ -1,7 +1,8 @@
-package newstock.domain.news.dto;
+package newstock.kafka.request;
 
 import lombok.Builder;
 import lombok.Data;
+import newstock.domain.news.dto.NewsItem;
 
 import java.util.List;
 

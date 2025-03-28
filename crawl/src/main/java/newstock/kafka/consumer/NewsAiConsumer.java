@@ -1,17 +1,19 @@
-package newstock.kafka;
+package newstock.kafka.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import newstock.domain.news.dto.AnalysisRequest;
 import newstock.domain.news.dto.AnalysisResponse;
-import newstock.domain.news.dto.NewsAiRequest;
 import newstock.domain.news.dto.NewsItem;
 import newstock.domain.news.dto.SummarizationRequest;
 import newstock.domain.news.dto.SummarizationResponse;
 import newstock.domain.news.service.NewsAiService;
-import newstock.domain.news.service.NewsService;
+import newstock.kafka.request.NewsAiRequest;
+import newstock.kafka.request.NewsDbRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -23,14 +25,17 @@ import java.util.List;
 public class NewsAiConsumer {
 
     private final NewsAiService newsAiService;
-    private final NewsService newsService;
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${kafka.topic.news-db}")
+    private String newsDbTopic;
 
     @KafkaListener(topics = "${kafka.topic.news-ai}", groupId = "${kafka.consumer.group.news-ai}")
     public void listen(String message) {
-        log.info("Kafka AI 메시지 수신: {}", message);
+        log.info("Kafka AI 분석 메시지 수신: {}", message);
         try {
-            // Kafka 메시지를 NewsAiRequest 객체로 역직렬화합니다.
+            // AI 분석 요청 메시지를 역직렬화합니다.
             NewsAiRequest aiRequest = objectMapper.readValue(message, NewsAiRequest.class);
             String stockName = aiRequest.getStockName();
             List<NewsItem> newsItemList = aiRequest.getNewsItemList();
@@ -47,7 +52,7 @@ public class NewsAiConsumer {
                     continue;
                 }
                 item.setScore(analysisResponse.getScore());
-                // 분석 후 AI가 반환한 내용을 업데이트
+                // 분석 후 AI가 반환한 내용으로 업데이트
                 item.setContent(analysisResponse.getContent());
                 try {
                     SummarizationResponse summarizationResponse = newsAiService.summarize(
@@ -59,9 +64,14 @@ public class NewsAiConsumer {
                 }
                 filteredNewsItems.add(item);
             }
-            // 최종 분석된 뉴스 아이템들을 DB에 저장하거나 후속 처리합니다.
-            newsService.addNewsItems(filteredNewsItems);
-            log.info("AI 분석 및 요약 완료, 종목: {} 뉴스 개수: {}", stockName, filteredNewsItems.size());
+            log.info("AI 분석 및 요약 완료, 종목: {} / 뉴스 개수: {}", stockName, filteredNewsItems.size());
+
+            // 분석 결과를 DB 저장 단계로 전달하기 위한 메시지 생성
+            String dbMessage = objectMapper.writeValueAsString(NewsDbRequest.of(stockName, filteredNewsItems));
+
+            // DB 저장용 토픽으로 메시지 전송
+            kafkaTemplate.send(newsDbTopic, dbMessage);
+            log.info("Kafka DB 저장 메시지 전송 완료: {}", dbMessage);
         } catch (Exception e) {
             log.error("뉴스 AI 분석 중 오류 발생: {}", e.getMessage());
         }

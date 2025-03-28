@@ -1,10 +1,10 @@
-package newstock.kafka;
+package newstock.kafka.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import newstock.domain.news.dto.NewsAiRequest;
-import newstock.domain.news.dto.StockMessage;
+import newstock.kafka.request.NewsAiRequest;
+import newstock.kafka.request.NewsCrawlerRequest;
 import newstock.domain.news.dto.NewsItem;
 import newstock.domain.news.service.NewsCrawlerService;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,11 +31,11 @@ public class NewsCrawlerConsumer {
         log.info("Kafka 메시지 수신: {}", message);
         try {
             // 크롤링 요청 메시지를 파싱합니다.
-            StockMessage stockMessage = objectMapper.readValue(message, StockMessage.class);
-            String stockName = stockMessage.getStockName();
+            NewsCrawlerRequest newsCrawlerRequest = objectMapper.readValue(message, NewsCrawlerRequest.class);
+            String stockName = newsCrawlerRequest.getStockName();
 
             // 뉴스 크롤링을 수행하여 뉴스 아이템 리스트를 얻습니다.
-            List<NewsItem> newsItemList = newsCrawlerService.fetchNews(stockMessage);
+            List<NewsItem> newsItemList = newsCrawlerService.fetchNews(newsCrawlerRequest);
 
             // 뉴스 크롤링 결과를 AI 분석 단계로 전달하기 위해 새로운 메시지 생성
             String aiMessage = objectMapper.writeValueAsString(NewsAiRequest.of(stockName, newsItemList));

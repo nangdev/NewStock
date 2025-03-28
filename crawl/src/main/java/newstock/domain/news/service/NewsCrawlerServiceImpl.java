@@ -3,7 +3,7 @@ package newstock.domain.news.service;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
 import newstock.domain.news.dto.NewsItem;
-import newstock.domain.news.dto.StockMessage;
+import newstock.kafka.request.NewsCrawlerRequest;
 import newstock.domain.news.util.ArticleCleaner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -44,7 +44,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
      * 나중에 AI 필터링 등의 추가 처리를 위해 이 리스트를 활용할 수 있습니다.
      */
     @Override
-    public List<NewsItem> fetchNews(StockMessage stockMessage) throws InterruptedException {
+    public List<NewsItem> fetchNews(NewsCrawlerRequest newsCrawlerRequest) throws InterruptedException {
         // WebDriver 설정 - RemoteWebDriver로 변경
         WebDriver driver = null;
         try {
@@ -76,7 +76,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 //        WebDriver driver = new ChromeDriver(options);
 //        WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
         // 뉴스 목록 페이지 URL 구성
-        String baseUrl = "https://search.naver.com/search.naver?where=news&query=" + stockMessage.getStockName() +
+        String baseUrl = "https://search.naver.com/search.naver?where=news&query=" + newsCrawlerRequest.getStockName() +
                 "&sm=tab_opt&sort=1&photo=0&field=0&pd=0&ds=&de=&docid=&related=0&mynews=0" +
                 "&office_type=0&office_section_code=0&news_office_checked=&nso=so%3Add%2Cp%3Aall" +
                 "&is_sug_officeid=0&office_category=0&service_area=0";
@@ -85,7 +85,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
         boolean stopCrawling = false;
 
         // 스케줄러에서 전달받은 시간을 기준으로 파싱
-        Instant schedulerTime = Instant.parse(stockMessage.getSchedulerTime());
+        Instant schedulerTime = Instant.parse(newsCrawlerRequest.getSchedulerTime());
         // OLDER_THAN_DURATION 이전의 뉴스는 수집하지 않도록 기준 시간을 계산
         Instant thresholdTime = schedulerTime.minus(OLDER_THAN_DURATION);
 
@@ -131,7 +131,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
                             break;
                         }
                     }
-                    item.setStockId(stockMessage.getStockId());
+                    item.setStockId(newsCrawlerRequest.getStockId());
                     collectedNews.add(item);
                 }
 
