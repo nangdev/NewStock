@@ -14,16 +14,16 @@ const DOMAIN = {
 export const API_PATH = {
   USER: {
     INFO: DOMAIN.USER,
+    CHECK_EMAIL: `${DOMAIN.USER}/check-email`,
     SIGN_IN: DOMAIN.USER,
     WITHDRAW: DOMAIN.USER,
     NEW: `${DOMAIN.USER}/new`,
   },
   AUTH: {
     SOCIAL: `${DOMAIN.AUTH}/social-login`,
-    CHECK_EMAIL: `${DOMAIN.AUTH}/social-login/check-email`,
-    LOGIN: `${DOMAIN.AUTH}/social-login/login`,
-    LOGOUT: `${DOMAIN.AUTH}/social-login/logout`,
-    ACCESS: `${DOMAIN.AUTH}/social-login/access`,
-    REFRESH: `${DOMAIN.AUTH}/social-login/refresh`,
+    LOGIN: `${DOMAIN.AUTH}/login`,
+    LOGOUT: `${DOMAIN.AUTH}/logout`,
+    ACCESS: `${DOMAIN.AUTH}/access`,
+    REFRESH: `${DOMAIN.AUTH}/refresh`,
   },
 };
