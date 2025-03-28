@@ -41,7 +41,6 @@ public class KisWebSocketClient {
             container.connectToServer(this, endpointURI);
         } catch (Exception e) {
             log.error("한투 웹소켓 연결 실패");
-            throw new ExternalApiException(ExceptionCode.EXTERNAL_API_ERROR);
         }
     }
 
@@ -79,21 +78,19 @@ public class KisWebSocketClient {
 
                 String jsonString = objectMapper.writeValueAsString(msg);
                 remote.sendText(jsonString);
-                log.info("subscribe {}", code);
+//                log.info("subscribe {}", code);
             }
 
         } catch (IllegalArgumentException | IOException ioe) {
             log.error("한투 웹소켓 구독 오류");
-            throw new ExternalApiException(ExceptionCode.EXTERNAL_API_ERROR);
         } catch (Exception e) {
             log.error("한투 웹소켓 세션 오류");
-            throw new ExternalApiException(ExceptionCode.BUSINESS_ERROR);
         }
     }
 
     @OnMessage
     public void onMessage(String message) {
-        log.info(message);
+//        log.info(message);
         try {
             // 구독 성공, pingpong -> json 형태
             if (isJson(message)) {
@@ -132,7 +129,6 @@ public class KisWebSocketClient {
 
             }
         } catch (Exception e) {
-            // 에러 무시하고 웹소켓 연결 유지
             log.error("한투 웹소켓 파싱 에러");
         }
     }
