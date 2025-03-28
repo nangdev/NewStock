@@ -51,7 +51,10 @@ api.interceptors.response.use(
     //   }
     // }
 
-    console.error('API Error:', error.response?.data || error.message);
+    // Memo: 개발 환경에서만 에러 로그 표시
+    if (__DEV__) {
+      console.error('API Error:', error.response?.data || error.message);
+    }
     return Promise.reject(error);
   }
 );

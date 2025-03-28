@@ -1,5 +1,5 @@
 import { API_BASE_URL, API_PATH } from 'constants/api';
-import { createServer } from 'miragejs';
+import { createServer, Response } from 'miragejs';
 
 export function makeServer({ environment = 'development' } = {}) {
   if (window.server) {
@@ -30,7 +30,20 @@ export function makeServer({ environment = 'development' } = {}) {
       this.get(`${API_BASE_URL}/${API_PATH.USER.CHECK_EMAIL}`, () => {
         return {
           data: {
-            isDuplicated: true,
+            isDuplicated: false,
+          },
+        };
+      });
+
+      // Memo: 유저 정보 조회
+      this.get(`${API_BASE_URL}/${API_PATH.USER.INFO}`, () => {
+        return {
+          data: {
+            userId: '1',
+            email: 'ssafy@naver.com',
+            userName: '김싸피',
+            nickname: '싸피좋아',
+            role: 0,
           },
         };
       });

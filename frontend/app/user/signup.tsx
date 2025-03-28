@@ -18,11 +18,13 @@ export default function SignUp() {
   const [userName, setUserName] = useState('');
 
   const { mutate: signInMutate } = useSignInMutation();
-  const { mutate: checkEmailMutate, isSuccess } = useCheckEmailMutation();
+  const { mutate: checkEmailMutate, isSuccess, data } = useCheckEmailMutation();
 
   useEffect(() => {
     if (isSuccess) {
-      setIsChecked(true);
+      if (!data.data.isDuplicated) {
+        setIsChecked(true);
+      }
     }
   }, [isSuccess]);
 

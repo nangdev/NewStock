@@ -1,8 +1,8 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 
-import { getCheckEmail, postSignIn } from '.';
+import { getCheckEmail, getUserInfo, postSignIn } from '.';
 
 export const useSignInMutation = () => {
   const router = useRouter();
@@ -31,5 +31,13 @@ export const useCheckEmailMutation = () => {
       // Todo: 에러 처리
       console.error(error);
     },
+  });
+};
+
+export const useUserInfoQuery = () => {
+  return useQuery({
+    queryKey: ['userInfo'],
+    queryFn: getUserInfo,
+    retry: false,
   });
 };

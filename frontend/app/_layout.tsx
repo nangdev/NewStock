@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Slot } from 'expo-router';
 import { makeServer } from 'mocks/mockServer';
+import UserProvider from 'providers/UserProvider';
 import { useEffect } from 'react';
 import { ImageBackground } from 'react-native';
 
@@ -28,7 +29,9 @@ export default function Layout() {
       style={{ flex: 1 }}
       imageStyle={{ resizeMode: 'cover' }}>
       <QueryClientProvider client={queryClient}>
-        <Slot />
+        <UserProvider>
+          <Slot />
+        </UserProvider>
       </QueryClientProvider>
     </ImageBackground>
   );
