@@ -79,7 +79,7 @@ deploy:
 
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/ai\" ]]; then
 
-          echo \"dev/crawl 브랜치: AI 서비스 배포 중...\"
+          echo \"dev/ai 브랜치: AI 서비스 배포 중...\"
           docker-compose build ai
           docker-compose up -d --no-deps ai
           
