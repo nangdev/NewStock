@@ -102,7 +102,7 @@ public class JwtTokenProvider {
     }
 
     /**
-     * ✅ JWT AccessToken으로부터 Authentication 추출
+     * JWT AccessToken으로부터 Authentication 추출
      */
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
@@ -127,7 +127,7 @@ public class JwtTokenProvider {
     }
 
     /**
-     * ✅ JWT에서 Claims(내용) 꺼내기
+     * JWT에서 Claims(내용) 꺼내기
      */
     private Claims parseClaims(String token) {
         try {

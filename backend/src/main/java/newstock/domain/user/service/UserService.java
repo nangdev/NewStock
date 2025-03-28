@@ -17,5 +17,7 @@ public interface UserService {
     // 로그인
     LoginResponse login(LoginRequest loginRequest);
 
-    void updateUserRole(User user);
+    void updateUserRole(Integer userId);
+
+    UserResponse getUserInfo(Integer userId);
 }

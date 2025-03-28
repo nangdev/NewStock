@@ -1,5 +1,6 @@
 package newstock.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import newstock.common.dto.Api;
@@ -28,10 +29,16 @@ public class UserController {
      * @return 생성된 사용자 정보
      */
     @PostMapping("")
-    public ResponseEntity<Api<Void>> addUser(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<Api<Void>> addUser(@Valid @RequestBody UserRequest userRequest) {
         userService.addUser(userRequest);
 
         return ResponseEntity.ok(Api.ok());
+    }
+
+    @GetMapping("")
+    public ResponseEntity<Api<UserResponse>> getUserInfo(@AuthenticationPrincipal Integer userId) {
+
+        return ResponseEntity.ok(Api.ok(userService.getUserInfo(userId)));
     }
 
     /**
@@ -44,19 +51,13 @@ public class UserController {
         return ResponseEntity.ok(Api.ok(new EmailCheckResponse(exists)));
     }
 
-    @PutMapping("")
-    public Api<Void> updateUserRole(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        userService.updateUserRole(userDetails.getUser());
+    @PutMapping("/new")
+    public ResponseEntity<Api<Void>> updateUserRole(@AuthenticationPrincipal Integer userId) {
+        userService.updateUserRole(userId);
 
-        return Api.ok();
+        return ResponseEntity.ok(Api.ok());
     }
 
-    @GetMapping("")
-    public Api<UserResponse> getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        User user = userDetails.getUser();
-        UserResponse userResponse = UserResponse.of(user);
 
-        return Api.ok(userResponse);
-    }
 }
 

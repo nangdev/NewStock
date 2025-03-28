@@ -3,9 +3,12 @@ package newstock.exception;
 import lombok.extern.slf4j.Slf4j;
 import newstock.common.dto.Api;
 import newstock.exception.type.InternalException;
+import newstock.exception.type.ValidationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.validation.ObjectError;
 
 @RestControllerAdvice
 @Slf4j
@@ -29,5 +32,18 @@ public class GlobalExceptionHandler {
         ExceptionCode ec = ExceptionCode.EXTERNAL_API_ERROR;
 
         return ResponseEntity.status(ec.getStatus()).body(Api.ERROR(ec.getMessage(), ec.getCode()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Api<Integer>> handleValidationException(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .findFirst()
+                .map(ObjectError::getDefaultMessage)
+                .orElse("요청값이 유효하지 않습니다.");
+
+        ExceptionCode ec = ExceptionCode.VALIDATION_ERROR;
+        return ResponseEntity.status(ec.getStatus()).body(Api.ERROR(message, ec.getCode()));
     }
 }
