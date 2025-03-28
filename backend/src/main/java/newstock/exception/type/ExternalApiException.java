@@ -4,17 +4,13 @@ import lombok.Getter;
 import newstock.exception.ExceptionCode;
 
 @Getter
-public class ExternalApiException extends RuntimeException {
-
-    private final ExceptionCode exceptionCode;
+public class ExternalApiException extends InternalException {
 
     public ExternalApiException(ExceptionCode exceptionCode) {
-        super(exceptionCode.getMessage());
-        this.exceptionCode = exceptionCode;
+        super(exceptionCode);
     }
 
-    public ExternalApiException(String message, ExceptionCode exceptionCode) {
-        super(message);
-        this.exceptionCode = exceptionCode;
+    public ExternalApiException(ExceptionCode exceptionCode, String message) {
+        super(exceptionCode, message);
     }
 }

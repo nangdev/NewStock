@@ -19,10 +19,10 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
     }
 
     @Override
-    public Optional<User> findById(int id) {
+    public Optional<User> findById(Integer userId) {
         return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(user)
-                .where(user.id.eq(id))
+                .where(user.userId.eq(userId))
                 .fetchOne());
 
     }

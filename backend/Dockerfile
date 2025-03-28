@@ -1,9 +1,9 @@
-FROM gradle:7.4.2-jdk11 AS build
+FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
 COPY . .
-RUN gradle build --no-daemon
+RUN gradle clean build -x test --no-daemon --refresh-dependencies --stacktrace
 
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17.0.12_7-jre-jammy
 COPY --from=build /app/build/libs/*.jar app.jar
 COPY .env /.env
 EXPOSE 8080

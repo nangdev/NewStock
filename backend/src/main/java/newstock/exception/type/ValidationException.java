@@ -4,17 +4,12 @@ import lombok.Getter;
 import newstock.exception.ExceptionCode;
 
 @Getter
-public class ValidationException extends RuntimeException {
-
-    private final ExceptionCode exceptionCode;
-
+public class ValidationException extends InternalException {
     public ValidationException(ExceptionCode exceptionCode) {
-        super(exceptionCode.getMessage());
-        this.exceptionCode = exceptionCode;
+        super(exceptionCode);
     }
 
-    public ValidationException(String message, ExceptionCode exceptionCode) {
-        super(message);
-        this.exceptionCode = exceptionCode;
+    public ValidationException(ExceptionCode exceptionCode, String message) {
+        super(exceptionCode, message);
     }
 }

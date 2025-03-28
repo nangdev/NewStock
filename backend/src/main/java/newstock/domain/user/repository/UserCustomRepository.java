@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface UserCustomRepository {
 
-    Optional<User> findById(int id);
+    Optional<User> findById(Integer userId);
 }
