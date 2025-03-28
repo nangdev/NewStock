@@ -1,37 +1,36 @@
 package newstock.domain.news.dto;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class NewsItem {
 
-    int id;
+    private Integer id;
 
-    String stockCode;
+    private Integer stockId;
 
-    String title;
+    private String title;
 
-    String description;
+    private String description;
 
-    String content;
+    private String content;
 
-    String newsImage;
+    private String newsImage;
 
-    String url;
+    private String url;
 
-    String press;
+    private String press;
 
-    String pressLogo;
+    private String pressLogo;
 
-    String publishedDate;
+    private String publishedDate;
 
-    String newsSummary;
+    private String newsSummary;
 
-    String score;
-
-    String keyword;
-
+    private int score;
 
 }
