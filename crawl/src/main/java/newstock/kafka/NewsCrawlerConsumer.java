@@ -3,14 +3,15 @@ package newstock.kafka;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import newstock.domain.news.dto.*;
+import newstock.domain.news.dto.NewsAiRequest;
+import newstock.domain.news.dto.StockMessage;
+import newstock.domain.news.dto.NewsItem;
 import newstock.domain.news.service.NewsCrawlerService;
-import newstock.domain.news.service.NewsService;
-import newstock.domain.news.service.NewsAiService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -19,40 +20,29 @@ import java.util.List;
 public class NewsCrawlerConsumer {
 
     private final NewsCrawlerService newsCrawlerService;
-    private final NewsService newsService;
-    private final NewsAiService newsAiService;
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @KafkaListener(topics = "news-crawl-topic", groupId = "news-crawl-group")
+    @Value("${kafka.topic.news-ai}")
+    private String newsAiTopic;
+
+    @KafkaListener(topics = "${kafka.topic.news-crawl}", groupId = "${spring.kafka.consumer.group-id}")
     public void listen(String message) {
         log.info("Kafka 메시지 수신: {}", message);
         try {
+            // 크롤링 요청 메시지를 파싱합니다.
             StockMessage stockMessage = objectMapper.readValue(message, StockMessage.class);
             String stockName = stockMessage.getStockName();
 
+            // 뉴스 크롤링을 수행하여 뉴스 아이템 리스트를 얻습니다.
             List<NewsItem> newsItemList = newsCrawlerService.fetchNews(stockMessage);
-            List<NewsItem> filteredNewsItems = new ArrayList<>();
 
-            for (NewsItem item : newsItemList) {
-                AnalysisResponse analysisResponse = newsAiService.analysis(AnalysisRequest.of(item.getTitle(),item.getContent()));
-                // 점수가 조건에 부합하지 않으면 바로 다음 항목으로 넘어감
-                log.info("점수 채점 완료! 점수 : {}",analysisResponse.getScore());
-                if (!(analysisResponse.getScore() > 5 || analysisResponse.getScore() < -5)) {
-                    continue;
-                }
-                item.setScore(analysisResponse.getScore());
-                // 조건에 맞는 경우 처리
-                item.setContent(analysisResponse.getContent());
-                try {
-                    SummarizationResponse summarizationResponse = newsAiService.summarize(SummarizationRequest.of(item.getContent(), 300, 40, false));
-                    item.setNewsSummary(summarizationResponse.getSummaryContent());
-                } catch (Exception e) {
-                    item.setNewsSummary("");
-                }
-                filteredNewsItems.add(item);
-            }
-            newsService.addNewsItems(filteredNewsItems);
-            log.info("크롤링 및 요약 완료, 종목: {} 뉴스 개수: {}", stockName, filteredNewsItems.size());
+            // 뉴스 크롤링 결과를 AI 분석 단계로 전달하기 위해 새로운 메시지 생성
+            String aiMessage = objectMapper.writeValueAsString(NewsAiRequest.of(stockName, newsItemList));
+
+            // 새로운 Kafka 토픽으로 메시지를 전송합니다.
+            kafkaTemplate.send(newsAiTopic, aiMessage);
+            log.info("Kafka AI 분석 메시지 전송 완료: {}", aiMessage);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("뉴스 크롤링 인터럽트 발생: {}", e.getMessage());
@@ -60,5 +50,4 @@ public class NewsCrawlerConsumer {
             log.error("뉴스 크롤링 중 오류 발생: {}", e.getMessage());
         }
     }
-
 }
