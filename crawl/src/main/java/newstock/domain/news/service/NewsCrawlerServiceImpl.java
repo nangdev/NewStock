@@ -1,5 +1,6 @@
 package newstock.domain.news.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +44,6 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
     // Selenium Grid URL을 환경 변수에서 가져옴
     @Value("${selenium.remote.url:http://selenium-hub:4444/wd/hub}")
     private String remoteUrl;
-
-    // ObjectMapper를 DI로 주입받음
-    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     /**
      * 주어진 종목명에 대한 뉴스들을 수집한 후 리스트로 반환합니다.
