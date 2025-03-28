@@ -1,7 +1,9 @@
 package newstock.domain.stock.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import newstock.domain.stock.entity.Stock;
 import newstock.exception.ExceptionCode;
 import newstock.exception.type.InternalException;
@@ -12,6 +14,8 @@ import java.nio.file.Files;
 import java.util.Base64;
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 public class StockInfoDto {
 
