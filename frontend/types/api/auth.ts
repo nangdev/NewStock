@@ -1,3 +1,5 @@
+import { UserInfoType } from 'types/user';
+
 import { BaseResType } from './base';
 
 export type LoginReqType = {
@@ -18,5 +20,11 @@ export type EmailCheckReqType = {
 };
 
 export type EmailCheckResType = BaseResType & {
-  isDuplicated: boolean;
+  data: {
+    isDuplicated: boolean;
+  };
+};
+
+export type UserInfoResType = BaseResType & {
+  data: UserInfoType;
 };
