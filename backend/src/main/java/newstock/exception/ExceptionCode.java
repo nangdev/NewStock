@@ -28,6 +28,7 @@ public enum ExceptionCode {
     STOCK_ALREADY_EXISTS("이미 존재하는 주식입니다.", 3010,HttpStatus.BAD_REQUEST),
     USER_STOCK_ALREADY_EXISTS("이미 존재하는 유저 관심 종목입니다.", 3011,HttpStatus.BAD_REQUEST),
     USER_STOCK_UPDATE_FAILED("유저 관심 종목 수정에 실패했습니다", 3012,HttpStatus.BAD_REQUEST),
+    STOCK_IMAGE_CHANGE_FAIELD("종목 이미지 변환 실패",3013,HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 외부 API 사용시 발생할 수 있는 예외 작성
     EXTERNAL_API_ERROR("외부 API를 호출하는 과정에서 예외가 발생했습니다.", 4001,HttpStatus.INTERNAL_SERVER_ERROR),
