@@ -129,6 +129,7 @@ public class JwtTokenProvider {
     /**
      * JWT에서 Claims(내용) 꺼내기
      */
+
     private Claims parseClaims(String token) {
         try {
             return Jwts.parserBuilder()
@@ -140,4 +141,19 @@ public class JwtTokenProvider {
             return e.getClaims();
         }
     }
+
+    /**
+     * 토큰 남은 시간 구하기
+     */
+    public long getTokenRemainingTime(String token) {
+        Date expiration = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+
+        return expiration.getTime() - System.currentTimeMillis();
+    }
+
 }
