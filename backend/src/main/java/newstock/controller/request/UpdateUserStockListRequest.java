@@ -1,14 +1,14 @@
 package newstock.controller.request;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
 public class UpdateUserStockListRequest {
 
     private List<Integer> stockIdList;

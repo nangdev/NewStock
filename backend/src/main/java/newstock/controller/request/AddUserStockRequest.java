@@ -1,10 +1,12 @@
 package newstock.controller.request;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AddUserStockRequest {
 
     private Integer stockId;
