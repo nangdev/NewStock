@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface NewsService {
 
-    void saveNewsItems(List<NewsItem> newsItemList);
+    void addNewsItems(List<NewsItem> newsItemList);
 }
