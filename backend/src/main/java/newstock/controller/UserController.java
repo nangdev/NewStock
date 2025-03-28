@@ -1,13 +1,12 @@
 package newstock.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import newstock.common.dto.Api;
 import newstock.controller.request.UserRequest;
 import newstock.controller.response.EmailCheckResponse;
 import newstock.controller.response.UserResponse;
-import newstock.domain.user.entity.User;
-import newstock.domain.user.service.CustomUserDetails;
 import newstock.domain.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,10 +27,19 @@ public class UserController {
      * @return 생성된 사용자 정보
      */
     @PostMapping("")
-    public ResponseEntity<Api<Void>> addUser(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<Api<Void>> addUser(@Valid @RequestBody UserRequest userRequest) {
         userService.addUser(userRequest);
 
         return ResponseEntity.ok(Api.ok());
+    }
+
+    /**
+     * 유저 정보 조회 API
+     */
+    @GetMapping("")
+    public ResponseEntity<Api<UserResponse>> getUserInfo(@AuthenticationPrincipal Integer userId) {
+
+        return ResponseEntity.ok(Api.ok(userService.getUserInfo(userId)));
     }
 
     /**
@@ -44,19 +52,14 @@ public class UserController {
         return ResponseEntity.ok(Api.ok(new EmailCheckResponse(exists)));
     }
 
-    @PutMapping("")
-    public Api<Void> updateUserRole(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        userService.updateUserRole(userDetails.getUser());
+    /**
+     * 최초 로그인 시 유저 권한 변경 API
+     */
+    @PutMapping("/new")
+    public ResponseEntity<Api<Void>> updateUserRole(@AuthenticationPrincipal Integer userId) {
+        userService.updateUserRole(userId);
 
-        return Api.ok();
-    }
-
-    @GetMapping("")
-    public Api<UserResponse> getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        User user = userDetails.getUser();
-        UserResponse userResponse = UserResponse.of(user);
-
-        return Api.ok(userResponse);
+        return ResponseEntity.ok(Api.ok());
     }
 }
 

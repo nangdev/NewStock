@@ -17,13 +17,4 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
     public UserCustomRepositoryImpl(EntityManager entityManager) {
         this.jpaQueryFactory = new JPAQueryFactory(entityManager);
     }
-
-    @Override
-    public Optional<User> findById(Integer userId) {
-        return Optional.ofNullable(jpaQueryFactory
-                .selectFrom(user)
-                .where(user.userId.eq(userId))
-                .fetchOne());
-
-    }
 }

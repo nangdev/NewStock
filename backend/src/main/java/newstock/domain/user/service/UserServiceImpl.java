@@ -89,14 +89,23 @@ public class UserServiceImpl implements UserService {
     // 회원가입 후 최초 로그인 시, 유저 권한을 1(USER)로 변경
     @Override
     @Transactional
-    public void updateUserRole(User user) {
+    public void updateUserRole(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
+
         if (user.getRole() != 0) {
-            throw new ValidationException(ExceptionCode.VALIDATION_ERROR);
+            throw new ValidationException(ExceptionCode.USER_ROLE_UPDATE_ERROR);
         }
 
         user.setRole((byte) 1);
         userRepository.save(user);
     }
 
-}
+    @Override
+    public UserResponse getUserInfo(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
+        return UserResponse.of(user);
+    }
+}
