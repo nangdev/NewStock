@@ -21,7 +21,7 @@ public class NewsCrawlerConsumer {
 
     private final NewsCrawlerService newsCrawlerService;
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper; // DI를 통한 주입
 
     @Value("${kafka.topic.news-ai}")
     private String newsAiTopic;
@@ -41,13 +41,17 @@ public class NewsCrawlerConsumer {
             String aiMessage = objectMapper.writeValueAsString(NewsAiRequest.of(stockName, newsItemList));
 
             // 새로운 Kafka 토픽으로 메시지를 전송합니다.
-            kafkaTemplate.send(newsAiTopic, aiMessage);
-            log.info("Kafka AI 분석 메시지 전송 완료: {}", aiMessage);
+            kafkaTemplate.send(newsAiTopic, aiMessage)
+                    .thenAccept(result -> log.info("Kafka AI 분석 메시지 전송 완료: {}", aiMessage))
+                    .exceptionally(ex -> {
+                        log.error("Kafka AI 분석 메시지 전송 실패: ", ex);
+                        return null;
+                    });
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("뉴스 크롤링 인터럽트 발생: {}", e.getMessage());
+            log.error("뉴스 크롤링 인터럽트 발생: ", e);
         } catch (Exception e) {
-            log.error("뉴스 크롤링 중 오류 발생: {}", e.getMessage());
+            log.error("뉴스 크롤링 중 오류 발생: ", e);
         }
     }
 }

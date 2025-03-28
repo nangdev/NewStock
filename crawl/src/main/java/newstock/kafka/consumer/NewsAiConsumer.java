@@ -26,7 +26,7 @@ public class NewsAiConsumer {
 
     private final NewsAiService newsAiService;
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper; // 생성자 주입 방식
 
     @Value("${kafka.topic.news-db}")
     private String newsDbTopic;
@@ -48,7 +48,7 @@ public class NewsAiConsumer {
                 );
                 log.info("점수 채점 완료! 점수: {}", analysisResponse.getScore());
                 // 점수가 조건에 부합하지 않으면 건너뜁니다.
-                if (!(analysisResponse.getScore() > 5 || analysisResponse.getScore() < -5)) {
+                if (!(analysisResponse.getScore() > 2 || analysisResponse.getScore() < -2)) {
                     continue;
                 }
                 item.setScore(analysisResponse.getScore());
@@ -60,6 +60,7 @@ public class NewsAiConsumer {
                     );
                     item.setNewsSummary(summarizationResponse.getSummaryContent());
                 } catch (Exception e) {
+                    log.error("요약 처리 중 오류 발생: ", e);
                     item.setNewsSummary("");
                 }
                 filteredNewsItems.add(item);
@@ -70,10 +71,14 @@ public class NewsAiConsumer {
             String dbMessage = objectMapper.writeValueAsString(NewsDbRequest.of(stockName, filteredNewsItems));
 
             // DB 저장용 토픽으로 메시지 전송
-            kafkaTemplate.send(newsDbTopic, dbMessage);
-            log.info("Kafka DB 저장 메시지 전송 완료: {}", dbMessage);
+            kafkaTemplate.send(newsDbTopic, dbMessage)
+                    .thenAccept(result -> log.info("Kafka DB 저장 메시지 전송 완료: {}", dbMessage))
+                    .exceptionally(ex -> {
+                        log.error("Kafka DB 저장 메시지 전송 실패: ", ex);
+                        return null;
+                    });
         } catch (Exception e) {
-            log.error("뉴스 AI 분석 중 오류 발생: {}", e.getMessage());
+            log.error("뉴스 AI 분석 중 오류 발생: ", e);
         }
     }
 }

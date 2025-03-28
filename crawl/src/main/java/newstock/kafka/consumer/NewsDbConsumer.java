@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import newstock.domain.news.service.NewsService;
 import newstock.kafka.request.NewsDbRequest;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class NewsDbConsumer {
 
     private final NewsService newsService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper; // 생성자 주입 방식으로 DI
 
     @KafkaListener(topics = "${kafka.topic.news-db}", groupId = "${kafka.consumer.group.news-db}")
     public void listen(String message) {
@@ -29,7 +28,7 @@ public class NewsDbConsumer {
             newsService.addNewsItems(dbRequest.getFilteredNewsItems());
             log.info("DB 저장 완료, 종목: {} / 뉴스 개수: {}", stockName, dbRequest.getFilteredNewsItems().size());
         } catch (Exception e) {
-            log.error("뉴스 DB 저장 중 오류 발생: {}", e.getMessage());
+            log.error("뉴스 DB 저장 중 오류 발생: ", e);
         }
     }
 }
