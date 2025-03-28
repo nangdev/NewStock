@@ -2,7 +2,7 @@ package newstock.domain.notification.service;
 
 import lombok.RequiredArgsConstructor;
 import newstock.controller.response.NotificationListResponse;
-import newstock.domain.notification.entity.UserNotification;
+import newstock.domain.notification.dto.UserNotificationDto;
 import newstock.domain.notification.repository.NotificationRepository;
 import newstock.domain.notification.repository.UserNotificationRepository;
 import org.springframework.stereotype.Service;
@@ -18,10 +18,11 @@ public class NotificationService {
     private final UserNotificationRepository userNotificationRepository;
 
     public NotificationListResponse getUserNotifications(Integer userId) {
-        List<UserNotification> unList = userNotificationRepository.findAllByUserId(userId);
-        int a = 1;
+        List<UserNotificationDto> notificationList = userNotificationRepository.findUserNotificationsWithDetails(userId);
 
-        return null;
+        return NotificationListResponse.builder()
+                .notificationList(notificationList)
+                .build();
     }
 
     @Transactional

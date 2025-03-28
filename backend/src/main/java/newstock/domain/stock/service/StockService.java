@@ -10,9 +10,14 @@ import newstock.domain.stock.repository.StockRepository;
 import newstock.domain.stock.repository.UserStockRepository;
 import newstock.exception.ExceptionCode;
 import newstock.exception.type.DbException;
+import newstock.exception.type.InternalException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -23,15 +28,31 @@ public class StockService {
 
     private final StockRepository stockRepository;
 
-    public List<StockDto> getStockList() {
-        return stockRepository.findAll()
+    public List<StockDto> getStockList(Integer userId) {
+        List<StockDto> stockDtoList = stockRepository.findAll()
                 .stream()
                 .map(StockDto::of)
                 .toList();
+
+        List<UserStock> userStockList = userStockRepository.findUserStocksByUserId(userId);
+
+        for(UserStock userStock : userStockList) {
+            stockDtoList.get(userStock.getStockId()-1).setInterested(true);
+        }
+
+        return stockDtoList;
     }
 
     public List<UserStockDto> getUserStockList(Integer userId) {
-        return stockRepository.findUserStocksByUserId(userId);
+        List<UserStockDto> userStockDtoList = stockRepository.findUserStocksByUserId(userId);
+
+        for(UserStockDto userStockDto : userStockDtoList) {
+            String imgUrl = userStockDto.getImgUrl();
+
+            userStockDto.setImgUrl(getBase64Image(imgUrl));
+        }
+
+        return userStockDtoList;
     }
 
     @Transactional
@@ -55,9 +76,18 @@ public class StockService {
         return StockInfoDto.of(stock);
     }
 
-    @Transactional
-    public void addUserStock(Integer userId, Integer stockId){
-        userStockRepository.save(UserStock.of(userId, stockId));
+    private String getBase64Image(String imgUrl) {
+        File imageFile = new File(imgUrl);
+
+        byte[] fileContent;
+
+        try {
+            fileContent = Files.readAllBytes(imageFile.toPath());
+        } catch (IOException e) {
+            throw new InternalException(ExceptionCode.STOCK_IMAGE_CHANGE_FAIELD);
+        }
+
+        return Base64.getEncoder().encodeToString(fileContent);
     }
 
 }
