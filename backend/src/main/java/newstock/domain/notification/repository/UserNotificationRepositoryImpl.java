@@ -16,7 +16,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class UserNotificationImpl implements UserNotificationRepositoryCustom{
+public class UserNotificationRepositoryImpl implements UserNotificationRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
 
