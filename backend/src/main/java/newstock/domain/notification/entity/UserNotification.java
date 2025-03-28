@@ -1,4 +1,4 @@
-package newstock.domain.stock.entity;
+package newstock.domain.notification.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,23 +11,17 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserStock {
+@Builder
+public class UserNotification {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer unId;
+
+    private Integer notificationId;
 
     private Integer userId;
 
-    private Integer stockId;
-
-    public static UserStock of(Integer userId, Integer stockId) {
-        return UserStock.builder()
-                .userId(userId)
-                .stockId(stockId)
-                .build();
-    }
-
+    private Byte isRead;
 }
