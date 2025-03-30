@@ -12,32 +12,6 @@ logger = logging.getLogger("score_article")
 
 app = FastAPI(title="News AI API")
 
-# === BERTClassifier 클래스 (필요시 사용) ===
-class BERTClassifier(nn.Module):
-    def __init__(self, bert, hidden_size=768, num_classes=3, dr_rate=None):
-        super(BERTClassifier, self).__init__()
-        self.bert = bert
-        self.dr_rate = dr_rate
-        self.classifier = nn.Linear(hidden_size, num_classes)
-        if dr_rate:
-            self.dropout = nn.Dropout(p=dr_rate)
-
-    def gen_attention_mask(self, token_ids, valid_length):
-        attention_mask = torch.zeros_like(token_ids)
-        for i, v in enumerate(valid_length):
-            attention_mask[i][:v] = 1
-        return attention_mask.float()
-
-    def forward(self, token_ids, valid_length, segment_ids):
-        attention_mask = self.gen_attention_mask(token_ids, valid_length)
-        _, pooler = self.bert(
-            input_ids=token_ids,
-            token_type_ids=segment_ids.long(),
-            attention_mask=attention_mask.float().to(token_ids.device)
-        )
-        out = self.dropout(pooler) if self.dr_rate else pooler
-        return self.classifier(out)
-
 # === 모델 로딩 ===
 try:
     model, tokenizer = load_model_and_tokenizer()
@@ -92,10 +66,9 @@ async def score_article(input_data: ScoreRequest):
         for sent_obj in sentences:
             sentence_text = sent_obj["sentence"].strip()
             if sentence_text:
-                neg, neu, pos = predict(model, tokenizer, sentence_text)
-                score = (pos - neg) * 100
+                result = predict(model, tokenizer, sentence_text)
+                score = (result['positive'] - result['negative']) * 100
                 scores.append(score)
-
 
         if not scores:
             raise HTTPException(status_code=400, detail="유효한 문장이 없습니다.")
