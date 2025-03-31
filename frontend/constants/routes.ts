@@ -1,9 +1,11 @@
 export const ROUTE = {
   HOME: '/',
-  INTRO: '/intro',
+  INTRO: {
+    INTRO: '/intro',
+    ONBOARDING: '/intro/onboarding',
+  },
   USER: {
     SIGNUP: '/user/signup',
     LOGIN: '/user/login',
-    ONBOARDING: '/user/onboarding',
   },
 };

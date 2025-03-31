@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 type UserStoreType = {
   userInfo: UserInfoType | null;
-  setUserInfo: (userInfo: UserInfoType      | null) => void;
+  setUserInfo: (userInfo: UserInfoType | null) => void;
   getUserInfo: () => void;
 };
 

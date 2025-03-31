@@ -20,12 +20,12 @@ export default function UserProvider({ children }: { children: React.ReactNode }
       userStore.setUserInfo(data.data);
 
       if (!data.data.role) {
-        router.replace(ROUTE.USER.ONBOARDING);
+        router.replace(ROUTE.INTRO.ONBOARDING);
       }
     }
 
     if (isError) {
-      router.replace(ROUTE.INTRO);
+      router.replace(ROUTE.INTRO.INTRO);
     }
 
     if (!isLoading) {
