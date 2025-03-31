@@ -1,12 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
+import { useUserInfoMutation } from 'api/user/query';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
-import { setToken } from 'utils/token';
+import { removeToken, setToken } from 'utils/token';
 
-import { postLogin } from '.';
+import { postLogin, postLogout } from '.';
 
 export const useLoginMutation = () => {
-  const router = useRouter();
+  const { mutate } = useUserInfoMutation();
 
   return useMutation({
     mutationFn: postLogin,
@@ -16,7 +17,25 @@ export const useLoginMutation = () => {
       await setToken({ key: 'accessToken', value: accessToken });
       await setToken({ key: 'refreshToken', value: refreshToken });
 
-      router.navigate(ROUTE.HOME);
+      mutate();
+    },
+    onError: (error) => {
+      // Todo: 에러 처리
+      console.error(error);
+    },
+  });
+};
+
+export const useLogoutMutation = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: postLogout,
+    onSuccess: async () => {
+      await removeToken('accessToken');
+      await removeToken('refreshToken');
+
+      router.navigate(ROUTE.INTRO.INTRO);
     },
     onError: (error) => {
       // Todo: 에러 처리

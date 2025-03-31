@@ -19,8 +19,14 @@ export function makeServer({ environment = 'development' } = {}) {
           data: {
             accessToken: 'accessToken123',
             refreshToken: 'refreshToken123',
+            role: 0,
           },
         };
+      });
+
+      // Memo: 로그아웃
+      this.post(`${API_BASE_URL}/${API_PATH.AUTH.LOGOUT}`, () => {
+        return {};
       });
 
       // Memo: 회원가입
@@ -50,6 +56,11 @@ export function makeServer({ environment = 'development' } = {}) {
         };
       });
 
+      // Memo: 최초 로그인 시 유저 권한 변경
+      this.put(`${API_BASE_URL}/${API_PATH.USER.NEW}`, () => {
+        return {};
+      });
+
       // Memo: 전체 주식 정보 조회
       this.get(`${API_BASE_URL}/${API_PATH.STOCK.ALL}`, () => {
         return mockAllStock;
@@ -57,11 +68,6 @@ export function makeServer({ environment = 'development' } = {}) {
 
       // Memo: 회원 관심 주식 수정
       this.put(`${API_BASE_URL}/${API_PATH.STOCK.USER_STOCK_EDIT}`, () => {
-        return {};
-      });
-
-      // Memo: 최초 로그인 시 유저 권한 변경
-      this.put(`${API_BASE_URL}/${API_PATH.USER.NEW}`, () => {
         return {};
       });
     },

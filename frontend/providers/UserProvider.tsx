@@ -1,41 +1,35 @@
-import { useUserInfoQuery } from 'api/user/query';
+import { useUserInfoMutation } from 'api/user/query';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import useUserStore from 'store/user';
+import { getToken } from 'utils/token';
+
+SplashScreen.preventAutoHideAsync();
 
 export default function UserProvider({ children }: { children: React.ReactNode }) {
-  const { data, isSuccess, isLoading, isError } = useUserInfoQuery();
-  const userStore = useUserStore();
   const router = useRouter();
+  const { mutateAsync } = useUserInfoMutation();
 
   useEffect(() => {
-    SplashScreen.preventAutoHideAsync();
-  }, []);
+    const prepare = async () => {
+      try {
+        const token = await getToken('accessToken');
 
-  useEffect(() => {
-    if (isSuccess && data) {
-      console.log('User Info:', data);
-      userStore.setUserInfo(data.data);
-
-      if (!data.data.role) {
-        router.replace(ROUTE.INTRO.ONBOARDING);
+        if (token) {
+          await mutateAsync();
+        } else {
+          router.navigate(ROUTE.INTRO.INTRO);
+        }
+      } catch (e) {
+        console.warn('사용자 정보 로딩 오류:', e);
+      } finally {
+        await SplashScreen.hideAsync();
       }
-    }
+    };
 
-    if (isError) {
-      router.replace(ROUTE.INTRO.INTRO);
-    }
-
-    if (!isLoading) {
-      SplashScreen.hideAsync();
-    }
-  }, [isSuccess, data, isLoading, isError, router]);
-
-  if (isLoading) {
-    return null;
-  }
+    prepare();
+  }, []);
 
   return <>{children}</>;
 }

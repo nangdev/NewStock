@@ -1,4 +1,5 @@
 import { AntDesign } from '@expo/vector-icons';
+import { useLogoutMutation } from 'api/auth/query';
 import CustomButton from 'components/CustomButton';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
@@ -6,6 +7,7 @@ import { View, Image } from 'react-native';
 
 export default function Home() {
   const router = useRouter();
+  const { mutate } = useLogoutMutation();
 
   const onPressSignUp = () => {
     router.navigate(ROUTE.USER.SIGNUP);
@@ -25,6 +27,10 @@ export default function Home() {
 
   const onPressInterest = () => {
     router.navigate('/intro/onboarding');
+  };
+
+  const onPressLogout = () => {
+    mutate();
   };
 
   return (
@@ -53,6 +59,10 @@ export default function Home() {
 
       <CustomButton variant="semiRounded" onPress={onPressInterest}>
         관심 종목 설정
+      </CustomButton>
+
+      <CustomButton variant="semiRounded" onPress={onPressLogout}>
+        로그아웃
       </CustomButton>
     </View>
   );

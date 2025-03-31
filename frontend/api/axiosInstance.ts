@@ -21,7 +21,11 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(response.data);
+
+    return response;
+  },
   async (error) => {
     // const originalRequest = error.config;
 

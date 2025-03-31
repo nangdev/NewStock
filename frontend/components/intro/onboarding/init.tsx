@@ -1,4 +1,5 @@
 import { AntDesign } from '@expo/vector-icons';
+import { useUserRoleMutation } from 'api/user/query';
 import BlurOverlay from 'components/BlurOverlay';
 import CustomButton from 'components/CustomButton';
 import { ROUTE } from 'constants/routes';
@@ -10,12 +11,14 @@ type InitProps = {
   onPressNextStep: () => void;
 };
 
-export default function Interest({ onPressNextStep }: InitProps) {
+export default function Init({ onPressNextStep }: InitProps) {
   const router = useRouter();
   const userStore = useUserStore();
   const { nickname } = userStore.userInfo!;
+  const { mutate } = useUserRoleMutation();
 
   const onPressExit = () => {
+    mutate();
     router.navigate(ROUTE.HOME);
   };
 
