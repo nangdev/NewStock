@@ -29,6 +29,14 @@ export function makeServer({ environment = 'development' } = {}) {
         return {};
       });
 
+      // Memo: 리프레쉬 요청
+      this.post(`${API_BASE_URL}/${API_PATH.AUTH.REFRESH}`, () => {
+        return {
+          accessToken: 'access123123',
+          refreshToken: 'refresh123123',
+        };
+      });
+
       // Memo: 회원가입
       this.post(`${API_BASE_URL}/${API_PATH.USER.SIGN_IN}`, () => {
         return {};
