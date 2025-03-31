@@ -25,3 +25,8 @@ export const getUserInfo = async () => {
   const response = await api.get<UserInfoResType>(API_PATH.USER.INFO);
   return response.data;
 };
+
+export const putUserRole = async () => {
+  const response = await api.get(API_PATH.USER.NEW);
+  return response.data;
+};

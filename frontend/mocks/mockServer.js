@@ -59,6 +59,11 @@ export function makeServer({ environment = 'development' } = {}) {
       this.put(`${API_BASE_URL}/${API_PATH.STOCK.USER_STOCK_EDIT}`, () => {
         return {};
       });
+
+      // Memo: 최초 로그인 시 유저 권한 변경
+      this.put(`${API_BASE_URL}/${API_PATH.USER.NEW}`, () => {
+        return {};
+      });
     },
   });
 }

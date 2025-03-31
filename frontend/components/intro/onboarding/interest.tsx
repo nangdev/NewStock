@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useAllStockListQuery, useStockInterestMutation } from 'api/stock/query';
+import { useUserRoleMutation } from 'api/user/query';
 import BlurOverlay from 'components/BlurOverlay';
 import CustomButton from 'components/CustomButton';
 import { useState } from 'react';
@@ -18,7 +19,8 @@ export default function Interest() {
   const [myList, setMyList] = useState<number[]>([1]);
   // Todo: 에러 처리
   const { data, isSuccess, isLoading } = useAllStockListQuery();
-  const { mutate } = useStockInterestMutation();
+  const { mutate: changeUserRoleMutate } = useUserRoleMutation();
+  const { mutate: setUserInterestStockMutate } = useStockInterestMutation();
 
   const toggleStock = (stockId: number) => {
     setMyList((prev) =>
@@ -27,8 +29,10 @@ export default function Interest() {
   };
 
   const onPressInterestStock = () => {
+    changeUserRoleMutate();
+
     if (myList.length) {
-      mutate({ stockIdList: myList });
+      setUserInterestStockMutate({ stockIdList: myList });
     }
   };
 
