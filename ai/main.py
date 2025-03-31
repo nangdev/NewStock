@@ -1,3 +1,6 @@
+import nltk
+nltk.download('punkt_tab')  # "punkt_tab" 리소스 다운로드
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from transformers import pipeline
