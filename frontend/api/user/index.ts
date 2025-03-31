@@ -1,6 +1,11 @@
 import { API_PATH } from 'constants/api';
-import { EmailCheckReqType, EmailCheckResType, UserInfoResType } from 'types/api/auth';
-import { SignInReqType, SignInResType } from 'types/api/user';
+import {
+  EmailCheckReqType,
+  EmailCheckResType,
+  SignInReqType,
+  SignInResType,
+  UserInfoResType,
+} from 'types/api/user';
 
 import { api } from '../axiosInstance';
 

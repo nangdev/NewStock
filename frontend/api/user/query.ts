@@ -1,6 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
+import useUserStore from 'store/user';
 
 import { getCheckEmail, getUserInfo, postSignIn, putUserRole } from '.';
 
@@ -34,10 +35,28 @@ export const useCheckEmailMutation = () => {
   });
 };
 
-export const useUserInfoQuery = () => {
-  return useQuery({
-    queryKey: ['userInfo'],
-    queryFn: getUserInfo,
+export const useUserInfoMutation = () => {
+  const router = useRouter();
+  const userStore = useUserStore();
+
+  return useMutation({
+    mutationKey: ['userInfo'],
+    mutationFn: getUserInfo,
+    onSuccess: async (data) => {
+      console.log('유저 정보 조회 성공');
+
+      userStore.setUserInfo(data.data);
+
+      if (!data.data.role) {
+        router.navigate(ROUTE.INTRO.ONBOARDING);
+      } else {
+        router.navigate(ROUTE.HOME);
+      }
+    },
+    onError: (error) => {
+      console.error(error);
+      router.navigate(ROUTE.INTRO.INTRO);
+    },
     retry: false,
   });
 };
