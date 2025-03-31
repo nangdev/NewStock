@@ -2,14 +2,10 @@ import { AntDesign } from '@expo/vector-icons';
 import CustomButton from 'components/CustomButton';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
-import { View, Image, Text, TouchableOpacity } from 'react-native';
+import { View, Image, Text } from 'react-native';
 
-export default function Home() {
+export default function Intro() {
   const router = useRouter();
-
-  const onPressLogo = () => {
-    router.navigate(ROUTE.HOME);
-  };
 
   const onPressLogin = () => {
     router.navigate(ROUTE.USER.LOGIN);
@@ -18,12 +14,10 @@ export default function Home() {
   return (
     <View className="flex-1 items-center justify-center gap-12">
       <View className="items-center gap-4">
-        <TouchableOpacity onPress={onPressLogo}>
-          <Image
-            source={require('../assets/logo.png')}
-            style={{ width: 150, height: 150, resizeMode: 'contain' }}
-          />
-        </TouchableOpacity>
+        <Image
+          source={require('../../assets/logo.png')}
+          style={{ width: 150, height: 150, resizeMode: 'contain' }}
+        />
         <View className="items-center">
           <Text className="text-5xl font-bold text-primary">NewStock</Text>
           <Text className="text-sm">주식 알림과 뉴스 레터를 동시에!</Text>

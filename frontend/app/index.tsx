@@ -16,11 +16,15 @@ export default function Home() {
   };
 
   const onPressIntro = () => {
-    router.navigate(ROUTE.INTRO);
+    router.navigate(ROUTE.INTRO.INTRO);
   };
 
   const onPressMain = () => {
     router.navigate('/main');
+  };
+
+  const onPressInterest = () => {
+    router.navigate('/intro/onboarding');
   };
 
   return (
@@ -45,6 +49,10 @@ export default function Home() {
 
       <CustomButton variant="semiRounded" onPress={onPressMain}>
         메인 페이지
+      </CustomButton>
+
+      <CustomButton variant="semiRounded" onPress={onPressInterest}>
+        관심 종목 설정
       </CustomButton>
     </View>
   );

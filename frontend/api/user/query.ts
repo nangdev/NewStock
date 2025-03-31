@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 
-import { getCheckEmail, getUserInfo, postSignIn } from '.';
+import { getCheckEmail, getUserInfo, postSignIn, putUserRole } from '.';
 
 export const useSignInMutation = () => {
   const router = useRouter();
@@ -39,5 +39,18 @@ export const useUserInfoQuery = () => {
     queryKey: ['userInfo'],
     queryFn: getUserInfo,
     retry: false,
+  });
+};
+
+export const useUserRoleMutation = () => {
+  return useMutation({
+    mutationFn: putUserRole,
+    onSuccess: () => {
+      console.log('유저 권한 변경 성공');
+    },
+    onError: (error) => {
+      // Todo: 에러 처리
+      console.error(error);
+    },
   });
 };

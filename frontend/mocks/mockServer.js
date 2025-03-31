@@ -1,6 +1,8 @@
 import { API_BASE_URL, API_PATH } from 'constants/api';
 import { createServer, Response } from 'miragejs';
 
+import { mockAllStock } from './mockDataBase';
+
 export function makeServer({ environment = 'development' } = {}) {
   if (window.server) {
     console.log('MirageJS 서버가 이미 실행 중입니다.');
@@ -46,6 +48,21 @@ export function makeServer({ environment = 'development' } = {}) {
             role: 0,
           },
         };
+      });
+
+      // Memo: 전체 주식 정보 조회
+      this.get(`${API_BASE_URL}/${API_PATH.STOCK.ALL}`, () => {
+        return mockAllStock;
+      });
+
+      // Memo: 회원 관심 주식 수정
+      this.put(`${API_BASE_URL}/${API_PATH.STOCK.USER_STOCK_EDIT}`, () => {
+        return {};
+      });
+
+      // Memo: 최초 로그인 시 유저 권한 변경
+      this.put(`${API_BASE_URL}/${API_PATH.USER.NEW}`, () => {
+        return {};
       });
     },
   });

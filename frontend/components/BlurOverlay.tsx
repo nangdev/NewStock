@@ -12,7 +12,7 @@ export default function BlurOverlay({
     <BlurView
       intensity={10}
       tint="regular"
-      className={cn('w-full overflow-hidden rounded-2xl border border-stroke p-10', className)}>
+      className={cn('w-full overflow-hidden rounded-2xl border border-gray-200 p-10', className)}>
       {children}
     </BlurView>
   );
