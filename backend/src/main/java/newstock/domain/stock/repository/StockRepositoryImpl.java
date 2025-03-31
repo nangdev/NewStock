@@ -29,6 +29,7 @@ public class StockRepositoryImpl implements StockRepositoryCustom {
                 .from(stock)
                 .join(userStock).on(stock.stockId.eq(userStock.stockId))
                 .where(userStock.userId.eq(userId))
+                .orderBy(userStock.id.asc())
                 .fetch();
     }
 
