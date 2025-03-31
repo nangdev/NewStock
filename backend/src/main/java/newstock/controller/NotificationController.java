@@ -23,12 +23,14 @@ public class NotificationController {
     @PutMapping("/{notificationId}")
     public ResponseEntity<Api<Void>> updateUserNotification(@PathVariable Integer notificationId,
                                                             @AuthenticationPrincipal Integer userId) {
+        notificationService.updateUserNotifications(notificationId, userId);
         return ResponseEntity.ok(Api.ok());
     }
 
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<Api<Void>> deleteUserNotification(@PathVariable Integer notificationId,
                                                             @AuthenticationPrincipal Integer userId) {
+        notificationService.deleteUserNotifications(notificationId, userId);
         return ResponseEntity.ok(Api.ok());
     }
 }

@@ -3,7 +3,7 @@ package newstock.domain.notification.service;
 import lombok.RequiredArgsConstructor;
 import newstock.controller.response.NotificationListResponse;
 import newstock.domain.notification.dto.UserNotificationDto;
-import newstock.domain.notification.repository.NotificationRepository;
+import newstock.domain.notification.entity.UserNotification;
 import newstock.domain.notification.repository.UserNotificationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationService {
 
-    private final NotificationRepository notificationRepository;
     private final UserNotificationRepository userNotificationRepository;
 
     public NotificationListResponse getUserNotifications(Integer userId) {
@@ -27,11 +26,13 @@ public class NotificationService {
 
     @Transactional
     public void updateUserNotifications(Integer userId, Integer notificationId) {
+        UserNotification userNotification = userNotificationRepository.findByUserIdAndNotificationId(notificationId, userId);
+        userNotification.setIsRead((byte) 1);
     }
 
     @Transactional
     public void deleteUserNotifications(Integer userId, Integer notificationId) {
-
+        userNotificationRepository.deleteByUserIdAndNotificationId(userId, notificationId);
     }
 
 }
