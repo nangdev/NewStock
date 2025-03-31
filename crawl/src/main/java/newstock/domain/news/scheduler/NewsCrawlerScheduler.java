@@ -35,7 +35,7 @@ public class NewsCrawlerScheduler {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     // 스케줄러가 매 분 0초마다 실행됩니다.
-    @Scheduled(cron = "0 * * * * *")
+//    @Scheduled(cron = "0 * * * * *")
     public void scheduleNewsCrawling() {
         // 작업을 단일 스레드 Executor에 제출하여, 이전 작업이 끝날 때까지 대기하도록 합니다.
         executor.submit(() -> {
