@@ -12,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
-import newstock.common.jwt.JwtTokenProvider;
 
 import java.io.IOException;
 
@@ -22,6 +21,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenBlacklistService tokenBlacklistService;
 
     /**
      * 모든 요청마다 실행되는 필터 메서드
@@ -30,17 +30,23 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        // 헤더에서 JWT 토큰 추출
         String token = resolveToken((HttpServletRequest) request);
 
-        // 유효한 토큰이라면 Authentication 객체를 꺼내서 SecurityContext에 등록
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-            Authentication authentication = jwtTokenProvider.getAuthentication(token); // 유저 정보 복원
-            SecurityContextHolder.getContext().setAuthentication(authentication); // 인증 등록
+
+            // 블랙리스트 확인
+            if (tokenBlacklistService.isBlacklisted(token)) {
+                log.warn("블랙리스트에 등록된 토큰입니다: {}", token);
+                chain.doFilter(request, response);
+                return;
+            }
+
+            // 정상 토큰
+            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             log.debug("JWT 인증 성공 - 사용자: {}", authentication.getName());
         }
 
-        // 다음 필터로 요청 전달
         chain.doFilter(request, response);
     }
 

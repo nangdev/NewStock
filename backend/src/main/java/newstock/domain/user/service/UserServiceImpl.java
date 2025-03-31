@@ -3,6 +3,7 @@ package newstock.domain.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import newstock.common.jwt.TokenBlacklistService;
 import newstock.controller.request.LoginRequest;
 import newstock.controller.request.UserRequest;
 import newstock.controller.response.LoginResponse;
@@ -28,7 +29,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenBlacklistService tokenBlacklistService;
 
+    // 회원 가입
     @Override
     @Transactional
     public void addUser(UserRequest userRequest) {
@@ -46,13 +49,37 @@ public class UserServiceImpl implements UserService {
         log.info("회원가입 성공 - userId: {}, email: {}", savedUser.getUserId(), savedUser.getEmail());
     }
 
-    // 이메일 중복 체크 기능
+    // 이메일 중복 체크
     @Override
     public boolean existsByEmail(String email) {
         boolean exists = userRepository.existsByEmail(email);
         log.debug("이메일 중복 확인 - 이메일: {}, 존재 여부: {}", email, exists);
 
         return userRepository.existsByEmail(email);
+    }
+
+    // 회원가입 후 최초 로그인 시, 유저 권한을 1(USER)로 변경
+    @Override
+    @Transactional
+    public void updateUserRole(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
+
+        if (user.getRole() != 0) {
+            throw new ValidationException(ExceptionCode.USER_ROLE_UPDATE_ERROR);
+        }
+
+        user.setRole((byte) 1);
+        userRepository.save(user);
+    }
+
+    // 유저 정보 조회
+    @Override
+    public UserResponse getUserInfo(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
+
+        return UserResponse.of(user);
     }
 
     // 로그인
@@ -72,7 +99,6 @@ public class UserServiceImpl implements UserService {
 
         JwtToken token = jwtTokenProvider.generateToken(authentication);
 
-        user.setAccessToken(token.getAccessToken());
         user.setRefreshToken(token.getRefreshToken());
 
         if (request.getFcmToken() != null && !request.getFcmToken().isBlank()) {
@@ -86,26 +112,26 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    // 회원가입 후 최초 로그인 시, 유저 권한을 1(USER)로 변경
+    // 로그아웃
     @Override
     @Transactional
-    public void updateUserRole(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
+    public void logout(Integer userId, String accessToken) {
+        tokenBlacklistService.addToBlacklist(accessToken);
+        log.info("토큰 블랙리스트 등록 완료 - userId: {}, token: {}", userId, accessToken);
 
-        if (user.getRole() != 0) {
-            throw new ValidationException(ExceptionCode.USER_ROLE_UPDATE_ERROR);
-        }
-
-        user.setRole((byte) 1);
-        userRepository.save(user);
+        clearFcmToken(userId);
     }
 
+    // FCM 토큰 초기화
     @Override
-    public UserResponse getUserInfo(Integer userId) {
+    @Transactional
+    public void clearFcmToken(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
-        return UserResponse.of(user);
+        user.setFcmToken(null);
+        userRepository.save(user);
+
+        log.info("FCM 토큰 초기화 완료 - userId: {}", userId);
     }
 }
