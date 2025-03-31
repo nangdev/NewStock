@@ -14,6 +14,7 @@ export default function InputField({
       onChangeText={onChangeText}
       placeholder={placeholder}
       secureTextEntry={secureTextEntry}
+      numberOfLines={1}
       className={cn(
         'w-full rounded-xl border border-stroke bg-background p-3 shadow-lg shadow-black',
         className
