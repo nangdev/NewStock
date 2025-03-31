@@ -103,7 +103,7 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            throw new ValidationException(ExceptionCode.TOKEN_EXPIRED);
+            throw new ValidationException(ExceptionCode.ACCESS_TOKEN_EXPIRED);
         } catch (JwtException e) {
             throw new ValidationException(ExceptionCode.TOKEN_INVALID);
         }
@@ -120,7 +120,7 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            throw new ValidationException(ExceptionCode.TOKEN_EXPIRED);
+            throw new ValidationException(ExceptionCode.REFRESH_TOKEN_EXPIRED);
         } catch (JwtException e) {
             throw new ValidationException(ExceptionCode.TOKEN_INVALID);
         }
@@ -167,7 +167,7 @@ public class JwtTokenProvider {
             return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
         } catch (ExpiredJwtException e) {
             log.warn("Access token expired: {}", e.getMessage());
-            throw new ValidationException(ExceptionCode.TOKEN_EXPIRED);
+            throw new ValidationException(ExceptionCode.ACCESS_TOKEN_EXPIRED);
         } catch (JwtException e) {
             log.warn("Invalid token: {}", e.getMessage());
             throw new ValidationException(ExceptionCode.TOKEN_INVALID);

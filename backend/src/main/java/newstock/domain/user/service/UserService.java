@@ -23,5 +23,5 @@ public interface UserService {
 
     void clearFcmToken(Integer userId);
 
-    LoginResponse reissueToken(String refreshToken);
+    LoginResponse reissueToken(String refreshToken, String fcmToken);
 }

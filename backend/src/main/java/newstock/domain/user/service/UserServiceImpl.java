@@ -140,7 +140,7 @@ public class UserServiceImpl implements UserService {
     // JWT 토큰 재발급
     @Override
     @Transactional
-    public LoginResponse reissueToken(String refreshToken) {
+    public LoginResponse reissueToken(String refreshToken, String fcmToken) {
         Integer userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
 
         User user = userRepository.findById(userId)
@@ -155,7 +155,10 @@ public class UserServiceImpl implements UserService {
                 userDetails, null, userDetails.getAuthorities());
 
         JwtToken newToken = jwtTokenProvider.generateToken(authentication);
+
         user.setRefreshToken(newToken.getRefreshToken());
+        user.setFcmToken(fcmToken);
+
         userRepository.save(user);
 
         return LoginResponse.builder()

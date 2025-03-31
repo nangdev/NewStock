@@ -6,6 +6,7 @@ import newstock.common.dto.Api;
 import newstock.common.jwt.JwtTokenProvider;
 import newstock.common.jwt.TokenBlacklistService;
 import newstock.controller.request.LoginRequest;
+import newstock.controller.request.RefreshRequest;
 import newstock.controller.response.LoginResponse;
 import newstock.domain.user.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -51,12 +52,15 @@ public class AuthController {
     }
 
     /**
-     * JWT 토큰 재발급 API
+     * JWT 토큰 재발급 API (자동 로그인)
      */
     @PostMapping("/refresh")
-    public ResponseEntity<Api<LoginResponse>> reissueToken(@RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<Api<LoginResponse>> reissueToken(
+            @RequestHeader("Authorization") String bearerToken,
+            @RequestBody RefreshRequest request) {
+
         String refreshToken = bearerToken.replace("Bearer ", "");
-        LoginResponse response = userService.reissueToken(refreshToken);
+        LoginResponse response = userService.reissueToken(refreshToken, request.getFcmToken());
 
         return ResponseEntity.ok(Api.ok(response));
     }
