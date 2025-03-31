@@ -2,7 +2,7 @@ import { Text, View, ScrollView } from 'react-native';
 import StockListItem from 'components/main/StockListItem';
 import { Client } from '@stomp/stompjs';
 import { useEffect, useState } from 'react';
-
+import { useAllUserStockListQuery } from 'api/stock/query';
 export default function Main() {
   
   // 테스트 데이터
@@ -12,14 +12,15 @@ export default function Main() {
     { stockName: '카카오', stockCode: '035720', price: 0, changeRate: 0.0 },
   ]);
 
+  
+  
   useEffect(() => {
+    // const { data, isLoading, isSuccess } = useAllUserStockListQuery();
+    // console.log(data)
     // STOMP 연결
     const client = new Client({
-      webSocketFactory: () => new WebSocket('ws://10.0.2.2:8080/api/ws'),
-      debug: (msg) => console.log('STOMP:', msg),
-      connectHeaders: {
-        Authorization: 'Bearer aasdf'
-      },
+      webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
+      // debug: (msg) => console.log('STOMP:', msg),
       onConnect: (frame) => {
         // 구독
         subscribedStocks.forEach((stock) => {

@@ -13,3 +13,8 @@ export const putStockInterest = async ({ stockIdList }: StockInterestReqType) =>
   });
   return response.data;
 };
+
+export const getAllUserStockList = async () => {
+  const response = await api.get<StockInterestReqType>(API_PATH.STOCK.USER_STOCK);
+  return response.data;
+}
