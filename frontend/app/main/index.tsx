@@ -16,7 +16,10 @@ export default function Main() {
     // STOMP 연결
     const client = new Client({
       webSocketFactory: () => new WebSocket('ws://10.0.2.2:8080/api/ws'),
-      // debug: (msg) => console.log('STOMP:', msg),
+      debug: (msg) => console.log('STOMP:', msg),
+      connectHeaders: {
+        Authorization: 'Bearer aasdf'
+      },
       onConnect: (frame) => {
         // 구독
         subscribedStocks.forEach((stock) => {

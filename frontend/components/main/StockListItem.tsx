@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import Collapsible from 'react-native-collapsible';
 
@@ -23,44 +23,48 @@ export default function StockListItem({
   const isPositive = changeRate > 0;
   const [expanded, setExpanded] = useState(false);
 
+  // mock data
   const newsList = [
-    { id: 1, title: `${stockName} 관련 뉴스 1`, time: '1시간 전' },
-    { id: 2, title: `${stockName} 관련 뉴스 2`, time: '2시간 전' },
-    { id: 3, title: `${stockName} 관련 뉴스 3`, time: '2시간 전' },
-    { id: 4, title: `${stockName} 관련 뉴스 4`, time: '2시간 전' },
-    { id: 5, title: `${stockName} 관련 뉴스 5`, time: '2시간 전' },
+    { id: `${stockCode}-1`, title: `${stockName} 관련 뉴스 1`, time: '1시간 전' },
+    { id: `${stockCode}-2`, title: `${stockName} 관련 뉴스 2`, time: '2시간 전' },
+    { id: `${stockCode}-3`, title: `${stockName} 관련 뉴스 3`, time: '2시간 전' },
+    { id: `${stockCode}-4`, title: `${stockName} 관련 뉴스 4`, time: '2시간 전' },
+    { id: `${stockCode}-5`, title: `${stockName} 관련 뉴스 5`, time: '2시간 전' },
   ];
 
   return (
-    <View style={styles.cardContainer}>
-      <View style={styles.card}>
-        <Image source={{ uri: imgUrl || 'https://via.placeholder.com/48' }} style={styles.logo} />
-        <View style={styles.info}>
-          <Text style={styles.name}>{stockName}</Text>
-          <Text style={styles.code}>{stockCode}</Text>
+    <View className="bg-white rounded-2xl mx-8 my-2 shadow-md overflow-hidden">
+      <View className="flex-row items-center p-4">
+        <Image
+          source={{ uri: imgUrl || 'https://via.placeholder.com/48' }}
+          className="w-16 h-16 rounded-xl mr-6 bg-gray-200"
+        />
+        <View className="flex-1">
+          <Text className="text-base font-bold">{stockName}</Text>
+          <Text className="text-xs text-gray-500">{stockCode}</Text>
         </View>
-        <View style={styles.priceBlock}>
-          <Text style={styles.price}>{isPositive
-          ? price.toLocaleString()
-          : price.toLocaleString()
-          } 원</Text>
-          <Text style={[styles.rate, isPositive ? styles.red : styles.blue]}>
+        <View className="flex-1 items-end mr-6">
+          <Text className="text-base font-bold">{price.toLocaleString()} 원</Text>
+          <Text className={`text-sm mt-1 ${isPositive ? 'text-red-500' : 'text-blue-500'}`}>
             {changeRate.toFixed(2)}%
           </Text>
         </View>
         <TouchableOpacity onPress={() => setExpanded(!expanded)}>
-          <AntDesign name={expanded ? 'up' : 'down'} style={styles.toggleButton} />
+          <AntDesign name={expanded ? 'up' : 'down'} size={14} color="#888" className="ml-2" />
         </TouchableOpacity>
       </View>
 
       <Collapsible collapsed={!expanded}>
-        <View style={styles.newsSection}>
+        <View className="bg-white px-4 py-2 mb-2">
           {newsList.map((news) => (
-            <View key={news.id} style={styles.newsItem}>
-              <Image source={{ uri: hojaeIconUrl || 'https://via.placeholder.com/48' }} style={styles.hojaeIcon} />
-              <View style={styles.newsRow}>
-                <Text style={styles.newsText}>{news.title}</Text>
-                <Text style={styles.newsTime}>{news.time}</Text>
+            <View key={news.id} className="flex-row items-center my-1">
+              <Image
+                source={{ uri: hojaeIconUrl || 'https://via.placeholder.com/36' }}
+                className="w-9 h-9 rounded-md mr-4 bg-gray-200"
+              />
+              <View className="flex-1 flex-row justify-between items-center">
+                <Text className="text-sm">{news.title}</Text>
+                <Text className="text-xs text-gray-500">{news.time}</Text>
               </View>
             </View>
           ))}
@@ -69,92 +73,3 @@ export default function StockListItem({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  cardContainer: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    marginVertical: 8,
-    marginHorizontal: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 1,
-    overflow: 'hidden',
-  },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  logo: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    marginRight: 12,
-    backgroundColor: '#eee',
-  },
-  info: {
-    flex: 1,
-  },
-  name: {
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  code: {
-    fontSize: 12,
-    color: '#999',
-  },
-  priceBlock: {
-    alignItems: 'flex-end',
-    marginRight: 8,
-  },
-  price: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  rate: {
-    fontSize: 14,
-    marginTop: 4,
-  },
-  red: {
-    color: 'red',
-  },
-  blue: {
-    color: 'blue',
-  },
-  toggleButton: {
-    fontSize: 14,
-    color: '#888',
-    marginLeft: 8,
-  },
-  newsSection: {
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    backgroundColor: '#f9f9f9',
-  },
-  newsItem: {
-    marginVertical: 4,
-    flexDirection: 'row',
-  },
-  hojaeIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 9,
-    marginRight: 9,
-    backgroundColor: '#eee',
-  },
-  newsRow: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  newsText: {
-    fontSize: 14,
-  },
-  newsTime: {
-    fontSize: 12,
-    color: '#888',
-  },
-});
