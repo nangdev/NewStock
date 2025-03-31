@@ -30,7 +30,7 @@ public class JwtTokenProvider {
     private final Key key;
     private final UserRepository userRepository;
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000L * 60 * 60* 24 * 14;      // 2주
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000L * 60 * 60 * 24 * 14;      // 2주
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000L * 60 * 60 * 24 * 30;    // 1달
 
     // JWT 시크릿 키 설정
@@ -64,6 +64,7 @@ public class JwtTokenProvider {
                 .compact();
 
         String refreshToken = Jwts.builder()
+                .setSubject(String.valueOf(userId))
                 .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -75,35 +76,11 @@ public class JwtTokenProvider {
                 .build();
     }
 
-
-    /**
-     * JWT 토큰의 유효성 검사
-     * 정상 / 만료 / 조작 검증
-     */
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.warn("Invalid JWT Token", e);
-        } catch (ExpiredJwtException e) {
-            log.warn("Expired JWT Token", e);
-        } catch (UnsupportedJwtException e) {
-            log.warn("Unsupported JWT Token", e);
-        } catch (IllegalArgumentException e) {
-            log.warn("JWT claims string is empty.", e);
-        }
-        return false;
-    }
-
     /**
      * JWT AccessToken으로부터 Authentication 추출
      */
     public Authentication getAuthentication(String accessToken) {
-        Claims claims = parseClaims(accessToken);
+        Claims claims = validateAccessToken(accessToken);
 
         if (claims.get("auth") == null) {
             throw new ValidationException(ExceptionCode.TOKEN_INVALID);
@@ -112,7 +89,7 @@ public class JwtTokenProvider {
         Integer userId = Integer.parseInt(claims.getSubject());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
 
@@ -122,22 +99,6 @@ public class JwtTokenProvider {
                 .toList();
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
-    }
-
-    /**
-     * JWT에서 Claims(내용) 꺼내기
-     */
-
-    private Claims parseClaims(String token) {
-        try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
     }
 
     /**
@@ -154,4 +115,53 @@ public class JwtTokenProvider {
         return expiration.getTime() - System.currentTimeMillis();
     }
 
+    /**
+     * AccessToken 유효성 검사 + Claims 추출
+     */
+    public Claims validateAccessToken(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new ValidationException(ExceptionCode.TOKEN_EXPIRED);
+        } catch (JwtException e) {
+            throw new ValidationException(ExceptionCode.TOKEN_INVALID);
+        }
+    }
+
+    /**
+     * AccessToken userId 추출
+     */
+    public Integer getUserIdFromAccessToken(String token) {
+        Claims claims = validateAccessToken(token);
+        return Integer.parseInt(claims.getSubject());
+    }
+
+    /**
+     * RefreshToken 유효성 검사 + Claims 추출
+     */
+    public Claims validateRefreshToken(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new ValidationException(ExceptionCode.TOKEN_EXPIRED);
+        } catch (JwtException e) {
+            throw new ValidationException(ExceptionCode.TOKEN_INVALID);
+        }
+    }
+
+    /**
+     * RefreshToken userId 추출
+     */
+    public Integer getUserIdFromRefreshToken(String token) {
+        Claims claims = validateRefreshToken(token);
+        return Integer.parseInt(claims.getSubject());
+    }
 }
