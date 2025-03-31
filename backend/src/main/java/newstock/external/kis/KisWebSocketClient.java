@@ -134,9 +134,9 @@ public class KisWebSocketClient {
     }
 
     @OnClose
-    public void onClose(Session session) {
+    public void onClose(Session session, CloseReason closeReason) {
         this.session = null;
-        log.info("한투 웹소켓 연결 종료");
+        log.info("한투 웹소켓 연결 종료: {}", closeReason.getReasonPhrase());
     }
 
     private boolean isJson(String message) {
