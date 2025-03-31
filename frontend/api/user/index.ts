@@ -27,6 +27,6 @@ export const getUserInfo = async () => {
 };
 
 export const putUserRole = async () => {
-  const response = await api.get(API_PATH.USER.NEW);
+  const response = await api.put(API_PATH.USER.NEW);
   return response.data;
 };
