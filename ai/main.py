@@ -1,26 +1,33 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from transformers import pipeline
-import torch
 import torch.nn as nn
-from utils.model_loader import load_model_and_tokenizer, predict
+from utils.model_loader import load_model_and_tokenizer, predict, finance_score
 from utils.preprocessor import preprocessing_single_news
-
+from typing import Tuple
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("score_article")
 
 app = FastAPI(title="News AI API")
 
-# === 모델 로딩 ===
-try:
-    model, tokenizer = load_model_and_tokenizer()
-    model.eval()
-    summarizer = pipeline("summarization", model="noahkim/KoT5_news_summarization")
-except Exception as e:
-    raise Exception(f"모델 로딩 실패: {str(e)}")
 
-# === 요청/응답 모델 정의 ===
+# === 모델 및 토크나이저, 요약기 초기화 ===
+def initialize_models() -> Tuple:
+    try:
+        model, tokenizer = load_model_and_tokenizer()
+        model.eval()
+        summarizer = pipeline("summarization", model="noahkim/KoT5_news_summarization")
+        logger.info("모든 모델이 정상적으로 로딩되었습니다.")
+        return model, tokenizer, summarizer
+    except Exception as e:
+        logger.exception("모델 로딩 실패")
+        raise RuntimeError(f"모델 로딩 실패: {str(e)}")
+
+model, tokenizer, summarizer = initialize_models()
+
+
+# === 요청/응답 스키마 ===
 class ScoreRequest(BaseModel):
     title: str
     content: str
@@ -38,7 +45,8 @@ class SummarizationRequest(BaseModel):
 class SummarizationResponse(BaseModel):
     summary_content: str
 
-# === API 엔드포인트 ===
+
+# === API 엔드포인트 정의 ===
 @app.get("/")
 async def home():
     return {"message": "Welcome to the News AI API!"}
@@ -46,11 +54,7 @@ async def home():
 @app.post("/score", response_model=ScoreResponse)
 async def score_article(input_data: ScoreRequest):
     try:
-        news_dict = {
-            "title": input_data.title,
-            "content": input_data.content
-        }
-
+        news_dict = {"title": input_data.title, "content": input_data.content}
         processed = preprocessing_single_news(news_dict)
 
         if not processed:
@@ -59,26 +63,28 @@ async def score_article(input_data: ScoreRequest):
         sentences = processed["filtered_sentences"]
         cleaned_content = processed["cleaned_content"]
 
-        logger.debug("sentences: %s", sentences)
-        logger.debug("cleaned_content: %s", cleaned_content)  
+        logger.info("문장 리스트: %s", sentences)
 
-        scores = []
-        for sent_obj in sentences:
-            sentence_text = sent_obj["sentence"].strip()
-            if sentence_text:
-                result = predict(model, tokenizer, sentence_text)
-                score = (result['positive'] - result['negative']) * 100
-                scores.append(score)
+        scores = [
+            finance_score(predict(model, tokenizer, s["sentence"].strip()))[1]
+            for s in sentences
+            if s["sentence"].strip() and s["재무적성과"] == 1
+]
+        logger.info("점수 리스트: %s", scores)
+
 
         if not scores:
             raise HTTPException(status_code=400, detail="유효한 문장이 없습니다.")
 
         average_score = round(sum(scores) / len(scores))
+        logger.info(f"재무적성과 점수: {average_score}")
+
         return ScoreResponse(content=cleaned_content, score=average_score)
 
     except Exception as e:
-        logger.exception("Error in score_article endpoint")
+        logger.exception("Error in /score endpoint")
         raise HTTPException(status_code=400, detail=str(e))
+    
 
 @app.post("/summarize", response_model=SummarizationResponse)
 def summarize(request: SummarizationRequest):
@@ -92,9 +98,11 @@ def summarize(request: SummarizationRequest):
         summary_text = result[0]["summary_text"]
         return SummarizationResponse(summary_content=summary_text)
     except Exception as e:
-        logger.exception("Error in summarize endpoint")
+        logger.exception("Error in /summarize endpoint")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# === 서버 실행 ===
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

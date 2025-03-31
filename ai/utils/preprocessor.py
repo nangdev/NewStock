@@ -1,7 +1,13 @@
 import re
 import nltk
+import logging
+from typing import Optional
 from nltk.tokenize import sent_tokenize
 nltk.download('punkt', quiet=True)
+
+# 로그 설정
+logger = logging.getLogger("preprocessor")
+logging.basicConfig(level=logging.INFO)
 
 
 # 상수 정의
@@ -11,25 +17,31 @@ CONTENT_KEYWORDS = ['자이언츠', '랜더스', 'KT위즈', 'KT 위즈', '트�
 CONTENT_START_PATTERNS = ['[SBS 김성준의 시사전망대]', '신청해 주셨던 분들']
 
 ASPECT_DEF = {
-    '재무적성과': ['매출', '이익', '수익', 'EBITDA', 'ROE', '손실'],
+    '재무적성과': ['매출', '이익', '수익', 'EBITDA', 'ROE', '손실', '영업이익', 'GP율', '재무', '실적'],
     '전략적성장': ['M&A', '합병', '신사업', '투자', '글로벌'],
     '기술혁신': ['특허', 'R&D', 'AI', '디지털', '자동화'],
     '자본구조': ['부채', '자본', '증자', '배당', '주식'],
     '외부환경': ['환율', '금리', '규제', '정책', '원자재']
 }
 
-def apply_initial_filters(news):
-    """초기 필터링 조건 검증"""
-    if any(kw in news.get('title', '') for kw in TITLE_KEYWORDS):
+
+def apply_initial_filters(news: dict) -> bool:
+    """뉴스 기사 필터링 조건 검사"""
+    title = news.get('title', '')
+    content = news.get('content', '')
+
+    if any(kw in title for kw in TITLE_KEYWORDS):
         return False
-    if any(news['title'].startswith(p) for p in TITLE_START_PATTERNS):
+    if any(title.startswith(p) for p in TITLE_START_PATTERNS):
         return False
-    if any(kw in news.get('content', '') for kw in CONTENT_KEYWORDS):
+    if any(kw in content for kw in CONTENT_KEYWORDS):
         return False
-    if len(news.get('content', '')) < 30:
+    if len(content) < 30:
         return False
-    if any(news['content'].startswith(p) for p in CONTENT_START_PATTERNS):
+    if any(content.startswith(p) for p in CONTENT_START_PATTERNS):
         return False
+
+    logger.info('모든 조건을 통과하였습니다.')
     return True
 
 
@@ -82,65 +94,72 @@ def clean_text(text):
     }
     for old, new in replacements.items():
         text = text.replace(old, new)
-
+    
+    text = text.lower().strip()
     # 최종 정제
-    return text.lower().strip()
+    logger.info('텍스트 정제가 완료되었습니다.')
+    return text
 
 
-def split_sentences(text):
-    """문장 분할 유틸리티"""
+def split_sentences(text: str) -> list:
+    """문장 단위 분리"""
     text = re.sub(r'(\d+)\.(\d+)', r'\1<dot>\2', text)
     text = text.replace('.', '. ')
     sentences = sent_tokenize(text)
-    return [s.replace('<dot>', '.') for s in sentences]
+    sentences = [s.replace('<dot>', '.') for s in sentences]
+
+    logger.info('문장 분할이 완료되었습니다.')
+    return sentences
 
 
-def analyze_sentences(sentences):
-    """문장 분석 및 필터링"""
+def analyze_sentences(sentences: list, min_len: int = 20, max_len: int = 200) -> list:
+    """문장 필터링 및 관점 분석"""
     valid_sentences = []
+
     for idx, sentence in enumerate(sentences):
-        if not 20 <= len(sentence) <= 200:
+        if not (min_len <= len(sentence) <= max_len):
             continue
-        
+
         aspect_flags = {
             aspect: int(any(kw in sentence for kw in keywords))
             for aspect, keywords in ASPECT_DEF.items()
         }
-        
-        if sum(aspect_flags.values()) > 0:
+
+        if any(aspect_flags.values()):
             valid_sentences.append({
                 'id': idx,
                 'sentence': sentence,
                 'length': len(sentence),
                 **aspect_flags
             })
+
+    logger.info(f'유효한 문장 수: {len(valid_sentences)}')
     return valid_sentences
 
 
-def preprocessing_single_news(news):
+def preprocessing_single_news(news: dict) -> Optional[dict]:
     """
-    단일 뉴스 데이터를 전처리하는 함수
-    - 입력: news 딕셔너리 (title, content필수)
-    - 출력: 처리된 news 딕셔너리 or None (필터링시)
+    단일 뉴스 기사 전처리
+    - 필터 조건 통과한 경우 정제 및 분석
     """
+
     if not apply_initial_filters(news):
         return None
 
-    news['cleaned_content'] = clean_text(news['content'])
-    news['sentences'] = split_sentences(news['cleaned_content'])
+    cleaned = clean_text(news['content'])
+    sentences = split_sentences(cleaned)
+    valid = analyze_sentences(sentences)
 
-    if len(news['sentences']) >= 200:
-        return None
-
-    valid_sentences = analyze_sentences(news['sentences'])
-
-    if not valid_sentences:
+    if not valid:
         return None
 
     news.update({
-        'filtered_sentences': valid_sentences,
-        'num_valid_sentence': len(valid_sentences),
-        'aspect_counts': {k: sum(s[k] for s in valid_sentences) for k in ASPECT_DEF}
+        'cleaned_content': cleaned,
+        'sentences': sentences,
+        'filtered_sentences': valid,
+        'num_valid_sentence': len(valid),
+        'aspect_counts': {k: sum(s[k] for s in valid) for k in ASPECT_DEF}
     })
-    
+
+    logger.info('기사 모든 전처리 완료')
     return news
