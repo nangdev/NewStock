@@ -6,10 +6,9 @@ import newstock.common.dto.Api;
 import newstock.common.jwt.JwtTokenProvider;
 import newstock.common.jwt.TokenBlacklistService;
 import newstock.controller.request.LoginRequest;
+import newstock.controller.request.RefreshRequest;
 import newstock.controller.response.LoginResponse;
 import newstock.domain.user.service.UserService;
-import newstock.exception.ExceptionCode;
-import newstock.exception.type.ValidationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -46,18 +45,23 @@ public class AuthController {
 
         log.info("로그아웃 요청 - userId: {}", userId);
 
-        if (userId == null) {
-            throw new ValidationException(ExceptionCode.UNAUTHORIZED);
-        }
-
         String token = bearerToken.replace("Bearer ", "");
-
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new ValidationException(ExceptionCode.TOKEN_EXPIRED);
-        }
-
         userService.logout(userId, token);
 
         return ResponseEntity.ok(Api.ok());
+    }
+
+    /**
+     * JWT 토큰 재발급 API (자동 로그인)
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<Api<LoginResponse>> reissueToken(
+            @RequestHeader("Authorization") String bearerToken,
+            @RequestBody RefreshRequest request) {
+
+        String refreshToken = bearerToken.replace("Bearer ", "");
+        LoginResponse response = userService.reissueToken(refreshToken, request.getFcmToken());
+
+        return ResponseEntity.ok(Api.ok(response));
     }
 }
