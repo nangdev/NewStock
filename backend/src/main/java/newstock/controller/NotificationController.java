@@ -20,17 +20,15 @@ public class NotificationController {
         return ResponseEntity.ok(Api.ok(notificationService.getUserNotifications(userId)));
     }
 
-    @PutMapping("/{notificationId}")
-    public ResponseEntity<Api<Void>> updateUserNotification(@PathVariable Integer notificationId,
-                                                            @AuthenticationPrincipal Integer userId) {
-        notificationService.updateUserNotifications(notificationId, userId);
+    @PutMapping("/{userNotificationId}")
+    public ResponseEntity<Api<Void>> updateUserNotification(@PathVariable Integer userNotificationId) {
+        notificationService.updateUserNotifications(userNotificationId);
         return ResponseEntity.ok(Api.ok());
     }
 
-    @DeleteMapping("/{notificationId}")
-    public ResponseEntity<Api<Void>> deleteUserNotification(@PathVariable Integer notificationId,
-                                                            @AuthenticationPrincipal Integer userId) {
-        notificationService.deleteUserNotifications(notificationId, userId);
+    @DeleteMapping("/{userNotificationId}")
+    public ResponseEntity<Api<Void>> deleteUserNotification(@PathVariable Integer userNotificationId) {
+        notificationService.deleteUserNotifications(userNotificationId);
         return ResponseEntity.ok(Api.ok());
     }
 }
