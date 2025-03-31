@@ -1,5 +1,6 @@
 package newstock.domain.user.service;
 
+import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import newstock.controller.response.UserResponse;
 import newstock.domain.user.dto.JwtToken;
 import newstock.domain.user.entity.User;
 import newstock.domain.user.repository.UserRepository;
+import newstock.domain.user.service.CustomUserDetails;
 import newstock.common.jwt.JwtTokenProvider;
 
 import newstock.exception.ExceptionCode;
@@ -55,7 +57,7 @@ public class UserServiceImpl implements UserService {
         boolean exists = userRepository.existsByEmail(email);
         log.debug("이메일 중복 확인 - 이메일: {}, 존재 여부: {}", email, exists);
 
-        return userRepository.existsByEmail(email);
+        return exists;
     }
 
     // 회원가입 후 최초 로그인 시, 유저 권한을 1(USER)로 변경
@@ -133,5 +135,32 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         log.info("FCM 토큰 초기화 완료 - userId: {}", userId);
+    }
+
+    // JWT 토큰 재발급
+    @Override
+    @Transactional
+    public LoginResponse reissueToken(String refreshToken) {
+        Integer userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
+
+        if (!refreshToken.equals(user.getRefreshToken())) {
+            throw new ValidationException(ExceptionCode.TOKEN_INVALID, "refreshToken이 일치하지 않습니다.");
+        }
+
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+
+        JwtToken newToken = jwtTokenProvider.generateToken(authentication);
+        user.setRefreshToken(newToken.getRefreshToken());
+        userRepository.save(user);
+
+        return LoginResponse.builder()
+                .accessToken(newToken.getAccessToken())
+                .refreshToken(newToken.getRefreshToken())
+                .build();
     }
 }

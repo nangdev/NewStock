@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 "/v1/auth/**",
                                 "/v1/users",
                                 "/v1/users/check-email",
+                                "/v1/auth/refresh",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"

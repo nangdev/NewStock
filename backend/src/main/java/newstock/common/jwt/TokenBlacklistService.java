@@ -1,7 +1,6 @@
 package newstock.common.jwt;
 
 import lombok.RequiredArgsConstructor;
-import newstock.common.jwt.JwtTokenProvider;
 import newstock.common.redis.RedisUtil;
 import org.springframework.stereotype.Service;
 
