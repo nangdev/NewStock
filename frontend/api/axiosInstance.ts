@@ -1,6 +1,8 @@
 import axios from 'axios';
-import { API_BASE_URL } from 'constants/api';
-import { getToken } from 'utils/token';
+import { API_BASE_URL, API_PATH } from 'constants/api';
+import { ROUTE } from 'constants/routes';
+import { router } from 'expo-router';
+import { getToken, removeToken, setToken } from 'utils/token';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -27,33 +29,34 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    // const originalRequest = error.config;
+    const originalRequest = error.config;
 
-    // Todo: 토큰 만료 API 작업 후 주석 해제 및 수정 (예: 401 또는 커스텀 에러 코드)
-    // if (error.response?.status === 401 && !originalRequest._retry) {
-    //   originalRequest._retry = true;
+    if (error.response?.data.data === 5003 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-    //   try {
-    //     const refreshToken = await getToken('refreshToken');
-    //     // Todo: API 명세서 완성되면 수정
-    //     const response = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
-    //     const newToken = response.data.accessToken;
+      try {
+        const refreshToken = await getToken('refreshToken');
+        const response = await axios.post(`${API_BASE_URL}/${API_PATH.AUTH.REFRESH}`, {
+          refreshToken,
+        });
+        const newAccessToken = response.data.accessToken;
+        const newRefreshToken = response.data.accessToken;
 
-    //     await setToken({ key: 'accessToken', value: newToken });
+        await setToken({ key: 'accessToken', value: newAccessToken });
+        await setToken({ key: 'refreshToken', value: newRefreshToken });
 
-    //     originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
 
-    //     return api(originalRequest);
-    //   } catch (refreshError) {
-    //     await removeToken('accessToken');
-    //     await removeToken('refreshToken');
+        return api(originalRequest);
+      } catch (refreshError) {
+        await removeToken('accessToken');
+        await removeToken('refreshToken');
 
-    //     // Memo: 로그인 화면으로 리다이렉트 시킬것인지
-    //     // navigation.navigate('Login');
-
-    //     return Promise.reject(refreshError);
-    //   }
-    // }
+        // Memo: 로그인 화면으로 리다이렉트
+        router.replace(ROUTE.USER.LOGIN);
+        return Promise.reject(refreshError);
+      }
+    }
 
     // Memo: 개발 환경에서만 에러 로그 표시
     if (__DEV__) {
