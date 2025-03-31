@@ -3,7 +3,7 @@ package newstock.domain.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import newstock.common.redis.TokenBlacklistService;
+import newstock.common.jwt.TokenBlacklistService;
 import newstock.controller.request.LoginRequest;
 import newstock.controller.request.UserRequest;
 import newstock.controller.response.LoginResponse;
@@ -99,7 +99,6 @@ public class UserServiceImpl implements UserService {
 
         JwtToken token = jwtTokenProvider.generateToken(authentication);
 
-        user.setAccessToken(token.getAccessToken());
         user.setRefreshToken(token.getRefreshToken());
 
         if (request.getFcmToken() != null && !request.getFcmToken().isBlank()) {
@@ -117,9 +116,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void logout(Integer userId, String accessToken) {
-        long remainingTime = jwtTokenProvider.getTokenRemainingTime(accessToken);
-
-        tokenBlacklistService.addToBlacklist(accessToken, remainingTime);
+        tokenBlacklistService.addToBlacklist(accessToken);
         log.info("토큰 블랙리스트 등록 완료 - userId: {}, token: {}", userId, accessToken);
 
         clearFcmToken(userId);

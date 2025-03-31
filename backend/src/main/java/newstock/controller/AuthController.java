@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import newstock.common.dto.Api;
 import newstock.common.jwt.JwtTokenProvider;
-import newstock.common.redis.TokenBlacklistService;
+import newstock.common.jwt.TokenBlacklistService;
 import newstock.controller.request.LoginRequest;
 import newstock.controller.response.LoginResponse;
 import newstock.domain.user.service.UserService;
@@ -56,9 +56,7 @@ public class AuthController {
             throw new ValidationException(ExceptionCode.TOKEN_EXPIRED);
         }
 
-        long remainingTime = jwtTokenProvider.getTokenRemainingTime(token);
-        tokenBlacklistService.addToBlacklist(token, remainingTime);
-        userService.clearFcmToken(userId);
+        userService.logout(userId, token);
 
         return ResponseEntity.ok(Api.ok());
     }

@@ -13,13 +13,13 @@ public class RedisUtil {
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**
-     * Redis에 key-value 저장 (TTL 설정 포함)
+     * Redis에 key-value 저장 (TTL 설정 포함, 초 단위)
      * @param key 저장할 키
      * @param value 저장할 값
-     * @param minutes 유효 시간 (분 단위)
+     * @param seconds 유효 시간 (초 단위)
      */
-    public void set(String key, Object value, long minutes) {
-        redisTemplate.opsForValue().set(key, value, minutes, TimeUnit.MINUTES);
+    public void set(String key, Object value, long seconds) {
+        redisTemplate.opsForValue().set(key, value, seconds, TimeUnit.SECONDS);
     }
 
     /**
