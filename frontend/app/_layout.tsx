@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { ImageBackground } from 'react-native';
 
 import '../global.css';
+import Toast from 'react-native-toast-message';
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ export default function Layout() {
       <QueryClientProvider client={queryClient}>
         <UserProvider>
           <Slot />
+          <Toast />
         </UserProvider>
       </QueryClientProvider>
     </ImageBackground>
