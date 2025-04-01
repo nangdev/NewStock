@@ -186,7 +186,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
     private void enrichNewsItemWithPlaywright(Page page, NewsItem item) {
         try {
             page.navigate(item.getUrl());
-            page.waitForLoadState(LoadState.NETWORKIDLE, new Page.WaitForLoadStateOptions().setTimeout(5000));
+            page.waitForLoadState(LoadState.NETWORKIDLE, new Page.WaitForLoadStateOptions().setTimeout(10000));
             String articleHtml = page.content();
             Document doc = Jsoup.parse(articleHtml);
 
