@@ -47,9 +47,6 @@ public class NewsCrawlerConsumer {
                         log.error("Kafka AI 분석 메시지 전송 실패: ", ex);
                         return null;
                     });
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("뉴스 크롤링 인터럽트 발생: ", e);
         } catch (Exception e) {
             log.error("뉴스 크롤링 중 오류 발생: ", e);
         }

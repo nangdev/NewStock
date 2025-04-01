@@ -35,7 +35,7 @@ public class NewsCrawlerScheduler {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     // 스케줄러가 매 분 0초마다 실행됩니다.
-//    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void scheduleNewsCrawling() {
         // 작업을 단일 스레드 Executor에 제출하여, 이전 작업이 끝날 때까지 대기하도록 합니다.
         executor.submit(() -> {
@@ -43,14 +43,13 @@ public class NewsCrawlerScheduler {
                 List<StockDto> stockList = stockService.getAllStocks();
                 Instant schedulerTime = Instant.now();
 
-                // 종목 목록을 병렬 스트림으로 처리하여 동시에 메시지를 전송합니다.
-                stockList.parallelStream().forEach(stock -> {
+                stockList.forEach(stock -> {
                     try {
                         String message = objectMapper.writeValueAsString(
                                 NewsCrawlerRequest.of(stock.getStockName(), stock.getStockId(), schedulerTime.toString())
                         );
                         CompletableFuture<SendResult<String, String>> future =
-                                kafkaTemplate.send(topic, String.valueOf(stock.getStockId()), message);
+                                kafkaTemplate.send(topic, message);
                         future.thenAccept(sendResult ->
                                 log.info("Kafka 메시지 전송 성공: {}", message)
                         ).exceptionally(ex -> {

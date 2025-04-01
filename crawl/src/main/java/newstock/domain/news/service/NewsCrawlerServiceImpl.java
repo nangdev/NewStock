@@ -49,7 +49,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
      * 나중에 AI 필터링 등의 추가 처리를 위해 이 리스트를 활용할 수 있습니다.
      */
     @Override
-    public List<NewsItem> fetchNews(NewsCrawlerRequest newsCrawlerRequest) throws InterruptedException {
+    public List<NewsItem> fetchNews(NewsCrawlerRequest newsCrawlerRequest) {
         WebDriver driver = null;
         try {
             driver = createWebDriver();
@@ -143,17 +143,13 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 
         // 원격 WebDriver 시도
         try {
-            log.info("RemoteWebDriver 초기화 시작. URL: {}", remoteUrl);
-            WebDriver driver = new RemoteWebDriver(new URL(remoteUrl), options);
-            log.info("RemoteWebDriver 초기화 성공");
-            return driver;
+            return new RemoteWebDriver(new URL(remoteUrl), options);
         } catch (MalformedURLException e) {
             log.error("RemoteWebDriver URL 형식 오류: {}", e.getMessage(), e);
         } catch (Exception e) {
             log.error("RemoteWebDriver 초기화 실패: {}", e.getMessage(), e);
         }
 
-        // 자동 폴백 (로컬 WebDriver 사용)
         log.info("로컬 WebDriver로 폴백합니다.");
         WebDriverManager.chromedriver().browserVersion("134.0.6998.89").setup();
         return new ChromeDriver(options);

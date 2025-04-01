@@ -33,7 +33,7 @@ public class NewsAiConsumer {
 
     @KafkaListener(topics = "${kafka.topic.news-ai}", groupId = "${kafka.consumer.group.news-ai}")
     public void listen(String message) {
-        log.info("Kafka AI 분석 메시지 수신: {}", message);
+        log.info("Kafka AI 분석 메시지 수신");
         try {
             // AI 분석 요청 메시지를 역직렬화합니다.
             NewsAiRequest aiRequest = objectMapper.readValue(message, NewsAiRequest.class);
