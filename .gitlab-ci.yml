@@ -72,6 +72,8 @@ deploy:
           echo \"SERVER_CONTEXT_PATH=$SERVER_CONTEXT_PATH\" >> crawl/.env &&
           echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> crawl/.env &&
           echo \"NEWS_AI_URL=$NEWS_AI_URL\" >> crawl/.env &&
+          echo \"PLAYWRIGHT_ENABLED=true\" >> crawl/.env &&  # Playwright 활성화 환경변수 추가
+
           
           # 크롤러만 재배포
           echo \"dev/crawl 브랜치: 크롤러 서비스 배포 중...\"
@@ -113,6 +115,7 @@ deploy:
           echo \"SERVER_CONTEXT_PATH=$SERVER_CONTEXT_PATH\" >> crawl/.env &&
           echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> crawl/.env &&
           echo \"NEWS_AI_URL=$NEWS_AI_URL\" >> crawl/.env &&
+          echo \"PLAYWRIGHT_ENABLED=true\" >> crawl/.env &&
           
           # 전체 서비스 재배포
           echo \"dev/be 브랜치: 모든 서비스 배포 중...\"

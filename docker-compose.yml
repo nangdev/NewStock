@@ -29,22 +29,12 @@ services:
     depends_on:
       - mysql
   
-  selenium-hub:
-    image: selenium/hub:4.15.0
-    container_name: selenium-hub
-    ports:
-      - "4444:4444"
-
-  chrome:
-    image: selenium/node-chrome:4.15.0
-    shm_size: 2gb
-    depends_on:
-      - selenium-hub
-    environment:
-      - SE_EVENT_BUS_HOST=selenium-hub
-      - SE_EVENT_BUS_PUBLISH_PORT=4442
-      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_MAX_SESSIONS=5
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.40.0-jammy
+    container_name: playwright
+    volumes:
+      - ./playwright:/app
+    entrypoint: sleep infinity 
 
   crawl:
     build:
@@ -53,12 +43,12 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - SPRING_PROFILES_ACTIVE=selenium-grid
-      - SELENIUM_REMOTE_URL=http://selenium-hub:4444/wd/hub
+      - SPRING_PROFILES_ACTIVE=prod
+      - PLAYWRIGHT_ENABLED=true
     env_file:
       - ./crawl/.env
     depends_on:
-      - selenium-hub
+      - playwright
       - mysql
       - kafka
   
