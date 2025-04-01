@@ -4,8 +4,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import newstock.domain.news.dto.NotificationNewsDto;
-import newstock.domain.news.entity.News;
-import newstock.domain.news.entity.QNews;
 import newstock.domain.notification.dto.NotificationResultDto;
 import newstock.domain.notification.dto.UserDto;
 import org.springframework.stereotype.Repository;

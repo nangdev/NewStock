@@ -2,7 +2,6 @@ package newstock.domain.notification.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import newstock.domain.news.repository.NewsRepository;
 import newstock.domain.notification.dto.NotificationDto;
 import newstock.domain.notification.dto.NotificationResultDto;
 import newstock.domain.notification.entity.Notification;
