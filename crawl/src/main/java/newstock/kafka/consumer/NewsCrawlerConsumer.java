@@ -37,6 +37,12 @@ public class NewsCrawlerConsumer {
             // 뉴스 크롤링을 수행하여 뉴스 아이템 리스트를 얻습니다.
             List<NewsItem> newsItemList = newsCrawlerService.fetchNews(newsCrawlerRequest);
 
+            // 리스트가 비어있으면 메시지 전송을 생략합니다.
+            if (newsItemList == null || newsItemList.isEmpty()) {
+                log.info("크롤링 결과 뉴스 아이템이 없습니다. 메시지 전송을 생략합니다. (종목: {})", stockName);
+                return;
+            }
+
             // 뉴스 크롤링 결과를 AI 분석 단계로 전달하기 위해 새로운 메시지 생성
             String aiMessage = objectMapper.writeValueAsString(NewsAiRequest.of(stockName, newsItemList));
 

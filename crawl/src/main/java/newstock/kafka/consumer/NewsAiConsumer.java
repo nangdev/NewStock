@@ -67,6 +67,12 @@ public class NewsAiConsumer {
             }
             log.info("AI 분석 및 요약 완료, 종목: {} / 뉴스 개수: {}", stockName, filteredNewsItems.size());
 
+            // 만약 필터링 결과 뉴스 아이템이 없다면 DB 저장 메시지 전송을 생략합니다.
+            if (filteredNewsItems.isEmpty()) {
+                log.info("필터링 결과 뉴스 아이템이 없습니다. DB 저장 메시지 전송을 생략합니다. (종목: {})", stockName);
+                return;
+            }
+
             // 분석 결과를 DB 저장 단계로 전달하기 위한 메시지 생성
             String dbMessage = objectMapper.writeValueAsString(NewsDbRequest.of(stockName, filteredNewsItems));
 
