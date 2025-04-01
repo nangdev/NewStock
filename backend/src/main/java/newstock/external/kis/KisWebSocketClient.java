@@ -11,6 +11,7 @@ import newstock.external.kis.dto.KisBodyDto;
 import newstock.external.kis.dto.KisHeaderDto;
 import newstock.external.kis.dto.KisInputDto;
 import newstock.external.kis.dto.KisStockInfoDto;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @ClientEndpoint
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class KisWebSocketClient {
     private Session session;
