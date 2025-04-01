@@ -139,5 +139,5 @@ def calculate_adjusted_sentiment_score(prediction_result, neutral_alpha=0.5, com
 
 def finance_score(prediction_result, neutral_alpha=0.5, composite_beta=0.8):
     adjusted_score = calculate_adjusted_sentiment_score(prediction_result, neutral_alpha, composite_beta)
-    adjusted_score_10 = 5 * (adjusted_score + 1)
+    adjusted_score_10 = 10 * adjusted_score
     return adjusted_score, adjusted_score_10

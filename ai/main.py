@@ -65,16 +65,16 @@ async def score_article(input_data: ScoreRequest):
 
         logger.info("문장 리스트: %s", sentences)
 
-        scores = [
-            finance_score(predict(model, tokenizer, s["sentence"].strip()))[1]
-            for s in sentences
-            if s["sentence"].strip() and s["재무적성과"] == 1
-]
+        # 재무적성과가 1인 문장만 필터링
+        finance_sentences = [s for s in sentences if s["재무적성과"] == 1 and s["sentence"].strip()]
+
+        if not finance_sentences:
+            raise HTTPException(status_code=400, detail="재무적성과가 1인 문장이 없습니다.")
+
+        # 점수 예측
+        scores = [finance_score(predict(model, tokenizer, s["sentence"].strip()))[1] for s in finance_sentences]
+
         logger.info("점수 리스트: %s", scores)
-
-
-        if not scores:
-            raise HTTPException(status_code=400, detail="유효한 문장이 없습니다.")
 
         average_score = round(sum(scores) / len(scores))
         logger.info(f"재무적성과 점수: {average_score}")
@@ -84,7 +84,7 @@ async def score_article(input_data: ScoreRequest):
     except Exception as e:
         logger.exception("Error in /score endpoint")
         raise HTTPException(status_code=400, detail=str(e))
-    
+
 
 @app.post("/summarize", response_model=SummarizationResponse)
 def summarize(request: SummarizationRequest):
