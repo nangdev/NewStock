@@ -37,10 +37,10 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ValidationException(ExceptionCode.VALIDATION_ERROR, "이메일 또는 비밀번호가 일치하지 않습니다."));
+                .orElseThrow(() -> new ValidationException(ExceptionCode.VALIDATION_ERROR));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new ValidationException(ExceptionCode.VALIDATION_ERROR, "이메일 또는 비밀번호가 일치하지 않습니다.");
+            throw new ValidationException(ExceptionCode.VALIDATION_ERROR);
         }
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
@@ -95,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         if (!refreshToken.equals(user.getRefreshToken())) {
-            throw new ValidationException(ExceptionCode.TOKEN_INVALID, "refreshToken이 일치하지 않습니다.");
+            throw new ValidationException(ExceptionCode.TOKEN_INVALID);
         }
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
@@ -118,21 +118,18 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public LoginResponse loginWithKakao(String code, String fcmToken) {
-        // 1. 카카오에 access token 요청
+
         KakaoTokenResponse tokenResponse = kakaoOauthService.getToken(code);
         String kakaoAccessToken = tokenResponse.getAccessToken();
 
-        // 2. access token으로 카카오 사용자 정보 조회
         KakaoUserInfo userInfo = kakaoOauthService.getUserInfo(kakaoAccessToken);
-        Long kakaoId = userInfo.getId(); // DB에서 고유 유저 식별자로 사용
+        Long kakaoId = userInfo.getId();
         String email = userInfo.getKakaoAccount().getEmail();
         String nickname = userInfo.getKakaoAccount().getProfile().getNickname();
 
-        // 3. DB에 사용자 있는지 확인
         User user = userRepository.findByKakaoId(kakaoId)
                 .orElseGet(() -> addNewKakaoUser(kakaoId, email, nickname)); // 없으면 회원가입
 
-        // 4. JWT 발급
         CustomUserDetails userDetails = new CustomUserDetails(user);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());

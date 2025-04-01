@@ -12,12 +12,12 @@ public class KakaoUserInfo {
 
     @Data
     public static class KakaoAccount {
-        private String email;    // 유저 이메일
-        private Profile profile; // 닉네임만 포함됨
+        private String email;
+        private Profile profile;
 
         @Data
         public static class Profile {
-            private String nickname; // 유저 닉네임
+            private String nickname;
         }
     }
 }
