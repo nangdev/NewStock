@@ -4,52 +4,33 @@ nltk.download('punkt_tab')  # "punkt_tab" 리소스 다운로드
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from transformers import pipeline
-import torch
 import torch.nn as nn
-from utils.model_loader import load_model_and_tokenizer, predict
+from utils.model_loader import load_model_and_tokenizer, predict, finance_score
 from utils.preprocessor import preprocessing_single_news
-
+from typing import Tuple
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("score_article")
 
 app = FastAPI(title="News AI API")
 
-# === BERTClassifier 클래스 (필요시 사용) ===
-class BERTClassifier(nn.Module):
-    def __init__(self, bert, hidden_size=768, num_classes=3, dr_rate=None):
-        super(BERTClassifier, self).__init__()
-        self.bert = bert
-        self.dr_rate = dr_rate
-        self.classifier = nn.Linear(hidden_size, num_classes)
-        if dr_rate:
-            self.dropout = nn.Dropout(p=dr_rate)
 
-    def gen_attention_mask(self, token_ids, valid_length):
-        attention_mask = torch.zeros_like(token_ids)
-        for i, v in enumerate(valid_length):
-            attention_mask[i][:v] = 1
-        return attention_mask.float()
+# === 모델 및 토크나이저, 요약기 초기화 ===
+def initialize_models() -> Tuple:
+    try:
+        model, tokenizer = load_model_and_tokenizer()
+        model.eval()
+        summarizer = pipeline("summarization", model="noahkim/KoT5_news_summarization")
+        logger.info("모든 모델이 정상적으로 로딩되었습니다.")
+        return model, tokenizer, summarizer
+    except Exception as e:
+        logger.exception("모델 로딩 실패")
+        raise RuntimeError(f"모델 로딩 실패: {str(e)}")
 
-    def forward(self, token_ids, valid_length, segment_ids):
-        attention_mask = self.gen_attention_mask(token_ids, valid_length)
-        _, pooler = self.bert(
-            input_ids=token_ids,
-            token_type_ids=segment_ids.long(),
-            attention_mask=attention_mask.float().to(token_ids.device)
-        )
-        out = self.dropout(pooler) if self.dr_rate else pooler
-        return self.classifier(out)
+model, tokenizer, summarizer = initialize_models()
 
-# === 모델 로딩 ===
-try:
-    model, tokenizer = load_model_and_tokenizer()
-    model.eval()
-    summarizer = pipeline("summarization", model="noahkim/KoT5_news_summarization")
-except Exception as e:
-    raise Exception(f"모델 로딩 실패: {str(e)}")
 
-# === 요청/응답 모델 정의 ===
+# === 요청/응답 스키마 ===
 class ScoreRequest(BaseModel):
     title: str
     content: str
@@ -67,7 +48,8 @@ class SummarizationRequest(BaseModel):
 class SummarizationResponse(BaseModel):
     summary_content: str
 
-# === API 엔드포인트 ===
+
+# === API 엔드포인트 정의 ===
 @app.get("/")
 async def home():
     return {"message": "Welcome to the News AI API!"}
@@ -75,11 +57,7 @@ async def home():
 @app.post("/score", response_model=ScoreResponse)
 async def score_article(input_data: ScoreRequest):
     try:
-        news_dict = {
-            "title": input_data.title,
-            "content": input_data.content
-        }
-
+        news_dict = {"title": input_data.title, "content": input_data.content}
         processed = preprocessing_single_news(news_dict)
 
         if not processed:
@@ -88,27 +66,28 @@ async def score_article(input_data: ScoreRequest):
         sentences = processed["filtered_sentences"]
         cleaned_content = processed["cleaned_content"]
 
-        logger.debug("sentences: %s", sentences)
-        logger.debug("cleaned_content: %s", cleaned_content)  
+        logger.info("문장 리스트: %s", sentences)
 
-        scores = []
-        for sent_obj in sentences:
-            sentence_text = sent_obj["sentence"].strip()
-            if sentence_text:
-                neg, neu, pos = predict(model, tokenizer, sentence_text)
-                score = (pos - neg) * 100
-                scores.append(score)
+        # 재무적성과가 1인 문장만 필터링
+        finance_sentences = [s for s in sentences if s["재무적성과"] == 1 and s["sentence"].strip()]
 
+        if not finance_sentences:
+            raise HTTPException(status_code=400, detail="재무적성과가 1인 문장이 없습니다.")
 
-        if not scores:
-            raise HTTPException(status_code=400, detail="유효한 문장이 없습니다.")
+        # 점수 예측
+        scores = [finance_score(predict(model, tokenizer, s["sentence"].strip()))[1] for s in finance_sentences]
+
+        logger.info("점수 리스트: %s", scores)
 
         average_score = round(sum(scores) / len(scores))
+        logger.info(f"재무적성과 점수: {average_score}")
+
         return ScoreResponse(content=cleaned_content, score=average_score)
 
     except Exception as e:
-        logger.exception("Error in score_article endpoint")
+        logger.exception("Error in /score endpoint")
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @app.post("/summarize", response_model=SummarizationResponse)
 def summarize(request: SummarizationRequest):
@@ -122,9 +101,11 @@ def summarize(request: SummarizationRequest):
         summary_text = result[0]["summary_text"]
         return SummarizationResponse(summary_content=summary_text)
     except Exception as e:
-        logger.exception("Error in summarize endpoint")
+        logger.exception("Error in /summarize endpoint")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# === 서버 실행 ===
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

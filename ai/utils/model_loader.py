@@ -1,101 +1,143 @@
 import os
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from typing import Dict, Tuple
+import logging
 
-class BERTClassifier(nn.Module):
-    def __init__(self, bert, hidden_size=768, num_classes=3, dr_rate=None):
-        super(BERTClassifier, self).__init__()
-        self.bert = bert
-        self.dr_rate = dr_rate
-        
-        self.classifier = nn.Linear(hidden_size, num_classes)
-        if dr_rate:
-            self.dropout = nn.Dropout(p=dr_rate)
+# 로깅 설정
+logger = logging.getLogger("model_loader")
+logging.basicConfig(level=logging.INFO)
 
-    def gen_attention_mask(self, token_ids, valid_length):
-        attention_mask = torch.zeros_like(token_ids)
-        for i, v in enumerate(valid_length):
-            attention_mask[i][:v] = 1
-        return attention_mask.float()
-
-    def forward(self, token_ids, valid_length, segment_ids):
-        attention_mask = self.gen_attention_mask(token_ids, valid_length)
-        _, pooler = self.bert(
-            input_ids=token_ids,
-            token_type_ids=segment_ids.long(),
-            attention_mask=attention_mask.float().to(token_ids.device)
-        )
-        if self.dr_rate:
-            out = self.dropout(pooler)
-        else:
-            out = pooler
-        return self.classifier(out)
 
 def load_model_and_tokenizer():
+    """사전학습된 모델과 토크나이저를 로드"""
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logger.info(f"디바이스 설정: {device}")
+
     try:
-        # 토크나이저와 BERT 모델 초기화
-        tokenizer = AutoTokenizer.from_pretrained("skt/kobert-base-v1")
-        bertmodel = AutoModel.from_pretrained("skt/kobert-base-v1", return_dict=False)
+        # 모델 및 토크나이저 로드
+        model = AutoModelForSequenceClassification.from_pretrained(
+            "snunlp/KR-FinBert-SC",
+            num_labels=4,
+            ignore_mismatched_sizes=True
+            ).to(device)
         
-        # 새 모델 인스턴스 생성
-        model = BERTClassifier(bertmodel, dr_rate=0.5)
-        
-        # state_dict 로드 시도
-        try:
-            model_path = 'models/E_score_model.pt'
+        tokenizer = AutoTokenizer.from_pretrained("snunlp/KR-FinBert-SC")
 
-            import torch.serialization
-            torch.serialization.add_safe_globals([BERTClassifier])
-            checkpoint = torch.load(model_path, map_location=torch.device('cpu'), weights_only=False)
-            
+        # 추가 가중치 로딩 (fine-tuned 모델)
+        model_path = 'models/finance_model.pt'
+        if os.path.exists(model_path):
+            checkpoint = torch.load(model_path, map_location=device)
+
             if isinstance(checkpoint, dict) and 'state_dict' in checkpoint:
-                model.load_state_dict(checkpoint['state_dict'])
+                model.load_state_dict(checkpoint['state_dict'], strict=False)
             elif isinstance(checkpoint, dict):
-                model.load_state_dict(checkpoint)
+                model.load_state_dict(checkpoint, strict=False)
+            elif hasattr(checkpoint, 'state_dict'):
+                model.load_state_dict(checkpoint.state_dict(), strict=False)
             else:
-                # 전체 모델이 저장된 경우, 가중치만 추출하여 로드
-                model = checkpoint
-        except Exception as e:
-            print(f"{str(e)}")
-            print()
-            print("모델의 state_dict 정보가 없으므로 모델 전체 로드를 시도합니다.")
-            # 다른 방법으로 시도
+                logger.warning("체크포인트 형식이 예상과 다릅니다.")
+
+            logger.info("모델 가중치를 성공적으로 로드했습니다.")
+        else:
+            logger.warning("로컬 가중치 파일이 존재하지 않습니다. 원본 모델만 사용됩니다.")
+
         model.eval()
-        print("모델을 성공적으로 로드했습니다.")
         return model, tokenizer
+
     except Exception as e:
-        print(f"오류 상세 내용: {str(e)}")
-        raise Exception(f"모델 로드 중 오류 발생: {str(e)}")
+        logger.exception("모델 로딩 중 오류 발생")
+        raise RuntimeError(f"모델 로드 실패: {str(e)}")
 
 
-def predict(model, tokenizer, predict_sentence):
-    max_len = 64
-    
-    encoded = tokenizer(predict_sentence,
-                       max_length=max_len,
-                       padding='max_length',
-                       truncation=True,
-                       return_tensors='pt')
-    
-    token_ids = encoded['input_ids']
-    valid_length = (token_ids != 0).sum(dim=1)
-    
-    # segment_ids를 0으로 초기화 (단일 문장이므로)
-    segment_ids = torch.zeros_like(token_ids)
+def predict(model: torch.nn.Module, tokenizer: AutoTokenizer, sentence: str) -> Dict[str, float]:
+    """문장에 대한 감성 예측 확률 반환"""
+    encoded = tokenizer(sentence,
+                        max_length=512,
+                        padding='max_length',
+                        truncation=True,
+                        return_tensors='pt')
 
-    model.eval()
+    device = next(model.parameters()).device
+    input_ids = encoded['input_ids'].to(device)
+    attention_mask = encoded['attention_mask'].to(device)
+
     with torch.no_grad():
-        out = model(token_ids, valid_length, segment_ids)
-        probabilities = F.softmax(out[0], dim=0).numpy()
-    
-    return probabilities[0], probabilities[1], probabilities[2]
+        logits = model(input_ids=input_ids, attention_mask=attention_mask).logits
+        probabilities = F.softmax(logits, dim=1).cpu().numpy()
 
-if __name__ == "__main__":
-    model, tokenizer = load_model_and_tokenizer()
+    return {
+        'negative': float(probabilities[0][0]),
+        'positive': float(probabilities[0][1]),
+        'neutral': float(probabilities[0][2]),
+        'composite': float(probabilities[0][3])
+    }
+
+
+def calculate_sentiment_score(prediction_result, neutral_alpha=0.5, composite_beta=0.7):
+    """
+    감성 점수를 계산하는 함수
+
+    종합점수 = [(긍정확률−부정확률)×(1−중립확률×α)]×복합조정계수
+    복합조정계수 = (1 - 복합확률) × β
+
+    Args:
+        prediction_result: 예측 결과 딕셔너리
+        neutral_alpha: 중립 영향력 계수 (기본값 0.5)
+        composite_beta: 복합 영향력 계수 (기본값 0.7)
+
+    Returns:
+        float: -1.0 ~ 1.0 사이의 감성 점수
+    """
+    pos = prediction_result['positive']
+    neg = prediction_result['negative']
+    neu = prediction_result['neutral']
+    comp = prediction_result['composite']
+
+    # 복합 조정 계수 계산
+    composite_adjustment = (1 - comp) * composite_beta
+
+    # 종합 점수 계산
+    sentiment_score = (pos - neg) * (1 - neu * neutral_alpha) * composite_adjustment
+
+    return sentiment_score
+
+
+def calculate_adjusted_sentiment_score(prediction_result, neutral_alpha=0.5, composite_beta=0.8):
+    """
+    복합 감성이 높을 때 조정된 감성 점수를 계산하는 함수
     
-    # 테스트 문장으로 예측 테스트
-    test_sentence = "최근 일본정부가 후쿠시마 제1원전 오염수의 바다 방출을 사실상 확정하면서 우진의 방사능 제염사업이 연일 부각되고 있다."
-    neg, neu, pos = predict(model, tokenizer, test_sentence)
-    print(f"부정: {neg:.3f}, 중립: {neu:.3f}, 긍정: {pos:.3f}")
+    Args:
+        prediction_result: 예측 결과 딕셔너리
+        neutral_alpha: 중립 영향력 계수 (기본값 0.5)
+        composite_beta: 복합 영향력 계수 (기본값 0.8)
+    
+    Returns:
+        float: -1.0 ~ 1.0 사이의 조정된 감성 점수
+    """
+    pos = prediction_result['positive']
+    neg = prediction_result['negative']
+    neu = prediction_result['neutral']
+    comp = prediction_result['composite']
+    
+    # 복합 감성이 높은 경우
+    if comp > 0.7:
+        # 긍정과 부정의 상대적 비율 계산 (0에 가까울수록 부정, 1에 가까울수록 긍정)
+        pos_neg_ratio = pos / (pos + neg + 0.0001)  # 0으로 나누기 방지
+        
+        # 상대적 비율을 -1~1 범위로 변환 (-1: 완전 부정, 1: 완전 긍정)
+        sentiment_direction = 2 * pos_neg_ratio - 1
+        
+        # 복합성과 중립성을 고려한 최종 점수 계산
+        adjusted_score = sentiment_direction * (1 - comp * 0.5) * (1 - neu * neutral_alpha)
+        return adjusted_score
+    
+    # 복합 감성이 낮은 경우 기존 방식 사용
+    else:
+        return calculate_sentiment_score(prediction_result, neutral_alpha, composite_beta)
+
+def finance_score(prediction_result, neutral_alpha=0.5, composite_beta=0.8):
+    adjusted_score = calculate_adjusted_sentiment_score(prediction_result, neutral_alpha, composite_beta)
+    adjusted_score_10 = 10 * adjusted_score
+    return adjusted_score, adjusted_score_10
