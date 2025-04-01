@@ -33,6 +33,9 @@ public enum ExceptionCode {
 
     // 외부 API 사용시 발생할 수 있는 예외 작성
     EXTERNAL_API_ERROR("외부 API를 호출하는 과정에서 예외가 발생했습니다.", 4001,HttpStatus.INTERNAL_SERVER_ERROR),
+    KAKAO_LOGIN_FAILED("카카오 로그인 처리 중 오류가 발생했습니다.", 4002, HttpStatus.BAD_REQUEST),
+    KAKAO_TOKEN_ERROR("카카오 토큰 요청에 실패했습니다.", 4003, HttpStatus.BAD_REQUEST),
+    KAKAO_USERINFO_ERROR("카카오 사용자 정보 조회에 실패했습니다.", 4004, HttpStatus.BAD_REQUEST),
 
     // 인증 및 보안 관련 예외 작성
     TOKEN_INVALID("유효하지 않은 토큰입니다.", 5001, HttpStatus.UNAUTHORIZED),

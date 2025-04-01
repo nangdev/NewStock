@@ -57,9 +57,11 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 path.equals("/v1/users/check-email") ||
                 path.equals("/v1/auth/refresh") ||
                 path.equals("/v1/auth/login") ||
+                path.equals("/v1/auth/oauth/kakao/callback") ||
                 path.equals("/swagger-ui.html") ||
                 path.startsWith("/swagger-ui") ||
-                path.startsWith("/v3/api-docs")
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/ws")
         ) {
             chain.doFilter(request, response);
             return;

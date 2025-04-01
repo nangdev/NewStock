@@ -15,13 +15,4 @@ public interface UserService {
     void updateUserRole(Integer userId);
 
     UserResponse getUserInfo(Integer userId);
-
-    // 인증 관련
-    LoginResponse login(LoginRequest loginRequest);
-
-    void logout(Integer userId, String accessToken);
-
-    void clearFcmToken(Integer userId);
-
-    LoginResponse reissueToken(String refreshToken, String fcmToken);
 }
