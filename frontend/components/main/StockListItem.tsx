@@ -36,7 +36,7 @@ export default function StockListItem({
     <View className="bg-white rounded-2xl mx-8 my-2 shadow-md overflow-hidden">
       <View className="flex-row items-center p-4">
         <Image
-          source={{ uri: imgUrl || 'https://via.placeholder.com/48' }}
+          source={{ uri: `data:image/png;base64,${imgUrl}` }}
           className="w-16 h-16 rounded-xl mr-6 bg-gray-200"
         />
         <View className="flex-1">

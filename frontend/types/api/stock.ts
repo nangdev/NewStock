@@ -16,3 +16,16 @@ export type StockInterestReqType = {
 };
 
 export type StockInterestResType = BaseResType;
+
+export type AllUserStockResType = BaseResType & {
+  data: {
+    stockList: {
+      stockId: number,
+      stockCode: string,
+      stockName: string,
+      closingPrice: number,
+      rcPdcp: number,
+      imgUrl: string,
+    }[];
+  }
+}

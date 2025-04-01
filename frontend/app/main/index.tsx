@@ -3,33 +3,48 @@ import StockListItem from 'components/main/StockListItem';
 import { Client } from '@stomp/stompjs';
 import { useEffect, useState } from 'react';
 import { useAllUserStockListQuery } from 'api/stock/query';
-export default function Main() {
-  
-  // 테스트 데이터
-  const [subscribedStocks, setSubscribedStocks] = useState([
-    { stockName: '삼성전자', stockCode: '005930', price: 0, changeRate: 0.0 },
-    { stockName: 'SK하이닉스', stockCode: '000660', price: 0, changeRate: 0.0 },
-    { stockName: '카카오', stockCode: '035720', price: 0, changeRate: 0.0 },
-  ]);
 
+type Stock = {
+  stockId: number,
+  stockCode: string,
+  stockName: string,
+  closingPrice: number,
+  rcPdcp: number,
+  imgUrl: string,
+}
+
+export default function Main() {
+
+  // 테스트 데이터
+  // const [subscribedStocks, setSubscribedStocks] = useState([
+  //   { stockName: '삼성전자', stockCode: '005930', price: 0, changeRate: 0.0 },
+  //   { stockName: 'SK하이닉스', stockCode: '000660', price: 0, changeRate: 0.0 },
+  //   { stockName: '카카오', stockCode: '035720', price: 0, changeRate: 0.0 },
+  // ]);
   
+  const { data, isLoading, isError } = useAllUserStockListQuery();
+  const [subscribedStocks, setSubscribedStocks] = useState<Stock[]>([]);
   
   useEffect(() => {
-    // const { data, isLoading, isSuccess } = useAllUserStockListQuery();
-    // console.log(data)
+    if (!data?.data.stockList) return;
+
+    setSubscribedStocks(data.data.stockList);
+    console.log(subscribedStocks)
     // STOMP 연결
     const client = new Client({
-      webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
+      // webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
+      webSocketFactory: () => new WebSocket('ws://10.0.2.2:8080/api/ws'),
       // debug: (msg) => console.log('STOMP:', msg),
       onConnect: (frame) => {
         // 구독
-        subscribedStocks.forEach((stock) => {
+        data.data.stockList.forEach((stock) => {
           client.subscribe(`/topic/rtp/${stock.stockCode}`, (msg) => {
             const parsed = JSON.parse(msg.body);
+            console.log(msg.body)
             setSubscribedStocks((prev) =>
               prev.map((s) =>
                 s.stockCode === parsed.stockCode
-                  ? { ...s, price: parsed.price, changeRate: parsed.changeRate }
+                  ? { ...s, closingPrice: parsed.price, rcPdcp: parsed.changeRate }
                   : s
               )
             );
@@ -45,7 +60,7 @@ export default function Main() {
     return () => {
       client.deactivate();
     }
-  }, []);
+  }, [data]);
 
   return (
     <View>
@@ -54,9 +69,9 @@ export default function Main() {
           <StockListItem
             stockName={stock.stockName}
             stockCode={stock.stockCode}
-            price={stock.price}
-            changeRate={stock.changeRate}
-            imgUrl=''
+            price={stock.closingPrice ? stock.closingPrice : 0}
+            changeRate={stock.rcPdcp ? stock.rcPdcp : 0}
+            imgUrl={stock.imgUrl}
             hojaeIconUrl=''
         />
         ))}
