@@ -23,22 +23,16 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private String userName;
-
-    @Column(nullable = false)
     private String nickname;
-
-    @Column
-    private String accessToken;
 
     @Column
     private String refreshToken;
 
-    @Column
-    private String refreshTokenExpires;
+    @Column(unique = true)
+    private Long kakaoId;
 
     @Column
-    private String socialProvider;
+    private String socialProvider; // "kakao", null (일반가입)
 
     @Column
     private String fcmToken;
@@ -46,11 +40,11 @@ public class User {
     @Column(nullable = false)
     private Byte role; // 유저 권한 0이면 NEW(신규 회원), 1이면 USER(기존 유저)
 
+
     public static User of(UserRequest userRequest, String encodedPassword) {
         return User.builder()
                 .email(userRequest.getEmail())
                 .password(encodedPassword)
-                .userName(userRequest.getUserName() )
                 .nickname(userRequest.getNickname())
                 .role((byte) 0)
                 .build();

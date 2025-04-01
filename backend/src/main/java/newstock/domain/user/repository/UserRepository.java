@@ -23,4 +23,11 @@ public interface UserRepository extends JpaRepository<User, Integer>, UserCustom
      */
     boolean existsByEmail(String email);
 
+    /**
+     * 카카오 ID를 기반으로 사용자 조회
+     *
+     * @param kakaoId 카카오 사용자 고유 ID
+     * @return 카카오 ID가 일치하는 사용자 (Optional<User>)
+     */
+    Optional<User> findByKakaoId(Long kakaoId);
 }
