@@ -1,6 +1,7 @@
 package newstock.domain.news.service;
 
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.LoadState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import newstock.domain.news.dto.NewsItem;
@@ -185,7 +186,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
     private void enrichNewsItemWithPlaywright(Page page, NewsItem item) {
         try {
             page.navigate(item.getUrl());
-            page.waitForSelector("body", new Page.WaitForSelectorOptions().setTimeout(5000));
+            page.waitForLoadState(LoadState.NETWORKIDLE, new Page.WaitForLoadStateOptions().setTimeout(5000));
             String articleHtml = page.content();
             Document doc = Jsoup.parse(articleHtml);
 
