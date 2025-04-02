@@ -1,8 +1,5 @@
 package newstock.domain.user.service;
 
-import ch.qos.logback.classic.layout.TTLLLayout;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import newstock.common.redis.RedisUtil;
@@ -13,7 +10,6 @@ import newstock.exception.type.ValidationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -25,7 +21,6 @@ public class EmailVerificationService {
 
     private static final String EMAIL_AUTH_PREFIX = "email:auth:";
     private static final long EXPIRATION_TIME = 60 * 5L; // 5분 TTL
-    private static final int CODE_LENGTH = 6;
 
     /**
      * 인증번호 생성 (6자리 숫자)
@@ -36,39 +31,16 @@ public class EmailVerificationService {
     }
 
     /**
-     * 메일 전송
-     */
-    public void sendEmailCode(String email) {
-        String authCode = generateAuthCode();
-
-        MimeMessage message = javaMailSender.createMimeMessage();
-        try {
-            message.setFrom("team.newstock@gmail.com");
-            message.setRecipients(MimeMesage.RecipientType.TO, email);
-            message.setSubject("[NewStock] 이메일 인증 코드입니다.");
-
-            String html = "<h3>요청하신 인증번호입니다.</h3>" +
-                    "<h1>" + authCode + "</h1>" +
-                    "<p>5분 이내로 입력해주세요.</p>";
-
-            message.setText(html, "UTF-8", "html");
-
-            javaMailSender.send(message);
-
-            // Redis에 저장
-            redisUtil.set(EMAIL_AUTH_PREFIX + email, authCode, TTL);
-            log.info("이메일 전송 및 인증 코드 저장 성공 - email: {}, code: {}", email, authCode);
-
-        } catch (MessagingException e) {
-            log.error("이메일 전송 실패 - email: {}", email, e);
-            throw new RuntimeException("이메일 전송 실패");
-        }
-    }
-
-    /**
      * 이메일 인증 코드 생성 및 Redis에 저장
      */
     public String generateAndSaveAuthCode(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
+
+        if (user.isEmailVerified()) {
+            throw new ValidationException(ExceptionCode.EMAIL_ALREADY_VERIFIED);
+        }
+
         String authCode = generateAuthCode();
         redisUtil.set(EMAIL_AUTH_PREFIX + email, authCode, EXPIRATION_TIME);
         log.info("이메일 인증 코드 생성 - email: {}, code: {}", email, authCode);
@@ -93,6 +65,10 @@ public class EmailVerificationService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
+
+        if (user.isEmailVerified()) {
+            throw new ValidationException(ExceptionCode.EMAIL_ALREADY_VERIFIED);
+        }
 
         user.setEmailVerified(true);
         userRepository.save(user);

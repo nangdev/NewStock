@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -19,7 +20,7 @@ public class RedisUtil {
      * @param seconds 유효 시간 (초 단위)
      */
     public void set(String key, Object value, long seconds) {
-        redisTemplate.opsForValue().set(key, value, seconds, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, value, Duration.ofSeconds(seconds));
     }
 
     /**
