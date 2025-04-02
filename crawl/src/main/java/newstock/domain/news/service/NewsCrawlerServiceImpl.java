@@ -128,6 +128,9 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu");
 
+        // Chrome 실행 파일 경로 명시 (Docker 이미지 내 설치 경로에 맞게 수정)
+        options.setBinary("/usr/bin/google-chrome");
+
         // 원격 WebDriver 시도
         try {
             return new RemoteWebDriver(new URL(remoteUrl), options);
@@ -137,10 +140,10 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
             log.error("RemoteWebDriver 초기화 실패: {}", e.getMessage(), e);
         }
 
-        log.info("로컬 WebDriver로 폴백합니다.");
         WebDriverManager.chromedriver().setup();
         return new ChromeDriver(options);
     }
+
 
     /**
      * 목록 페이지에서 li 태그들을 순회하며 기본 정보(제목, 네이버뉴스 링크)를 추출하여 리스트로 반환합니다.
