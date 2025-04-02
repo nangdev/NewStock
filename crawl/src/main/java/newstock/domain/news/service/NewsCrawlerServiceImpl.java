@@ -16,7 +16,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.http.HttpCommandExecutor;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +37,7 @@ import java.util.List;
 public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final Duration WAIT_TIMEOUT = Duration.ofSeconds(3);
+    private static final Duration WAIT_TIMEOUT = Duration.ofSeconds(5);
     private static final Duration OLDER_THAN_DURATION = Duration.ofMinutes(2); // 테스트용: 스케줄러 시간 기준 1분 전 이후 뉴스만 수집
 
     // Selenium Grid URL을 환경 변수에서 가져옴
@@ -127,39 +126,23 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 
     private WebDriver createWebDriver() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu", 
-                            "--disable-extensions", "--disable-infobars");
-        options.setBinary("/usr/bin/google-chrome");
-
-        // 재시도 로직 추가
-        int maxRetries = 3;
-        int currentRetry = 0;
-        Exception lastException = null;
-
-        while (currentRetry < maxRetries) {
-            try {
-                // HttpCommandExecutor에 타임아웃 설정 추가
-                HttpCommandExecutor executor = new HttpCommandExecutor(
-                    new URL(remoteUrl),
-                    Duration.ofSeconds(30) // 30초로 증가
-                );
-                return new RemoteWebDriver(executor, options);
-            } catch (Exception e) {
-                lastException = e;
-                log.warn("RemoteWebDriver 연결 시도 {}/{} 실패: {}", 
-                        currentRetry + 1, maxRetries, e.getMessage());
-                currentRetry++;
-                try {
-                    // 재시도 전 대기 시간
-                    Thread.sleep(currentRetry * 2000); // 2초, 4초, 6초...
-                } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt();
-                }
-            }
+        options.addArguments(
+            "--headless=new",  // 새 headless 모드 사용
+            "--no-sandbox", 
+            "--disable-dev-shm-usage", 
+            "--disable-gpu",
+            "--disable-extensions",
+            "--window-size=1920,1080"
+        );
+        // 원격 WebDriver 시도
+        try {
+            return new RemoteWebDriver(new URL(remoteUrl), options);
+        } catch (MalformedURLException e) {
+            log.error("RemoteWebDriver URL 형식 오류: {}", e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("RemoteWebDriver 초기화 실패: {}", e.getMessage(), e);
         }
 
-        // 모든 재시도 실패, 폴백으로 로컬 드라이버 시도
-        log.error("RemoteWebDriver 초기화 최종 실패: {}", lastException.getMessage(), lastException);
         WebDriverManager.chromedriver().setup();
         return new ChromeDriver(options);
     }
