@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8" /><title>Kakao Oauth Deeplink Page</title></head>
+<body>
+<script>
+    const code = new URLSearchParams(window.location.search).get("code");
+    // 딥링크
+    window.location.href = `exp://70.12.246.238:8081?code=${code}`;
+</script>
+</body>
+</html>
