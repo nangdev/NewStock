@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import Collapsible from 'react-native-collapsible';
+import { useRouter } from 'expo-router';
+import { ROUTE } from 'constants/routes';
 
 type Props = {
   stockName: string;
@@ -20,6 +22,14 @@ type Props = {
   imgUrl,
   hojaeIconUrl,
 }: Props) {
+  const router = useRouter();
+  const onPressItem = () => {
+    router.navigate({
+      pathname: ROUTE.STOCK.DETAIL(stockCode),
+      params: {stockCode}
+    })
+  }
+
   const isPositive = changeRate > 0;
   const [expanded, setExpanded] = useState(false);
 
@@ -33,44 +43,46 @@ type Props = {
   ];
 
   return (
-    <View className="bg-white rounded-2xl mx-8 my-2 shadow-md overflow-hidden">
-      <View className="flex-row items-center p-4">
-        <Image
-          source={{ uri: `data:image/png;base64,${imgUrl}` }}
-          className="w-16 h-16 rounded-xl mr-6 bg-gray-200"
-        />
-        <View className="flex-1">
-          <Text className="text-base font-bold">{stockName}</Text>
-          <Text className="text-xs text-gray-500">{stockCode}</Text>
+    <TouchableOpacity onPress={onPressItem}>
+      <View className="bg-white rounded-2xl mx-8 my-2 shadow-md overflow-hidden">
+        <View className="flex-row items-center p-4">
+          <Image
+            source={{ uri: `data:image/png;base64,${imgUrl}` }}
+            className="w-16 h-16 rounded-xl mr-6 bg-gray-200"
+          />
+          <View className="flex-1">
+            <Text className="text-base font-bold">{stockName}</Text>
+            <Text className="text-xs text-gray-500">{stockCode}</Text>
+          </View>
+          <View className="flex-1 items-end mr-6">
+            <Text className="text-base font-bold">{price.toLocaleString()} 원</Text>
+            <Text className={`text-sm mt-1 ${isPositive ? 'text-red-500' : 'text-blue-500'}`}>
+              {changeRate.toFixed(2)}%
+            </Text>
+          </View>
+          <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+            <AntDesign name={expanded ? 'up' : 'down'} size={14} color="#888" className="ml-2" />
+          </TouchableOpacity>
         </View>
-        <View className="flex-1 items-end mr-6">
-          <Text className="text-base font-bold">{price.toLocaleString()} 원</Text>
-          <Text className={`text-sm mt-1 ${isPositive ? 'text-red-500' : 'text-blue-500'}`}>
-            {changeRate.toFixed(2)}%
-          </Text>
-        </View>
-        <TouchableOpacity onPress={() => setExpanded(!expanded)}>
-          <AntDesign name={expanded ? 'up' : 'down'} size={14} color="#888" className="ml-2" />
-        </TouchableOpacity>
-      </View>
 
-      <Collapsible collapsed={!expanded}>
-        <View className="bg-white px-4 py-2 mb-2">
-          {newsList.map((news) => (
-            <View key={news.id} className="flex-row items-center my-1">
-              <Image
-                source={{ uri: hojaeIconUrl || 'https://via.placeholder.com/36' }}
-                className="w-9 h-9 rounded-md mr-4 bg-gray-200"
-              />
-              <View className="flex-1 flex-row justify-between items-center">
-                <Text className="text-sm">{news.title}</Text>
-                <Text className="text-xs text-gray-500">{news.time}</Text>
+        <Collapsible collapsed={!expanded}>
+          <View className="bg-white px-4 py-2 mb-2">
+            {newsList.map((news) => (
+              <View key={news.id} className="flex-row items-center my-1">
+                <Image
+                  source={{ uri: hojaeIconUrl || 'https://via.placeholder.com/36' }}
+                  className="w-9 h-9 rounded-md mr-4 bg-gray-200"
+                />
+                <View className="flex-1 flex-row justify-between items-center">
+                  <Text className="text-sm">{news.title}</Text>
+                  <Text className="text-xs text-gray-500">{news.time}</Text>
+                </View>
               </View>
-            </View>
-          ))}
-        </View>
-      </Collapsible>
-    </View>
+            ))}
+          </View>
+        </Collapsible>
+      </View>
+    </TouchableOpacity>
   );
 }
 

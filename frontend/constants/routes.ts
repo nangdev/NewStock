@@ -8,4 +8,7 @@ export const ROUTE = {
     SIGNUP: '/user/signup',
     LOGIN: '/user/login',
   },
+  STOCK: {
+    DETAIL: (stockCode: string) => `/stock/${stockCode}`,
+  },
 };
