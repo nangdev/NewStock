@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8" /><title>Kakao Oauth Deeplink Page</title></head>
+<body>
+<script>
+    const code = new URLSearchParams(window.location.search).get("code");
+    // 딥링크
+    window.location.href = `newstock://oauth?code=${code}`;
+</script>
+</body>
+</html>
