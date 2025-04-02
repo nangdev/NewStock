@@ -1,33 +1,30 @@
 import nltk
-nltk.download('punkt_tab')  # "punkt_tab" 리소스 다운로드
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from transformers import pipeline
 import torch.nn as nn
-from utils.model_loader import load_model_and_tokenizer, predict, finance_score
+from utils.model_loader import load_all_models_and_tokenizers
+from utils.predictor import predict, compute_article_score, calculate_weighted_article_score
 from utils.preprocessor import preprocessing_single_news
-from typing import Tuple
+from typing import Tuple, Dict, List
+
 import logging
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("score_article")
 
 app = FastAPI(title="News AI API")
 
 
-# === 모델 및 토크나이저, 요약기 초기화 ===
-def initialize_models() -> Tuple:
-    try:
-        model, tokenizer = load_model_and_tokenizer()
-        model.eval()
-        summarizer = pipeline("summarization", model="noahkim/KoT5_news_summarization")
-        logger.info("모든 모델이 정상적으로 로딩되었습니다.")
-        return model, tokenizer, summarizer
-    except Exception as e:
-        logger.exception("모델 로딩 실패")
-        raise RuntimeError(f"모델 로딩 실패: {str(e)}")
-
-model, tokenizer, summarizer = initialize_models()
+# === 모델 및 요약기 초기화 ===
+try:
+    model_dict = load_all_models_and_tokenizers()
+    summarizer = pipeline("summarization", model="noahkim/KoT5_news_summarization")
+    logger.info("모든 모델과 요약기 로딩 완료")
+except Exception as e:
+    logger.exception("모델 로딩 실패")
+    raise RuntimeError(f"모델 로딩 실패: {str(e)}")
 
 
 # === 요청/응답 스키마 ===
@@ -37,7 +34,8 @@ class ScoreRequest(BaseModel):
 
 class ScoreResponse(BaseModel):
     content: str
-    score: int
+    aspect_scores: Dict[str, float]
+    score: float
 
 class SummarizationRequest(BaseModel):
     content: str
@@ -54,6 +52,7 @@ class SummarizationResponse(BaseModel):
 async def home():
     return {"message": "Welcome to the News AI API!"}
 
+
 @app.post("/score", response_model=ScoreResponse)
 async def score_article(input_data: ScoreRequest):
     try:
@@ -61,33 +60,43 @@ async def score_article(input_data: ScoreRequest):
         processed = preprocessing_single_news(news_dict)
 
         if not processed:
-            return ScoreResponse(content="", score=0)
+            return ScoreResponse(content="", aspect_scores={}, score=0.0)
+
 
         sentences = processed["filtered_sentences"]
         cleaned_content = processed["cleaned_content"]
-
         logger.info("문장 리스트: %s", sentences)
 
-        # 재무적성과가 1인 문장만 필터링
-        finance_sentences = [s for s in sentences if s["재무적성과"] == 1 and s["sentence"].strip()]
+        aspect_scores: Dict[str, List[float]] = {cat: [] for cat in model_dict.keys()}
 
-        if not finance_sentences:
-            raise HTTPException(status_code=400, detail="재무적성과가 1인 문장이 없습니다.")
+        # 각 문장에 대해 카테고리별 점수 계산
+        for s in sentences:
+            sentence = s["sentence"]
+            if not sentence:
+                continue
 
-        # 점수 예측
-        scores = [finance_score(predict(model, tokenizer, s["sentence"].strip()))[1] for s in finance_sentences]
+            for category in [cat for cat in model_dict if s.get(cat, 0) == 1]:
+                model, tokenizer, device = model_dict[category]
+                score = compute_article_score(predict(model, tokenizer, sentence, device))[1]
+                aspect_scores[category].append(score)
 
-        logger.info("점수 리스트: %s", scores)
+        logger.info("카테고리별 점수 리스트: %s", aspect_scores)
 
-        average_score = round(sum(scores) / len(scores))
-        logger.info(f"재무적성과 점수: {average_score}")
+        # 평균 점수 계산
+        average_scores = {
+            category: round(sum(scores) / len(scores), 3) if scores else 0.0
+            for category, scores in aspect_scores.items()
+        }
 
-        return ScoreResponse(content=cleaned_content, score=average_score)
+        # 종합 점수 계산 (가중 평균 방식)
+        article_score = calculate_weighted_article_score(aspect_scores)
+
+        return ScoreResponse(content=cleaned_content, aspect_scores=average_scores, score=article_score)
 
     except Exception as e:
         logger.exception("Error in /score endpoint")
         raise HTTPException(status_code=400, detail=str(e))
-
+    
 
 @app.post("/summarize", response_model=SummarizationResponse)
 def summarize(request: SummarizationRequest):
