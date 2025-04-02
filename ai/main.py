@@ -14,8 +14,7 @@ import logging
 import uvicorn
 
 # 키워드 추출을 위한 라이브러리 (krwordrank 사용)
-from krwordrank.word import KRWordRank
-from collections import Counter
+from krwordrank.word import summarize_with_keywords
 from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(level=logging.DEBUG)
@@ -154,29 +153,24 @@ def get_keywords(request: KeywordRequest):
         if not request.articles:
             raise HTTPException(status_code=400, detail="기사 하나 이상 제공해야 합니다.")
 
-        # 여러 기사에서 텍스트만 추출
         docs = [article.content for article in request.articles]
 
-        # 불용어 집합 정의 (필요에 따라 단어들을 추가/수정)
         stopwords = {
-            "국내","해외","판매","글로벌","대비","전년","시장","증가","기아","투자"
+            "국내", "해외", "판매", "글로벌", "대비", "전년", "시장", "증가", "기아", "투자"
         }
-
-        # KRWordRank 초기화 (불용어 집합 포함)
-        wordrank_extractor = KRWordRank(
-            min_count=5,    # 후보 단어가 등장해야 하는 최소 빈도수
-            max_length=10,  # 후보 단어의 최대 길이
-            verbose=True,
-            stopwords=stopwords
-        )
 
         beta = 0.85
         max_iter = 10
 
-        # extract 메서드 사용 (전체 결과 추출 후 직접 상위 10개 선택)
-        keywords, ranks, graph = wordrank_extractor.extract(docs, beta, max_iter)
+        keywords = summarize_with_keywords(
+            docs,
+            stopwords=stopwords,
+            min_count=5,
+            max_length=10,
+            beta=beta,
+            max_iter=max_iter
+        )
 
-        # 추출된 키워드 딕셔너리를 점수 기준 내림차순 정렬 후 상위 10개 선택
         top_keywords = sorted(keywords.items(), key=lambda x: x[1], reverse=True)[:10]
         top_keywords = [word for word, score in top_keywords]
 
@@ -185,7 +179,6 @@ def get_keywords(request: KeywordRequest):
     except Exception as e:
         logger.exception("Error in /keywords endpoint with krwordrank")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 # === 서버 실행 ===
