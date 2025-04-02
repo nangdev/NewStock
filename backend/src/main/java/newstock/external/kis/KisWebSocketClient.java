@@ -10,7 +10,7 @@ import newstock.domain.stock.service.StockPriceService;
 import newstock.external.kis.dto.KisBodyDto;
 import newstock.external.kis.dto.KisHeaderDto;
 import newstock.external.kis.dto.KisInputDto;
-import newstock.external.kis.dto.KisStockInfoDto;
+import newstock.external.kis.dto.KisRealTimeStockPriceDto;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -115,7 +115,7 @@ public class KisWebSocketClient {
                     int price = Integer.parseInt(parsedData[2]);
                     double changeRate = Double.parseDouble(parsedData[5]);
 
-                    KisStockInfoDto stockInfoDto = KisStockInfoDto.builder()
+                    KisRealTimeStockPriceDto RTStockInfoDto = KisRealTimeStockPriceDto.builder()
                             .stockCode(stockCode)
                             .time(time)
                             .price(price)
@@ -123,7 +123,7 @@ public class KisWebSocketClient {
                             .build();
 
                     // websocket 브로커
-                    stockPriceService.sendStockInfo(stockInfoDto);
+                    stockPriceService.sendStockInfo(RTStockInfoDto);
                 }
 
             }
