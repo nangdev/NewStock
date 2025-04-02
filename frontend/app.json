@@ -1,6 +1,7 @@
 {
   "expo": {
     "scheme": "newstock",
+    "platforms": ["ios", "android"],
     "name": "NewStock",
     "slug": "NewStock",
     "version": "1.0.0",

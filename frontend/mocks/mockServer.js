@@ -19,7 +19,16 @@ export function makeServer({ environment = 'development' } = {}) {
           data: {
             accessToken: 'accessToken123',
             refreshToken: 'refreshToken123',
-            role: 0,
+          },
+        };
+      });
+
+      // Memo: 소셜 로그인
+      this.post(`${API_BASE_URL}/${API_PATH.AUTH.SOCIAL}`, () => {
+        return {
+          data: {
+            accessToken: 'accessToken123',
+            refreshToken: 'refreshToken123',
           },
         };
       });
@@ -57,7 +66,6 @@ export function makeServer({ environment = 'development' } = {}) {
           data: {
             userId: '1',
             email: 'ssafy@naver.com',
-            userName: '김싸피',
             nickname: '싸피좋아',
             role: 0,
           },

@@ -7,5 +7,6 @@ export const ROUTE = {
   USER: {
     SIGNUP: '/user/signup',
     LOGIN: '/user/login',
+    OAUTH: '/user/kakaoLogin',
   },
 };

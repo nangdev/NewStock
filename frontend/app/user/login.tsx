@@ -22,8 +22,7 @@ export default function Login() {
   };
 
   const onPressKakaoLogin = () => {
-    // Todo: API 연결
-    console.log('카카오 로그인');
+    router.navigate(ROUTE.USER.OAUTH);
   };
 
   return (

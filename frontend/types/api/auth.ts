@@ -10,7 +10,18 @@ export type LoginResType = BaseResType & {
   data: {
     accessToken: string;
     refreshToken: string;
-    role: 0 | 1;
+  };
+};
+
+export type KakaoLoginReqType = {
+  code: string;
+  fcmToken: string;
+};
+
+export type KakaoLoginResType = BaseResType & {
+  data: {
+    accessToken: string;
+    refreshToken: string;
   };
 };
 
