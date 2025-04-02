@@ -26,7 +26,7 @@ public class NewsCrawlerConsumer {
     @Value("${kafka.topic.news-ai}")
     private String newsAiTopic;
 
-    @KafkaListener(topics = "${kafka.topic.news-crawl}", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "${kafka.topic.news-crawl}", groupId = "${spring.kafka.consumer.group-id}", concurrency = "5")
     public void listen(String message) {
         log.info("Kafka 메시지 수신: {}", message);
         try {
