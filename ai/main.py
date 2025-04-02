@@ -1,4 +1,6 @@
 import nltk
+nltk.download('punkt')  # punkt 리소스 다운로드
+
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -7,15 +9,20 @@ import torch.nn as nn
 from utils.model_loader import load_all_models_and_tokenizers
 from utils.predictor import predict, compute_article_score, calculate_weighted_article_score
 from utils.preprocessor import preprocessing_single_news
-from typing import Dict, List
-from concurrent.futures import ThreadPoolExecutor
-
+from typing import Tuple, Dict, List
 import logging
+import uvicorn
+
+# 키워드 추출을 위한 라이브러리 (krwordrank 사용)
+from krwordrank.word import KRWordRank
+from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("score_article")
 
 app = FastAPI(title="News AI API")
+
 
 # 글로벌 executor 선언 (필요시 FastAPI startup 이벤트에서 선언 가능)
 executor = ThreadPoolExecutor(max_workers=5)
@@ -28,7 +35,6 @@ try:
 except Exception as e:
     logger.exception("모델 로딩 실패")
     raise RuntimeError(f"모델 로딩 실패: {str(e)}")
-
 
 # === 요청/응답 스키마 ===
 class ScoreRequest(BaseModel):
@@ -49,6 +55,15 @@ class SummarizationRequest(BaseModel):
 class SummarizationResponse(BaseModel):
     summary_content: str
 
+class KeywordResponse(BaseModel):
+    keywords: List[str]
+
+# 여러 기사를 받아서 전체 키워드를 집계하는 요청
+class Article(BaseModel):
+    content: str
+
+class KeywordRequest(BaseModel):
+    articles: List[Article]
 
 # === API 엔드포인트 정의 ===
 @app.get("/")
@@ -86,6 +101,7 @@ async def score_article(input_data: ScoreRequest):
             sentence = s["sentence"]
             if not sentence:
                 continue
+
 
             for category in [cat for cat in model_dict if s.get(cat, 0) == 1]:
                 model, tokenizer, device = model_dict[category]
@@ -132,7 +148,46 @@ def summarize(request: SummarizationRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/keywords", response_model=KeywordResponse)
+def get_keywords(request: KeywordRequest):
+    try:
+        if not request.articles:
+            raise HTTPException(status_code=400, detail="기사 하나 이상 제공해야 합니다.")
+
+        # 여러 기사에서 텍스트만 추출
+        docs = [article.content for article in request.articles]
+
+        # 불용어 집합 정의 (필요에 따라 단어들을 추가/수정)
+        stopwords = {
+            "국내","해외","판매","글로벌","대비","전년","시장","증가","기아","투자"
+        }
+
+        # KRWordRank 초기화 (불용어 집합 포함)
+        wordrank_extractor = KRWordRank(
+            min_count=5,    # 후보 단어가 등장해야 하는 최소 빈도수
+            max_length=10,  # 후보 단어의 최대 길이
+            verbose=True,
+            stopwords=stopwords
+        )
+
+        beta = 0.85
+        max_iter = 10
+
+        # extract 메서드 사용 (전체 결과 추출 후 직접 상위 10개 선택)
+        keywords, ranks, graph = wordrank_extractor.extract(docs, beta, max_iter)
+
+        # 추출된 키워드 딕셔너리를 점수 기준 내림차순 정렬 후 상위 10개 선택
+        top_keywords = sorted(keywords.items(), key=lambda x: x[1], reverse=True)[:10]
+        top_keywords = [word for word, score in top_keywords]
+
+        return KeywordResponse(keywords=top_keywords)
+
+    except Exception as e:
+        logger.exception("Error in /keywords endpoint with krwordrank")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
 # === 서버 실행 ===
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
