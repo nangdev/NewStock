@@ -16,7 +16,6 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [nickname, setNickname] = useState('');
-  const [userName, setUserName] = useState('');
   const [errorField, setErrorField] = useState<string | null>(null);
 
   const { mutate: signInMutate } = useSignInMutation();
@@ -57,11 +56,6 @@ export default function SignUp() {
       Toast.show({ type: 'error', text1: '닉네임은 2~10자여야 합니다' });
       return false;
     }
-    if (!REGEX.SIGN_UP.NAME.test(userName)) {
-      setErrorField('userName');
-      Toast.show({ type: 'error', text1: '이름은 2~10자여야 합니다' });
-      return false;
-    }
     return true;
   };
 
@@ -76,7 +70,7 @@ export default function SignUp() {
 
   const onSubmitSignUp = (): void => {
     if (!validateInputs()) return;
-    signInMutate({ email, password, nickname, userName });
+    signInMutate({ email, password, nickname });
   };
 
   return (
@@ -129,12 +123,6 @@ export default function SignUp() {
           onChangeText={setNickname}
           placeholder="닉네임은 2~10자여야 합니다"
           className={errorField === 'nickname' ? 'border-red-500' : ''}
-        />
-        <InputField
-          value={userName}
-          onChangeText={setUserName}
-          placeholder="이름은 2~10자여야 합니다"
-          className={errorField === 'userName' ? 'border-red-500' : ''}
         />
 
         <CustomButton

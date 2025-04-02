@@ -9,11 +9,10 @@ import {
 
 import { api } from '../axiosInstance';
 
-export const postSignIn = async ({ email, password, userName, nickname }: SignInReqType) => {
+export const postSignIn = async ({ email, password, nickname }: SignInReqType) => {
   const response = await api.post<SignInResType>(API_PATH.USER.SIGN_IN, {
     email,
     password,
-    userName,
     nickname,
   });
   return response.data;
