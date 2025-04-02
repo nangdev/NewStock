@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 
-import { getAllStockList, putStockInterest } from '.';
+import { getAllStockList, getAllUserStockList, putStockInterest } from '.';
 
 export const useAllStockListQuery = () => {
   return useQuery({
@@ -23,5 +23,12 @@ export const useStockInterestMutation = () => {
       // Todo: 에러 처리
       console.error(error);
     },
+  });
+};
+
+export const useAllUserStockListQuery = () => {
+  return useQuery({
+    queryKey: ['userStockList'],
+    queryFn: getAllUserStockList,
   });
 };
