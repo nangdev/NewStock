@@ -46,11 +46,6 @@ services:
   chrome:
     image: selenium/node-chrome:4.16.1
     shm_size: 2gb
-    deploy:
-      resources:
-        limits:
-          memory: 4g
-          cpus: '2'
     container_name: chrome
     environment:
       - SE_EVENT_BUS_HOST=selenium-hub
