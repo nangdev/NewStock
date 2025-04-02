@@ -1,29 +1,29 @@
 import nltk
-nltk.download('punkt')  # punkt 리소스 다운로드
+nltk.download("punkt")
 
+import logging
+from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
+from typing import Tuple, Dict, List
 
+import uvicorn
+import torch.nn as nn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from transformers import pipeline
-import torch.nn as nn
+from konlpy.tag import Okt
+
 from utils.model_loader import load_all_models_and_tokenizers
 from utils.predictor import predict, compute_article_score, calculate_weighted_article_score
 from utils.preprocessor import preprocessing_single_news
-from typing import Tuple, Dict, List
-import logging
-import uvicorn
 
-# 키워드 추출을 위한 라이브러리 (krwordrank 사용)
-from krwordrank.word import summarize_with_keywords
-from concurrent.futures import ThreadPoolExecutor
-
+# === 로깅 설정 ===
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("score_article")
 
+# === FastAPI 앱 및 글로벌 객체 초기화 ===
 app = FastAPI(title="News AI API")
-
-
-# 글로벌 executor 선언 (필요시 FastAPI startup 이벤트에서 선언 가능)
+okt = Okt()
 executor = ThreadPoolExecutor(max_workers=5)
 
 # === 모델 및 요약기 초기화 ===
@@ -35,7 +35,7 @@ except Exception as e:
     logger.exception("모델 로딩 실패")
     raise RuntimeError(f"모델 로딩 실패: {str(e)}")
 
-# === 요청/응답 스키마 ===
+# === 요청/응답 스키마 정의 ===
 class ScoreRequest(BaseModel):
     title: str
     content: str
@@ -54,10 +54,13 @@ class SummarizationRequest(BaseModel):
 class SummarizationResponse(BaseModel):
     summary_content: str
 
-class KeywordResponse(BaseModel):
-    keywords: List[str]
+class KeywordItem(BaseModel):
+    word: str
+    count: int
 
-# 여러 기사를 받아서 전체 키워드를 집계하는 요청
+class KeywordResponse(BaseModel):
+    keywords: List[KeywordItem]
+
 class Article(BaseModel):
     content: str
 
@@ -68,7 +71,6 @@ class KeywordRequest(BaseModel):
 @app.get("/")
 async def home():
     return {"message": "Welcome to the News AI API!"}
-
 
 @app.post("/score", response_model=ScoreResponse)
 async def score_article(input_data: ScoreRequest):
@@ -93,26 +95,16 @@ async def score_article(input_data: ScoreRequest):
         logger.info("유효 문장 수: %d", len(sentences))
 
         aspect_scores: Dict[str, List[float]] = {cat: [] for cat in model_dict}
-        futures = []
+        futures = [
+            executor.submit(predict_score_for_category, cat, *model_dict[cat], s["sentence"])
+            for s in sentences if s["sentence"]
+            for cat in model_dict if s.get(cat, 0) == 1
+        ]
 
-        # 각 문장에 대해 관련 카테고리만 병렬 처리
-        for s in sentences:
-            sentence = s["sentence"]
-            if not sentence:
-                continue
-
-
-            for category in [cat for cat in model_dict if s.get(cat, 0) == 1]:
-                model, tokenizer, device = model_dict[category]
-                future = executor.submit(predict_score_for_category, category, model, tokenizer, device, sentence)
-                futures.append(future)
-
-        # 결과 수집
         for f in futures:
             category, score = f.result()
             aspect_scores[category].append(score)
 
-        # 평균 점수 계산
         average_scores = {
             category: round(sum(scores) / len(scores), 3) if scores else 0.0
             for category, scores in aspect_scores.items()
@@ -130,7 +122,6 @@ async def score_article(input_data: ScoreRequest):
         logger.exception("Error in /score endpoint")
         raise HTTPException(status_code=400, detail="문서 분석 중 오류가 발생했습니다.")
 
-
 @app.post("/summarize", response_model=SummarizationResponse)
 def summarize(request: SummarizationRequest):
     try:
@@ -140,12 +131,10 @@ def summarize(request: SummarizationRequest):
             min_length=request.min_length,
             do_sample=request.do_sample
         )
-        summary_text = result[0]["summary_text"]
-        return SummarizationResponse(summary_content=summary_text)
+        return SummarizationResponse(summary_content=result[0]["summary_text"])
     except Exception as e:
         logger.exception("Error in /summarize endpoint")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/keywords", response_model=KeywordResponse)
 def get_keywords(request: KeywordRequest):
@@ -154,33 +143,24 @@ def get_keywords(request: KeywordRequest):
             raise HTTPException(status_code=400, detail="기사 하나 이상 제공해야 합니다.")
 
         docs = [article.content for article in request.articles]
-
+        allowed_pos = {"Noun"}
         stopwords = {
-            "국내", "해외", "판매", "글로벌", "대비", "전년", "시장", "증가", "기아", "투자"
+            "전년", "지난해", "올해", "동월", "현대차", "계획", "모비스", "퍼센트", "대다", "하다", "기아", "대비", "가장", "있다"
         }
 
-        beta = 0.85
-        max_iter = 10
+        keywords = [
+            word for doc in docs
+            for word, tag in okt.pos(doc, stem=True)
+            if tag in allowed_pos and len(word) > 1 and word not in stopwords
+        ]
 
-        keywords = summarize_with_keywords(
-            docs,
-            stopwords=stopwords,
-            min_count=5,
-            max_length=10,
-            beta=beta,
-            max_iter=max_iter
-        )
-
-        top_keywords = sorted(keywords.items(), key=lambda x: x[1], reverse=True)[:10]
-        top_keywords = [word for word, score in top_keywords]
-
-        return KeywordResponse(keywords=top_keywords)
+        counter = Counter(keywords)
+        keyword_items = [KeywordItem(word=word, count=count) for word, count in counter.most_common(10)]
+        return KeywordResponse(keywords=keyword_items)
 
     except Exception as e:
-        logger.exception("Error in /keywords endpoint with krwordrank")
+        logger.exception("Error in /keywords endpoint with Okt + POS filtering")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# === 서버 실행 ===
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
