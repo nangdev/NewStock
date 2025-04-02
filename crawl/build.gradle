@@ -44,6 +44,8 @@ dependencies {
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
 	// Crawling
+	implementation 'io.github.bonigarcia:webdrivermanager:5.5.3'
+	implementation 'org.seleniumhq.selenium:selenium-java:4.25.0'
 	implementation 'com.rometools:rome:1.18.0'
 	implementation 'org.jsoup:jsoup:1.15.4'
 	implementation 'com.microsoft.playwright:playwright:1.40.0'

@@ -37,8 +37,7 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
-        // 동시성(concurrency) 설정 예시: 5개의 스레드
-        factory.setConcurrency(5);
+        factory.setConcurrency(10);
         return factory;
     }
 }
