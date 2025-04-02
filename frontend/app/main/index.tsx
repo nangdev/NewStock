@@ -32,15 +32,15 @@ export default function Main() {
     console.log(subscribedStocks)
     // STOMP 연결
     const client = new Client({
-      // webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
-      webSocketFactory: () => new WebSocket('ws://10.0.2.2:8080/api/ws'),
+      webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
+      // webSocketFactory: () => new WebSocket('ws://10.0.2.2:8080/api/ws'),
       // debug: (msg) => console.log('STOMP:', msg),
       onConnect: (frame) => {
         // 구독
         data.data.stockList.forEach((stock) => {
           client.subscribe(`/topic/rtp/${stock.stockCode}`, (msg) => {
             const parsed = JSON.parse(msg.body);
-            console.log(msg.body)
+            // console.log(msg.body)
             setSubscribedStocks((prev) =>
               prev.map((s) =>
                 s.stockCode === parsed.stockCode
@@ -67,6 +67,7 @@ export default function Main() {
       <ScrollView>
         {subscribedStocks.map((stock) => (
           <StockListItem
+            key={stock.stockCode}
             stockName={stock.stockName}
             stockCode={stock.stockCode}
             price={stock.closingPrice ? stock.closingPrice : 0}

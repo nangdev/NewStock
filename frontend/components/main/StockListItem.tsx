@@ -12,7 +12,7 @@ type Props = {
   hojaeIconUrl: string;
 };
 
-export default function StockListItem({
+ function StockListItem({
   stockName,
   stockCode,
   price,
@@ -73,3 +73,5 @@ export default function StockListItem({
     </View>
   );
 }
+
+export default React.memo(StockListItem);
