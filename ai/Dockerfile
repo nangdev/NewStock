@@ -22,7 +22,7 @@ EXPOSE 8000
 # 시작 스크립트 생성
 RUN echo '#!/bin/bash\n\
 # FastAPI 서버 실행\n\
-uvicorn main:app --host 0.0.0.0 --port 8000\n\
+uvicorn main:app --host 0.0.0.0 --port 8000 --workers 2\n\
 ' > /app/start.sh && chmod +x /app/start.sh
 
 # 시작 스크립트 실행

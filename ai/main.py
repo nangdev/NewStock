@@ -7,7 +7,8 @@ import torch.nn as nn
 from utils.model_loader import load_all_models_and_tokenizers
 from utils.predictor import predict, compute_article_score, calculate_weighted_article_score
 from utils.preprocessor import preprocessing_single_news
-from typing import Tuple, Dict, List
+from typing import Dict, List
+from concurrent.futures import ThreadPoolExecutor
 
 import logging
 
@@ -16,6 +17,8 @@ logger = logging.getLogger("score_article")
 
 app = FastAPI(title="News AI API")
 
+# 글로벌 executor 선언 (필요시 FastAPI startup 이벤트에서 선언 가능)
+executor = ThreadPoolExecutor(max_workers=5)
 
 # === 모델 및 요약기 초기화 ===
 try:
@@ -55,6 +58,15 @@ async def home():
 
 @app.post("/score", response_model=ScoreResponse)
 async def score_article(input_data: ScoreRequest):
+    def predict_score_for_category(category, model, tokenizer, device, sentence: str):
+        try:
+            result = predict(model, tokenizer, sentence, device)
+            score = compute_article_score(result)[1]
+            return category, score
+        except Exception as e:
+            logger.warning(f"[{category}] 예측 실패: {e}")
+            return category, 0.0
+
     try:
         news_dict = {"title": input_data.title, "content": input_data.content}
         processed = preprocessing_single_news(news_dict)
@@ -62,14 +74,14 @@ async def score_article(input_data: ScoreRequest):
         if not processed:
             return ScoreResponse(content="", aspect_scores={}, score=0.0)
 
-
         sentences = processed["filtered_sentences"]
         cleaned_content = processed["cleaned_content"]
-        logger.info("문장 리스트: %s", sentences)
+        logger.info("유효 문장 수: %d", len(sentences))
 
-        aspect_scores: Dict[str, List[float]] = {cat: [] for cat in model_dict.keys()}
+        aspect_scores: Dict[str, List[float]] = {cat: [] for cat in model_dict}
+        futures = []
 
-        # 각 문장에 대해 카테고리별 점수 계산
+        # 각 문장에 대해 관련 카테고리만 병렬 처리
         for s in sentences:
             sentence = s["sentence"]
             if not sentence:
@@ -77,10 +89,13 @@ async def score_article(input_data: ScoreRequest):
 
             for category in [cat for cat in model_dict if s.get(cat, 0) == 1]:
                 model, tokenizer, device = model_dict[category]
-                score = compute_article_score(predict(model, tokenizer, sentence, device))[1]
-                aspect_scores[category].append(score)
+                future = executor.submit(predict_score_for_category, category, model, tokenizer, device, sentence)
+                futures.append(future)
 
-        logger.info("카테고리별 점수 리스트: %s", aspect_scores)
+        # 결과 수집
+        for f in futures:
+            category, score = f.result()
+            aspect_scores[category].append(score)
 
         # 평균 점수 계산
         average_scores = {
@@ -88,15 +103,18 @@ async def score_article(input_data: ScoreRequest):
             for category, scores in aspect_scores.items()
         }
 
-        # 종합 점수 계산 (가중 평균 방식)
         article_score = calculate_weighted_article_score(aspect_scores)
 
-        return ScoreResponse(content=cleaned_content, aspect_scores=average_scores, score=article_score)
+        return ScoreResponse(
+            content=cleaned_content,
+            aspect_scores=average_scores,
+            score=article_score
+        )
 
     except Exception as e:
         logger.exception("Error in /score endpoint")
-        raise HTTPException(status_code=400, detail=str(e))
-    
+        raise HTTPException(status_code=400, detail="문서 분석 중 오류가 발생했습니다.")
+
 
 @app.post("/summarize", response_model=SummarizationResponse)
 def summarize(request: SummarizationRequest):
