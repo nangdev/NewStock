@@ -11,18 +11,16 @@ from typing import Tuple, List
 import logging
 import uvicorn
 
-# 키워드 추출을 위한 라이브러리
-from keybert import KeyBERT
-from sentence_transformers import SentenceTransformer
+# 키워드 추출을 위한 라이브러리 (krwordrank 사용)
+from krwordrank.word import KRWordRank
 from collections import Counter
-from konlpy.tag import Mecab
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("score_article")
 
 app = FastAPI(title="News AI API")
 
-# === 모델 및 토크나이저, 요약기, 키워드 모델 초기화 ===
+# === 모델 및 토크나이저, 요약기 초기화 ===
 def initialize_models() -> Tuple:
     try:
         model, tokenizer = load_model_and_tokenizer()
@@ -35,17 +33,6 @@ def initialize_models() -> Tuple:
         raise RuntimeError(f"모델 로딩 실패: {str(e)}")
 
 model, tokenizer, summarizer = initialize_models()
-
-# 키워드 모델 초기화 (다국어 임베딩 모델 사용)
-embedding_model = SentenceTransformer("distiluse-base-multilingual-cased-v2")
-keyword_model = KeyBERT(model=embedding_model)
-logger.info("키워드 모델이 정상적으로 로딩되었습니다.")
-
-# Mecab 형태소 분석기 초기화
-mecab = Mecab()
-
-def extract_nouns(text: str) -> List[str]:
-    return mecab.nouns(text)
 
 # === 요청/응답 스키마 ===
 class ScoreRequest(BaseModel):
@@ -74,7 +61,6 @@ class Article(BaseModel):
 
 class KeywordRequest(BaseModel):
     articles: List[Article]
-
 
 # === API 엔드포인트 정의 ===
 @app.get("/")
@@ -133,34 +119,43 @@ def summarize(request: SummarizationRequest):
 
 
 @app.post("/keywords", response_model=KeywordResponse)
-def aggregate_keywords(request: KeywordRequest):
+def get_keywords(request: KeywordRequest):
     try:
         if not request.articles:
-            raise HTTPException(status_code=400, detail="기사를 하나 이상 제공해야 합니다.")
+            raise HTTPException(status_code=400, detail="기사 하나 이상 제공해야 합니다.")
 
-        all_keywords = []
-        for article in request.articles:
-            nouns = extract_nouns(article.content)
-            if not nouns:
-                continue
-            text = " ".join(nouns)
-            keywords = keyword_model.extract_keywords(
-                text,
-                keyphrase_ngram_range=(1, 1),
-                stop_words=None,
-                top_n=10
-            )
-            extracted = [kw for kw, score in keywords]
-            all_keywords.extend(extracted)
+        # 여러 기사에서 텍스트만 추출
+        docs = [article.content for article in request.articles]
 
-        keyword_counter = Counter(all_keywords)
-        top_keywords = [keyword for keyword, count in keyword_counter.most_common(10)]
+        # 불용어 집합 정의 (필요에 따라 단어들을 추가/수정)
+        stopwords = {
+            "국내","해외","판매","글로벌","대비","전년","시장","증가","기아","투자"
+        }
+
+        # KRWordRank 초기화 (불용어 집합 포함)
+        wordrank_extractor = KRWordRank(
+            min_count=5,    # 후보 단어가 등장해야 하는 최소 빈도수
+            max_length=10,  # 후보 단어의 최대 길이
+            verbose=True,
+            stopwords=stopwords
+        )
+
+        beta = 0.85
+        max_iter = 10
+
+        # extract 메서드 사용 (전체 결과 추출 후 직접 상위 10개 선택)
+        keywords, ranks, graph = wordrank_extractor.extract(docs, beta, max_iter)
+
+        # 추출된 키워드 딕셔너리를 점수 기준 내림차순 정렬 후 상위 10개 선택
+        top_keywords = sorted(keywords.items(), key=lambda x: x[1], reverse=True)[:10]
+        top_keywords = [word for word, score in top_keywords]
 
         return KeywordResponse(keywords=top_keywords)
 
     except Exception as e:
-        logger.exception("Error in /aggregate_keywords endpoint")
+        logger.exception("Error in /keywords endpoint with krwordrank")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 # === 서버 실행 ===
