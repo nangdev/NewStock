@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { ROUTE } from 'constants/routes';
 
 type Props = {
+  stockId: number;
   stockName: string;
   stockCode: string;
   price: number;
@@ -15,6 +16,7 @@ type Props = {
 };
 
  function StockListItem({
+  stockId,
   stockName,
   stockCode,
   price,
@@ -25,12 +27,11 @@ type Props = {
   const router = useRouter();
   const onPressItem = () => {
     router.navigate({
-      pathname: ROUTE.STOCK.DETAIL(stockCode),
-      params: {stockCode}
+      pathname: ROUTE.STOCK.DETAIL(stockId),
+      params: {stockId}
     })
   }
 
-  const isPositive = changeRate > 0;
   const [expanded, setExpanded] = useState(false);
 
   // mock data
@@ -56,9 +57,13 @@ type Props = {
           </View>
           <View className="flex-1 items-end mr-6">
             <Text className="text-base font-bold">{price.toLocaleString()} 원</Text>
-            <Text className={`text-sm mt-1 ${isPositive ? 'text-red-500' : 'text-blue-500'}`}>
-              {changeRate.toFixed(2)}%
-            </Text>
+            <Text className={`text-sm mt-1 ${changeRate > 0
+            ? 'text-red-500' 
+            : changeRate == 0
+            ? 'text-black'
+            : 'text-blue-500'}`}>
+            {changeRate.toFixed(2)}%
+          </Text>
           </View>
           <TouchableOpacity onPress={() => setExpanded(!expanded)}>
             <AntDesign name={expanded ? 'up' : 'down'} size={14} color="#888" className="ml-2" />

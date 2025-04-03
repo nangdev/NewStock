@@ -2,7 +2,12 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 
-import { getAllStockList, getAllUserStockList, putStockInterest } from '.';
+import {
+  getAllStockList,
+  getAllUserStockList,
+  putStockInterest,
+  getStockDetailInfo,
+} from '.';
 
 export const useAllStockListQuery = () => {
   return useQuery({
@@ -30,5 +35,12 @@ export const useAllUserStockListQuery = () => {
   return useQuery({
     queryKey: ['userStockList'],
     queryFn: getAllUserStockList,
+  });
+};
+
+export const useStockDetailInfoQuery = (stockId: number) => {
+  return useQuery({
+    queryKey: ['stockDetailInfo'],
+    queryFn: () => getStockDetailInfo(stockId),
   });
 };

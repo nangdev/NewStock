@@ -9,6 +9,6 @@ export const ROUTE = {
     LOGIN: '/user/login',
   },
   STOCK: {
-    DETAIL: (stockCode: string) => `/stock/${stockCode}`,
+    DETAIL: (stockId: number) => `/stock/${stockId}`,
   },
 };

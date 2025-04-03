@@ -40,7 +40,7 @@ export default function Main() {
         data.data.stockList.forEach((stock) => {
           client.subscribe(`/topic/rtp/${stock.stockCode}`, (msg) => {
             const parsed = JSON.parse(msg.body);
-            // console.log(msg.body)
+            console.log(parsed)
             setSubscribedStocks((prev) =>
               prev.map((s) =>
                 s.stockCode === parsed.stockCode
@@ -68,10 +68,11 @@ export default function Main() {
         {subscribedStocks.map((stock) => (
           <StockListItem
             key={stock.stockCode}
+            stockId={stock.stockId}
             stockName={stock.stockName}
             stockCode={stock.stockCode}
             price={stock.closingPrice ? stock.closingPrice : 0}
-            changeRate={stock.rcPdcp ? stock.rcPdcp : 0}
+            changeRate={Number(stock.rcPdcp ?? 0)}
             imgUrl={stock.imgUrl}
             hojaeIconUrl=''
         />

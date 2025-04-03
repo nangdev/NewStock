@@ -29,3 +29,20 @@ export type AllUserStockResType = BaseResType & {
     }[];
   }
 }
+
+export type StockDetailInfoResType = BaseResType & {
+  data: {
+    stockId: number,
+    stockName: string,
+    closingPrice: number,
+    rcPdcp: number,
+    stockImage: string,
+    totalPrice: string,
+    capital: string,
+    lstgStqt: string,
+    parValue: string,
+    issuePrice: string,
+    listingDate: string,
+    stdIccn: string,
+  }
+}
