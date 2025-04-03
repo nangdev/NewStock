@@ -3,13 +3,17 @@ package newstock.domain.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import newstock.controller.request.UserRequest;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="users")
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
     @Id
@@ -40,6 +44,15 @@ public class User {
     @Column(nullable = false)
     private Byte role; // 유저 권한 0이면 NEW(신규 회원), 1이면 USER(기존 유저)
 
+    @Column(nullable = false)
+    private boolean isActivated;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     public static User of(UserRequest userRequest, String encodedPassword) {
         return User.builder()
@@ -47,10 +60,7 @@ public class User {
                 .password(encodedPassword)
                 .nickname(userRequest.getNickname())
                 .role((byte) 0)
+                .isActivated(true)
                 .build();
     }
 }
-
-
-
-

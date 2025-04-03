@@ -1,25 +1,14 @@
 package newstock.domain.user.service;
 
-import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import newstock.common.jwt.TokenBlacklistService;
-import newstock.controller.request.LoginRequest;
 import newstock.controller.request.UserRequest;
-import newstock.controller.response.LoginResponse;
 import newstock.controller.response.UserResponse;
-import newstock.domain.user.dto.JwtToken;
 import newstock.domain.user.entity.User;
 import newstock.domain.user.repository.UserRepository;
-import newstock.domain.user.service.CustomUserDetails;
-import newstock.common.jwt.JwtTokenProvider;
-
 import newstock.exception.ExceptionCode;
 import newstock.exception.type.ValidationException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +19,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final TokenBlacklistService tokenBlacklistService;
 
     // 회원 가입
     @Override
