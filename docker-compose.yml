@@ -41,16 +41,20 @@ services:
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_SESSION_TIMEOUT=180
       - SE_SESSION_REQUEST_TIMEOUT=180
+      - SE_NODE_MAX_SESSIONS=2         # 동시 세션 수 제한
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: '0.5'
 
   chrome:
     image: selenium/node-chrome:4.16.1
     shm_size: 4gb
-    deploy:
-       resources:
-         limits:
-           memory: 6g
-           cpus: '2'
+    volumes:
+      - /dev/shm:/dev/shm                # 호스트의 /dev/shm 마운트
     container_name: chrome
     environment:
       - SE_EVENT_BUS_HOST=selenium-hub
@@ -58,9 +62,18 @@ services:
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_SESSION_TIMEOUT=180
       - SE_SESSION_REQUEST_TIMEOUT=180
+      - SE_NODE_MAX_SESSIONS=2           # 동시 세션 수 제한
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+      - SE_SCREEN_WIDTH=1366
+      - SE_SCREEN_HEIGHT=768
     depends_on:
       - selenium-hub
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+          cpus: '1.5'
 
   crawl:
     build:
@@ -71,12 +84,20 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - PLAYWRIGHT_ENABLED=false
+      - CRAWLER_CONCURRENT_WORKERS=2    # 크롤러 동시 작업자 수 제한
+      - CRAWLER_RATE_LIMIT=1000         # 요청 간 지연 시간(ms)
     env_file:
       - ./crawl/.env
     depends_on:
       - selenium-hub
       - mysql
       - kafka
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+          cpus: '1'
   
   mysql:
     image: mysql:8.0.33
@@ -103,9 +124,15 @@ services:
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_HEAP_OPTS="-Xmx512m -Xms256m"  # 힙 메모리 제한
     depends_on:
       - zookeeper
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: '0.5'
 
   
   zookeeper:
@@ -113,9 +140,15 @@ services:
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
       - ZOOKEEPER_TICK_TIME=2000
+      - JVMFLAGS="-Xmx256m -Xms128m"  # JVM 메모리 제한
     ports:
       - "2181:2181"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 0.5g
+          cpus: '0.5'
 
 volumes:
   db-data:
