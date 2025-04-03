@@ -31,4 +31,14 @@ public class NewsCustomRepositoryImpl implements NewsCustomRepository {
                 .fetch());
 
     }
+
+    @Override
+    public List<News> findNewsByStockIdAndDate(Integer stockId, String publishedDate) {
+        return jpaQueryFactory.selectFrom(news)
+                .where(
+                        news.stockId.eq(stockId)
+                                .and(news.publishedDate.startsWith(publishedDate))
+                )
+                .fetch();
+    }
 }

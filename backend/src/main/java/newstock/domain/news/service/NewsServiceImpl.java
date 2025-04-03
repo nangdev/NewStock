@@ -9,6 +9,8 @@ import newstock.controller.response.NewsDetailResponse;
 import newstock.controller.response.NewsScrapResponse;
 import newstock.controller.response.StockNewsResponse;
 import newstock.controller.response.TopNewsResponse;
+import newstock.domain.keyword.dto.Article;
+import newstock.domain.keyword.dto.KeywordRequest;
 import newstock.domain.news.dto.NewsDetailDto;
 import newstock.domain.news.dto.NewsScrapDto;
 import newstock.domain.news.dto.StockNewsDto;
@@ -130,6 +132,22 @@ public class NewsServiceImpl implements NewsService {
                 .orElseThrow(() -> new DbException(ExceptionCode.NEWS_SCRAP_NOT_FOUND));
 
         newsScrapRepository.deleteById(scrapId);
+    }
+
+    @Override
+    public List<Article> getNewsByStockIdAndDate(KeywordRequest keywordRequest) {
+        String date = keywordRequest.getDate();
+        String formattedDate = date.substring(0, 4) + "-" + date.substring(4, 6) + "-" + date.substring(6, 8);
+
+        List<News> newsList = newsRepository.findNewsByStockIdAndDate(
+                keywordRequest.getStockId(), formattedDate
+        );
+
+        return newsList.stream()
+                .map(news -> Article.builder()
+                        .content(news.getContent())
+                        .build())
+                .collect(Collectors.toList());
     }
 
 }
