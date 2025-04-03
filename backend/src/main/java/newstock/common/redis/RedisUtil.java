@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 @Component
 @RequiredArgsConstructor
@@ -19,16 +19,17 @@ public class RedisUtil {
      * @param seconds 유효 시간 (초 단위)
      */
     public void set(String key, Object value, long seconds) {
-        redisTemplate.opsForValue().set(key, value, seconds, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, value, Duration.ofSeconds(seconds));
     }
 
     /**
      * key로부터 값 가져오기
      */
-    public Object get(String key) {
-        return redisTemplate.opsForValue().get(key);
+    @SuppressWarnings("unchecked")
+    public <T> T get(String key, Class<T> clazz) {
+        Object value = redisTemplate.opsForValue().get(key);
+        return (T) value;
     }
-
     /**
      * key 삭제
      */

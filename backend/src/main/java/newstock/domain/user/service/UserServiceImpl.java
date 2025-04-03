@@ -1,25 +1,15 @@
 package newstock.domain.user.service;
 
-import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import newstock.common.jwt.TokenBlacklistService;
-import newstock.controller.request.LoginRequest;
+import newstock.common.redis.RedisUtil;
 import newstock.controller.request.UserRequest;
-import newstock.controller.response.LoginResponse;
 import newstock.controller.response.UserResponse;
-import newstock.domain.user.dto.JwtToken;
 import newstock.domain.user.entity.User;
 import newstock.domain.user.repository.UserRepository;
-import newstock.domain.user.service.CustomUserDetails;
-import newstock.common.jwt.JwtTokenProvider;
-
 import newstock.exception.ExceptionCode;
 import newstock.exception.type.ValidationException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +20,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final TokenBlacklistService tokenBlacklistService;
+    private final RedisUtil redisUtil;
 
     // 회원 가입
     @Override
@@ -45,9 +34,15 @@ public class UserServiceImpl implements UserService {
 
         String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
 
+        // ⚠️ [임시 주석] 이메일 인증 우회 (테스트용)
+//        if (!Boolean.TRUE.equals(redisUtil.get("email:verified:" + userRequest.getEmail(), Boolean.class))) {
+//            throw new ValidationException(ExceptionCode.EMAIL_NOT_VERIFIED);
+//        }
+
         User newUser = User.of(userRequest, encodedPassword);
         User savedUser = userRepository.save(newUser);
 
+        redisUtil.delete("email:verified:" + userRequest.getEmail());
         log.info("회원가입 성공 - userId: {}, email: {}", savedUser.getUserId(), savedUser.getEmail());
     }
 
