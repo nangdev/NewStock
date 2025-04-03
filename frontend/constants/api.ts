@@ -31,7 +31,7 @@ export const API_PATH = {
   },
   STOCK: {
     ALL: `${DOMAIN.STOCK}`,
-    DETAIL: (stockId: number) => `${DOMAIN.STOCK}/info/${stockId}`,
+    DETAIL: (stockCode: string) => `${DOMAIN.STOCK}/info/${stockCode}`,
     USER_STOCK: `${DOMAIN.STOCK}/interest`,
     USER_STOCK_EDIT: `${DOMAIN.STOCK}/interest`,
   },

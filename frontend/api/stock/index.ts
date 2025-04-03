@@ -25,7 +25,7 @@ export const getAllUserStockList = async () => {
   return response.data;
 }
 
-export const getStockDetailInfo = async (stockId: number) => {
-  const response = await api.get<StockDetailInfoResType>(API_PATH.STOCK.DETAIL(stockId));
+export const getStockDetailInfo = async (stockCode: string) => {
+  const response = await api.get<StockDetailInfoResType>(API_PATH.STOCK.DETAIL(stockCode));
   return response.data;
 }

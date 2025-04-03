@@ -29,7 +29,7 @@ export default function Main() {
   
   useEffect(() => {
     if (!data?.data.stockList) {
-      router.replace(`/stock/${1}`)
+      router.replace(`/stock/005930`)
       return;
     }
     setSubscribedStocks(data.data.stockList);
