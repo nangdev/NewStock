@@ -1,9 +1,9 @@
 import { View, Text, Image } from "react-native";
 
 type Props = {
-  stockId: number;
+  // stockId: number;
   stockName: string;
-  // stockCode: string;
+  stockCode: string;
   price: number;
   changeRate: number;
   imgUrl: string;
@@ -11,14 +11,14 @@ type Props = {
 };
 
 export default function StockInfoCard ({
-  stockId,
+  // stockId,
   stockName,
-  // stockCode,
+  stockCode,
   price,
   changeRate,
   imgUrl,
 }:Props) {
-  
+  console.log(stockCode)
   return (
     <View className="bg-white rounded-2xl mx-8 my-2 shadow-md">
       <View className="flex-row items-center p-4">
@@ -28,7 +28,7 @@ export default function StockInfoCard ({
         />
         <View className="flex-1">
           <Text className="text-base font-bold">{stockName ? stockName : 'SSAFY'}</Text>
-          {/* <Text className="text-xs text-gray-500">{stockCode}</Text> */}
+          <Text className="text-xs text-gray-500">{stockCode}</Text>
         </View>
         <View className="flex-1 items-end mr-6">
           <Text className="text-base font-bold">{price.toLocaleString()} 원</Text>
