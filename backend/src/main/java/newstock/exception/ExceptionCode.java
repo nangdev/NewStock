@@ -13,8 +13,14 @@ public enum ExceptionCode {
 
     // Service에서 비즈니스 로직 처리시 발생할 수 있는 예외 작성
     BUSINESS_ERROR("비즈니스 로직에서 예외가 발생했습니다.", 2001,HttpStatus.INTERNAL_SERVER_ERROR),
-    DUPLICATE_EMAIL("이미 사용 중인 이메일입니다.", 2002,HttpStatus.BAD_REQUEST),
-    USER_ROLE_UPDATE_ERROR("신규 회원이 아닌 경우 권한 변경이 불가능합니다.",  2003, HttpStatus.BAD_REQUEST),
+    USER_ROLE_UPDATE_ERROR("신규 회원이 아닌 경우 권한 변경이 불가능합니다.",  2002, HttpStatus.BAD_REQUEST),
+    DUPLICATE_EMAIL("이미 사용 중인 이메일입니다.", 2003,HttpStatus.BAD_REQUEST),
+    EMAIL_AUTH_EXPIRED("이메일 인증 유효시간이 만료되었습니다.", 2004, HttpStatus.BAD_REQUEST),
+    EMAIL_AUTH_INVALID("유효하지 인증 코드입니다.", 2005, HttpStatus.BAD_REQUEST),
+    EMAIL_SEND_FAILED("이메일 전송에 실패했습니다.", 2006, HttpStatus.INTERNAL_SERVER_ERROR),
+    EMAIL_NOT_VERIFIED("이메일 인증이 필요합니다.", 2007, HttpStatus.BAD_REQUEST),
+    EMAIL_ALREADY_VERIFIED("이미 인증된 이메일입니다.", 2008, HttpStatus.BAD_REQUEST),
+
 
     // Repository에서 데이터베이스 조작시 발생할 수 있는 예외 작성
     DATABASE_ERROR("데이터베이스 조작 과정에서 예외가 발생했습니다.", 3001,HttpStatus.INTERNAL_SERVER_ERROR),

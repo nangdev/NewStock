@@ -54,6 +54,8 @@ public class SecurityConfig {
                                 "/v1/auth/**",
                                 "/v1/users",
                                 "/v1/users/check-email",
+                                "/v1/users/send-email",
+                                "/v1/users/verify-email",
                                 "/v1/auth/refresh",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",

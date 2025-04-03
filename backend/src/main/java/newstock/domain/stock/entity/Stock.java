@@ -16,7 +16,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Stock {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer stockId;
 
     private String stockCode;
@@ -30,6 +31,8 @@ public class Stock {
     private String imgUrl;
 
     private Integer totalPrice;
+
+    private Integer ctpdPrice;
 
     private String capital;
 

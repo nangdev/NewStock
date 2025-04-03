@@ -3,6 +3,7 @@ package newstock.domain.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import newstock.common.redis.RedisUtil;
 import newstock.controller.request.UserRequest;
 import newstock.controller.response.UserResponse;
 import newstock.domain.user.entity.User;
@@ -19,6 +20,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RedisUtil redisUtil;
 
     // 회원 가입
     @Override
@@ -32,9 +34,15 @@ public class UserServiceImpl implements UserService {
 
         String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
 
+        // ⚠️ [임시 주석] 이메일 인증 우회 (테스트용)
+//        if (!Boolean.TRUE.equals(redisUtil.get("email:verified:" + userRequest.getEmail(), Boolean.class))) {
+//            throw new ValidationException(ExceptionCode.EMAIL_NOT_VERIFIED);
+//        }
+
         User newUser = User.of(userRequest, encodedPassword);
         User savedUser = userRepository.save(newUser);
 
+        redisUtil.delete("email:verified:" + userRequest.getEmail());
         log.info("회원가입 성공 - userId: {}, email: {}", savedUser.getUserId(), savedUser.getEmail());
     }
 
