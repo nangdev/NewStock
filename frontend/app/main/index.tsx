@@ -3,6 +3,7 @@ import StockListItem from 'components/main/StockListItem';
 import { Client } from '@stomp/stompjs';
 import { useEffect, useState } from 'react';
 import { useAllUserStockListQuery } from 'api/stock/query';
+import { useRouter } from 'expo-router';
 
 type Stock = {
   stockId: number,
@@ -14,20 +15,21 @@ type Stock = {
 }
 
 export default function Main() {
-
   // 테스트 데이터
   // const [subscribedStocks, setSubscribedStocks] = useState([
   //   { stockName: '삼성전자', stockCode: '005930', price: 0, changeRate: 0.0 },
   //   { stockName: 'SK하이닉스', stockCode: '000660', price: 0, changeRate: 0.0 },
   //   { stockName: '카카오', stockCode: '035720', price: 0, changeRate: 0.0 },
   // ]);
-  
+  const router = useRouter();
   const { data, isLoading, isError } = useAllUserStockListQuery();
   const [subscribedStocks, setSubscribedStocks] = useState<Stock[]>([]);
   
   useEffect(() => {
-    if (!data?.data.stockList) return;
-
+    if (!data?.data.stockList) {
+      router.replace(`/stock/${1}`)
+      return;
+    }
     setSubscribedStocks(data.data.stockList);
     console.log(subscribedStocks)
     // STOMP 연결
@@ -64,20 +66,20 @@ export default function Main() {
 
   return (
     <View>
-      <ScrollView>
-        {subscribedStocks.map((stock) => (
-          <StockListItem
-            key={stock.stockCode}
-            stockId={stock.stockId}
-            stockName={stock.stockName}
-            stockCode={stock.stockCode}
-            price={stock.closingPrice ? stock.closingPrice : 0}
-            changeRate={Number(stock.rcPdcp ?? 0)}
-            imgUrl={stock.imgUrl}
-            hojaeIconUrl=''
-        />
-        ))}
-      </ScrollView>
+        <ScrollView>
+          {subscribedStocks.map((stock) => (
+            <StockListItem
+              key={stock.stockCode}
+              stockId={stock.stockId}
+              stockName={stock.stockName}
+              stockCode={stock.stockCode}
+              price={stock.closingPrice ? stock.closingPrice : 0}
+              changeRate={Number(stock.rcPdcp ?? 0)}
+              imgUrl={stock.imgUrl}
+              hojaeIconUrl=''
+          />
+          ))}
+        </ScrollView>
     </View>
   );
 }

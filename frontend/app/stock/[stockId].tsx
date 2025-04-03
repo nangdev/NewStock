@@ -8,9 +8,7 @@ export default function StockDetail () {
   const { stockId } = useLocalSearchParams();
   const code = Array.isArray(stockId) ? stockId[0] : stockId ?? '';
   const { data, isLoading, isError } = useStockDetailInfoQuery(+stockId);
-
-
-
+  
   return (
     <View>
       <Text>stock detail page {stockId}</Text>
