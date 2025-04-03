@@ -9,6 +9,7 @@ import newstock.controller.request.UserRequest;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name="users")
 public class User {
 
     @Id
