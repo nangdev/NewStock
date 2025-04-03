@@ -14,6 +14,8 @@ type Stock = {
   imgUrl: string,
 }
 
+
+
 export default function Main() {
   // 테스트 데이터
   // const [subscribedStocks, setSubscribedStocks] = useState([
@@ -39,7 +41,7 @@ export default function Main() {
       // debug: (msg) => console.log('STOMP:', msg),
       onConnect: (frame) => {
         // 구독
-        data.data.stockList.forEach((stock) => {
+        subscribedStocks.forEach((stock) => {
           client.subscribe(`/topic/rtp/${stock.stockCode}`, (msg) => {
             const parsed = JSON.parse(msg.body);
             console.log(parsed)

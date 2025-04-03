@@ -4,8 +4,9 @@ import { AntDesign } from '@expo/vector-icons';
 import Collapsible from 'react-native-collapsible';
 import { useRouter } from 'expo-router';
 import { ROUTE } from 'constants/routes';
+import NewsListItem from 'components/stock/NewsListItem';
 
-type Props = {
+type StockProps = {
   stockId: number;
   stockName: string;
   stockCode: string;
@@ -15,6 +16,14 @@ type Props = {
   hojaeIconUrl: string;
 };
 
+type NewsProps = {
+  newsId: string;
+  title: string;
+  description: string;
+  score: number;
+  publishedDate: string;
+}
+
  function StockListItem({
   stockId,
   stockName,
@@ -23,7 +32,7 @@ type Props = {
   changeRate,
   imgUrl,
   hojaeIconUrl,
-}: Props) {
+}: StockProps) {
   const router = useRouter();
   const onPressItem = () => {
     router.navigate({
@@ -71,18 +80,27 @@ type Props = {
         </View>
 
         <Collapsible collapsed={!expanded}>
-          <View className="bg-white px-4 py-2 mb-2">
+          
+          <View className="bg-white mb-2">
             {newsList.map((news) => (
-              <View key={news.id} className="flex-row items-center my-1">
-                <Image
-                  source={{ uri: hojaeIconUrl || 'https://via.placeholder.com/36' }}
-                  className="w-9 h-9 rounded-md mr-4 bg-gray-200"
-                />
-                <View className="flex-1 flex-row justify-between items-center">
-                  <Text className="text-sm">{news.title}</Text>
-                  <Text className="text-xs text-gray-500">{news.time}</Text>
-                </View>
-              </View>
+              <NewsListItem
+                newsId={news.id}
+                title={news.title}
+                description='desc'
+                score={10}
+                publishedDate='2025-03-14:20:08:49'
+                hojaeIconUrl=''
+              />
+              // <View key={news.id} className="flex-row items-center my-1">
+              //   <Image
+              //     source={{ uri: hojaeIconUrl || 'https://via.placeholder.com/36' }}
+              //     className="w-9 h-9 rounded-md mr-4 bg-gray-200"
+              //   />
+              //   <View className="flex-1 flex-row justify-between items-center">
+              //     <Text className="text-sm">{news.title}</Text>
+              //     <Text className="text-xs text-gray-500">{news.time}</Text>
+              //   </View>
+              // </View>
             ))}
           </View>
         </Collapsible>
