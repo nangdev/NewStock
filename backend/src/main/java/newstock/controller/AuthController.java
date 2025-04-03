@@ -1,21 +1,17 @@
 package newstock.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import newstock.common.dto.Api;
 import newstock.controller.request.KakaoLoginRequest;
 import newstock.controller.request.LoginRequest;
 import newstock.controller.request.RefreshRequest;
 import newstock.controller.response.LoginResponse;
 import newstock.domain.user.service.AuthService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
-import java.net.URI;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor

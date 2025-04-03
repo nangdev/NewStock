@@ -24,11 +24,6 @@ public class UserRequest {
     @Schema(description = "비밀번호 (숫자+문자+특수문자 포함)", example = "Ssafy123!")
     private String password;
 
-    @NotBlank(message = "이름을 입력해주세요.")
-    @Size(min = 2, max = 10, message = "이름을 2자 이상 10자 이하로 입력해주세요.")
-    @Schema(description = "실명", example = "김싸피")
-    private String userName;
-
     @NotBlank(message = "닉네임을 입력해주세요.")
     @Size(min = 2, max = 10, message = "닉네임은 2자 이상 10자 이하로 입력해주세요.")
     @Schema(description = "닉네임", example = "싸피")
