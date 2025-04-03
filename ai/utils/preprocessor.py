@@ -3,7 +3,6 @@ import nltk
 import logging
 from typing import Optional
 from nltk.tokenize import sent_tokenize
-nltk.download('punkt', quiet=True)
 
 # 로그 설정
 logger = logging.getLogger("preprocessor")

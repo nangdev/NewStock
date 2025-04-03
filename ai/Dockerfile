@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# punkt 데이터 미리 다운로드
+RUN python -m nltk.downloader punkt
+
 # 애플리케이션 코드 복사
 COPY . .
 
@@ -22,7 +25,7 @@ EXPOSE 8000
 # 시작 스크립트 생성
 RUN echo '#!/bin/bash\n\
 # FastAPI 서버 실행\n\
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 2\n\
+uvicorn main:app --host 0.0.0.0 --port 8000\n\
 ' > /app/start.sh && chmod +x /app/start.sh
 
 # 시작 스크립트 실행
