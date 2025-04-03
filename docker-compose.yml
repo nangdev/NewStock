@@ -35,16 +35,10 @@ services:
     image: selenium/hub:4.16.1
     container_name: selenium-hub
     ports:
-      - "4442:4442"
-      - "4443:4443"
       - "4444:4444"
     environment:
-      - SE_EVENT_BUS_PUBLISH_PORT=4442
-      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_SESSION_TIMEOUT=180
-      - SE_SESSION_REQUEST_TIMEOUT=180
-      - SE_NODE_MAX_SESSIONS=2         # 동시 세션 수 제한
-      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+      - GRID_MAX_SESSION=10
+      - GRID_BROWSER_TIMEOUT=300000
     restart: unless-stopped
     deploy:
       resources:
@@ -54,28 +48,19 @@ services:
 
   chrome:
     image: selenium/node-chrome:4.16.1
-    shm_size: 4gb
-    volumes:
-      - /dev/shm:/dev/shm                # 호스트의 /dev/shm 마운트
-    container_name: chrome
+    depends_on:
+      - selenium-hub
     environment:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_SESSION_TIMEOUT=180
-      - SE_SESSION_REQUEST_TIMEOUT=180
-      - SE_NODE_MAX_SESSIONS=2           # 동시 세션 수 제한
-      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
-      - SE_SCREEN_WIDTH=1366
-      - SE_SCREEN_HEIGHT=768
-    depends_on:
-      - selenium-hub
-    restart: unless-stopped
+      - NODE_MAX_INSTANCES=5
+      - NODE_MAX_SESSION=5
     deploy:
       resources:
         limits:
-          memory: 4g
-          cpus: '1.5'
+          cpus: '1'
+          memory: 2G
 
   crawl:
     build:
