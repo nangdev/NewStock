@@ -5,7 +5,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -26,10 +25,11 @@ public class RedisUtil {
     /**
      * key로부터 값 가져오기
      */
-    public Object get(String key) {
-        return redisTemplate.opsForValue().get(key);
+    @SuppressWarnings("unchecked")
+    public <T> T get(String key, Class<T> clazz) {
+        Object value = redisTemplate.opsForValue().get(key);
+        return (T) value;
     }
-
     /**
      * key 삭제
      */

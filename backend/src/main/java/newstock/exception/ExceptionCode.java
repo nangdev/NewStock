@@ -18,7 +18,7 @@ public enum ExceptionCode {
     EMAIL_AUTH_EXPIRED("이메일 인증 유효시간이 만료되었습니다.", 2004, HttpStatus.BAD_REQUEST),
     EMAIL_AUTH_INVALID("유효하지 인증 코드입니다.", 2005, HttpStatus.BAD_REQUEST),
     EMAIL_SEND_FAILED("이메일 전송에 실패했습니다.", 2006, HttpStatus.INTERNAL_SERVER_ERROR),
-    EMAIL_NOT_REQUESTED("이메일 인증 요청이 먼저 필요합니다.", 2007, HttpStatus.BAD_REQUEST),
+    EMAIL_NOT_VERIFIED("이메일 인증이 필요합니다.", 2007, HttpStatus.BAD_REQUEST),
     EMAIL_ALREADY_VERIFIED("이미 인증된 이메일입니다.", 2008, HttpStatus.BAD_REQUEST),
 
 

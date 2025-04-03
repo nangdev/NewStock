@@ -9,7 +9,6 @@ import newstock.controller.request.UserRequest;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="users")
 public class User {
 
     @Id
@@ -40,7 +39,6 @@ public class User {
     @Column(nullable = false)
     private Byte role; // 유저 권한 0이면 NEW(신규 회원), 1이면 USER(기존 유저)
 
-
     public static User of(UserRequest userRequest, String encodedPassword) {
         return User.builder()
                 .email(userRequest.getEmail())
@@ -50,7 +48,3 @@ public class User {
                 .build();
     }
 }
-
-
-
-
