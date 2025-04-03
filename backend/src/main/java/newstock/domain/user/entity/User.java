@@ -1,7 +1,10 @@
 package newstock.domain.user.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import newstock.controller.request.UserRequest;
 
 @Entity
@@ -9,9 +12,9 @@ import newstock.controller.request.UserRequest;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="users")
+@Table(name = "users")
 public class User {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
