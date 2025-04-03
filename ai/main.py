@@ -1,5 +1,6 @@
 import nltk
-nltk.download("punkt")
+nltk.download('punkt')  # punkt 리소스 다운로드
+nltk.download('punkt_tab')  # "punkt_tab" 리소스 다운로드
 
 import logging
 from collections import Counter
