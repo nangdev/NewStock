@@ -1,4 +1,4 @@
-package newstock.domain.newsletter.entity;
+package newstock.domain.keyword.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
