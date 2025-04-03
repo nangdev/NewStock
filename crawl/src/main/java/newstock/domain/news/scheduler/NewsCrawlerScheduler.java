@@ -31,20 +31,16 @@ public class NewsCrawlerScheduler {
     @Value("${kafka.topic.news-crawl}")
     private String topic;
 
-    // 단일 스레드 Executor를 사용해 스케줄 작업들을 순차적으로 실행합니다.
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    // 스케줄러가 매 분 0초마다 실행됩니다.
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0/3 * * * *")
     public void scheduleNewsCrawling() {
-        // 작업을 단일 스레드 Executor에 제출하여, 이전 작업이 끝날 때까지 대기하도록 합니다.
         executor.submit(() -> {
             try {
                 List<StockDto> stockList = stockService.getAllStocks();
                 Instant schedulerTime = Instant.now();
 
-                // 종목 목록을 병렬 스트림으로 처리하여 동시에 메시지를 전송합니다.
-                stockList.parallelStream().forEach(stock -> {
+                stockList.forEach(stock -> {
                     try {
                         String message = objectMapper.writeValueAsString(
                                 NewsCrawlerRequest.of(stock.getStockName(), stock.getStockId(), schedulerTime.toString())

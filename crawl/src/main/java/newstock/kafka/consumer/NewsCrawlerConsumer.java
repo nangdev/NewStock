@@ -26,7 +26,7 @@ public class NewsCrawlerConsumer {
     @Value("${kafka.topic.news-ai}")
     private String newsAiTopic;
 
-    @KafkaListener(topics = "${kafka.topic.news-crawl}", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "${kafka.topic.news-crawl}", groupId = "${spring.kafka.consumer.group-id}", concurrency = "5")
     public void listen(String message) {
         log.info("Kafka 메시지 수신: {}", message);
         try {
@@ -36,6 +36,12 @@ public class NewsCrawlerConsumer {
 
             // 뉴스 크롤링을 수행하여 뉴스 아이템 리스트를 얻습니다.
             List<NewsItem> newsItemList = newsCrawlerService.fetchNews(newsCrawlerRequest);
+
+            // 리스트가 비어있으면 메시지 전송을 생략합니다.
+            if (newsItemList == null || newsItemList.isEmpty()) {
+                log.info("크롤링 결과 뉴스 아이템이 없습니다. 메시지 전송을 생략합니다. (종목: {})", stockName);
+                return;
+            }
 
             // 뉴스 크롤링 결과를 AI 분석 단계로 전달하기 위해 새로운 메시지 생성
             String aiMessage = objectMapper.writeValueAsString(NewsAiRequest.of(stockName, newsItemList));
@@ -47,9 +53,6 @@ public class NewsCrawlerConsumer {
                         log.error("Kafka AI 분석 메시지 전송 실패: ", ex);
                         return null;
                     });
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("뉴스 크롤링 인터럽트 발생: ", e);
         } catch (Exception e) {
             log.error("뉴스 크롤링 중 오류 발생: ", e);
         }

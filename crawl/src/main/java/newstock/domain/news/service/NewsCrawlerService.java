@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface NewsCrawlerService {
 
-    List<NewsItem> fetchNews(NewsCrawlerRequest newsCrawlerRequest) throws InterruptedException;
+    List<NewsItem> fetchNews(NewsCrawlerRequest newsCrawlerRequest);
 }

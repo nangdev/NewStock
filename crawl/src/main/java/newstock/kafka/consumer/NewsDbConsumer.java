@@ -29,7 +29,7 @@ public class NewsDbConsumer {
 
     @KafkaListener(topics = "${kafka.topic.news-db}", groupId = "${kafka.consumer.group.news-db}")
     public void listen(String message) {
-        log.info("Kafka DB 저장 메시지 수신: {}", message);
+        log.info("Kafka DB 저장 메시지 수신");
         try {
             // 메시지를 NewsDbRequest 객체로 역직렬화
             NewsDbRequest dbRequest = objectMapper.readValue(message, NewsDbRequest.class);

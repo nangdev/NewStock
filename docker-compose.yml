@@ -23,6 +23,8 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      - /home/ubuntu/imgs/stock_images:/app/uploads
     env_file:
       - ./.env
     restart: unless-stopped
@@ -30,21 +32,42 @@ services:
       - mysql
   
   selenium-hub:
-    image: selenium/hub:4.15.0
+    image: selenium/hub:4.16.1
     container_name: selenium-hub
     ports:
       - "4444:4444"
+    environment:
+      - GRID_MAX_SESSION=20
+      - GRID_BROWSER_TIMEOUT=300000
+      - GRID_TIMEOUT=300
+      - SE_SESSION_REQUEST_TIMEOUT=300
+      - SE_NODE_SESSION_TIMEOUT=300
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+          cpus: '1'
 
   chrome:
-    image: selenium/node-chrome:4.15.0
-    shm_size: 2gb
+    image: selenium/node-chrome:4.16.1
     depends_on:
       - selenium-hub
     environment:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_MAX_SESSIONS=5
+      - NODE_MAX_INSTANCES=5
+      - NODE_MAX_SESSION=5
+      - SE_NODE_SESSION_TIMEOUT=300
+      - SE_NODE_GRID_URL=http://selenium-hub:4444
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 4G
+    shm_size: 4g
 
   crawl:
     build:
@@ -53,14 +76,22 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - SPRING_PROFILES_ACTIVE=selenium-grid
-      - SELENIUM_REMOTE_URL=http://selenium-hub:4444/wd/hub
+      - SPRING_PROFILES_ACTIVE=prod
+      - PLAYWRIGHT_ENABLED=false
+      - CRAWLER_CONCURRENT_WORKERS=2    # 크롤러 동시 작업자 수 제한
+      - CRAWLER_RATE_LIMIT=1000         # 요청 간 지연 시간(ms)
     env_file:
       - ./crawl/.env
     depends_on:
       - selenium-hub
       - mysql
       - kafka
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+          cpus: '1'
   
   mysql:
     image: mysql:8.0.33
@@ -87,9 +118,16 @@ services:
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_HEAP_OPTS=-Xmx1g -Xms512m  # 따옴표 제거
+      - KAFKA_JVM_PERFORMANCE_OPTS=-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35
     depends_on:
       - zookeeper
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1.5g
+          cpus: '0.5'
 
   
   zookeeper:
@@ -97,9 +135,15 @@ services:
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
       - ZOOKEEPER_TICK_TIME=2000
+      - JVMFLAGS=-Xmx256m -Xms128m  # JVM 메모리 제한
     ports:
       - "2181:2181"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 0.5g
+          cpus: '0.5'
 
 volumes:
   db-data:

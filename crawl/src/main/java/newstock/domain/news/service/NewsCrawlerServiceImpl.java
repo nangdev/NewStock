@@ -4,6 +4,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import newstock.domain.news.dto.NewsItem;
+import newstock.domain.news.util.CompanyKeywordUtil;
 import newstock.kafka.request.NewsCrawlerRequest;
 import newstock.domain.news.util.ArticleCleaner;
 import org.jsoup.Jsoup;
@@ -36,91 +37,76 @@ import java.util.List;
 public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final Duration WAIT_TIMEOUT = Duration.ofSeconds(3);
-    private static final Duration OLDER_THAN_DURATION = Duration.ofMinutes(1); // 테스트용 1분 전 기준
-    private static final int PAGE_INCREMENT = 10;
+    private static final Duration WAIT_TIMEOUT = Duration.ofSeconds(5);
+    private static final Duration OLDER_THAN_DURATION = Duration.ofMinutes(3); // 예: 스케줄러 기준 시간에서 3분 전
 
     // Selenium Grid URL을 환경 변수에서 가져옴
     @Value("${selenium.remote.url:http://selenium-hub:4444/wd/hub}")
     private String remoteUrl;
 
     /**
-     * 주어진 종목명에 대한 뉴스들을 수집한 후 리스트로 반환합니다.
-     * 나중에 AI 필터링 등의 추가 처리를 위해 이 리스트를 활용할 수 있습니다.
+     * 주어진 종목명에 대한 뉴스들을 첫 페이지만 수집한 후,
+     * 스케줄러 기준 시간(schedulerTime)에서 OLDER_THAN_DURATION(예: 3분 전) ~ schedulerTime 사이에 작성된 뉴스만 리스트로 반환합니다.
      */
     @Override
-    public List<NewsItem> fetchNews(NewsCrawlerRequest newsCrawlerRequest) throws InterruptedException {
+    public List<NewsItem> fetchNews(NewsCrawlerRequest newsCrawlerRequest) {
         WebDriver driver = null;
         try {
             driver = createWebDriver();
             WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
 
-            // 뉴스 목록 페이지 URL 구성
-            String baseUrl = "https://search.naver.com/search.naver?where=news&query="
+            // 뉴스 목록 페이지 URL 구성 (첫 페이지만 탐색)
+            String listPageUrl = "https://search.naver.com/search.naver?where=news&query="
                     + newsCrawlerRequest.getStockName() +
                     "&sm=tab_opt&sort=1&photo=0&field=0&pd=0&ds=&de=&docid=&related=0&mynews=0" +
                     "&office_type=0&office_section_code=0&news_office_checked=&nso=so%3Add%2Cp%3Aall" +
-                    "&is_sug_officeid=0&office_category=0&service_area=0";
-            int start = 1;
-            boolean isLastPage = false;
-            boolean stopCrawling = false;
+                    "&is_sug_officeid=0&office_category=0&service_area=0&start=1";
+            driver.get(listPageUrl);
+            try {
+                wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("ul.list_news")));
+            } catch (TimeoutException e) {
+                log.info("뉴스 목록을 찾을 수 없습니다. 크롤링을 종료합니다.");
+                return new ArrayList<>();
+            }
 
-            // 스케줄러에서 전달받은 시간을 기준으로 파싱
+            List<WebElement> liElements = driver.findElements(By.cssSelector("ul.list_news li.bx"));
+            if (liElements.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            // 스케줄러 기준 시간과 threshold 시간(예: 3분 전) 계산
             Instant schedulerTime = Instant.parse(newsCrawlerRequest.getSchedulerTime());
-            // OLDER_THAN_DURATION 이전의 뉴스는 수집하지 않도록 기준 시간을 계산
             Instant thresholdTime = schedulerTime.minus(OLDER_THAN_DURATION);
 
             List<NewsItem> collectedNews = new ArrayList<>();
+            List<NewsItem> basicNewsItems = extractBasicNewsItems(liElements);
 
-            // 목록 페이지를 순회하며 뉴스 수집
-            while (!isLastPage && !stopCrawling) {
-                String listPageUrl = baseUrl + "&start=" + start;
-                driver.get(listPageUrl);
-                try {
-                    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("ul.list_news")));
-                } catch (TimeoutException e) {
-                    log.info("뉴스 목록을 찾을 수 없습니다. 크롤링을 종료합니다.");
-                    break;
+            for (NewsItem item : basicNewsItems) {
+
+                if (!CompanyKeywordUtil.isTitleContainsCompanyName(item.getTitle(), newsCrawlerRequest.getStockName())) {
+                    continue;
                 }
 
-                List<WebElement> liElements = driver.findElements(By.cssSelector("ul.list_news li.bx"));
-                if (liElements.isEmpty()) {
-                    isLastPage = true;
-                    break;
+                enrichNewsItem(driver, wait, item);
+
+                // 필수 추가 정보가 없으면 건너뜁니다.
+                if (!isNewsItemValid(item)) {
+                    continue;
                 }
 
-                List<NewsItem> basicNewsItems = extractBasicNewsItems(liElements);
-
-                for (NewsItem item : basicNewsItems) {
-                    enrichNewsItem(driver, wait, item);
-
-                    // 필수 추가 정보가 없으면 건너뜁니다.
-                    if (!isNewsItemValid(item)) {
-                        continue;
-                    }
-
-                    if (item.getPublishedDate() != null) {
-                        try {
-                            LocalDateTime publishedTime = LocalDateTime.parse(item.getPublishedDate(), DATE_FORMATTER);
-                            Instant publishedInstant = publishedTime.atZone(ZoneId.of("Asia/Seoul")).toInstant();
-                            if (publishedInstant.isBefore(thresholdTime)) {
-                                stopCrawling = true;
-                                break;
-                            }
-                        } catch (Exception e) {
-                            log.error("날짜 파싱 오류: {}", e.getMessage(), e);
+                // 작성 시간이 thresholdTime(예: 10:57:00) 이상이고 schedulerTime(예: 11:00:00) 미만인 경우에만 수집
+                if (item.getPublishedDate() != null) {
+                    try {
+                        LocalDateTime publishedTime = LocalDateTime.parse(item.getPublishedDate(), DATE_FORMATTER);
+                        Instant publishedInstant = publishedTime.atZone(ZoneId.of("Asia/Seoul")).toInstant();
+                        if (publishedInstant.compareTo(thresholdTime) >= 0 && publishedInstant.isBefore(schedulerTime)) {
+                            item.setStockId(newsCrawlerRequest.getStockId());
+                            collectedNews.add(item);
                         }
+                    } catch (Exception e) {
+                        log.error("날짜 파싱 오류: {}", e.getMessage(), e);
                     }
-                    item.setStockId(newsCrawlerRequest.getStockId());
-                    collectedNews.add(item);
                 }
-
-                if (stopCrawling) {
-                    break;
-                }
-                start += PAGE_INCREMENT;
-                // 500ms ~ 1000ms 사이의 딜레이
-                Thread.sleep(500 + (int)(Math.random() * 500));
             }
             return collectedNews;
         } catch (Exception e) {
@@ -139,23 +125,24 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 
     private WebDriver createWebDriver() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu");
-
+        options.addArguments(
+                "--headless=new",  // 새 headless 모드 사용
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-extensions",
+                "--window-size=1920,1080"
+        );
         // 원격 WebDriver 시도
         try {
-            log.info("RemoteWebDriver 초기화 시작. URL: {}", remoteUrl);
-            WebDriver driver = new RemoteWebDriver(new URL(remoteUrl), options);
-            log.info("RemoteWebDriver 초기화 성공");
-            return driver;
+            return new RemoteWebDriver(new URL(remoteUrl), options);
         } catch (MalformedURLException e) {
             log.error("RemoteWebDriver URL 형식 오류: {}", e.getMessage(), e);
         } catch (Exception e) {
             log.error("RemoteWebDriver 초기화 실패: {}", e.getMessage(), e);
         }
 
-        // 자동 폴백 (로컬 WebDriver 사용)
-        log.info("로컬 WebDriver로 폴백합니다.");
-        WebDriverManager.chromedriver().browserVersion("134.0.6998.89").setup();
+        WebDriverManager.chromedriver().setup();
         return new ChromeDriver(options);
     }
 
@@ -200,7 +187,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
             String articleHtml = driver.getPageSource();
             Document doc = Jsoup.parse(articleHtml);
 
-            // 본문 추출: ArticleCleaner를 사용하고, 내용이 없으면 <article id="dic_area">에서 직접 추출
+            // 본문 추출: ArticleCleaner를 사용하고, 내용이 없으면 id="dic_area"에서 직접 추출
             String content = ArticleCleaner.extractMeaningfulContent(articleHtml);
             if (content == null || content.trim().isEmpty()) {
                 var articleElem = doc.getElementById("dic_area");
