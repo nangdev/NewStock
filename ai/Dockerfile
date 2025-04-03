@@ -28,6 +28,9 @@ ENV _JAVA_OPTIONS="-Xmx2g"
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# NLTK punkt 리소스 다운로드
+RUN python -m nltk.downloader punkt
+
 # 앱 코드 복사
 COPY . /app
 WORKDIR /app
