@@ -37,14 +37,17 @@ services:
     ports:
       - "4444:4444"
     environment:
-      - GRID_MAX_SESSION=10
+      - GRID_MAX_SESSION=20
       - GRID_BROWSER_TIMEOUT=300000
+      - GRID_TIMEOUT=300
+      - SE_SESSION_REQUEST_TIMEOUT=300
+      - SE_NODE_SESSION_TIMEOUT=300
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          memory: 1g
-          cpus: '0.5'
+          memory: 2g
+          cpus: '1'
 
   chrome:
     image: selenium/node-chrome:4.16.1
@@ -56,11 +59,15 @@ services:
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - NODE_MAX_INSTANCES=5
       - NODE_MAX_SESSION=5
+      - SE_NODE_SESSION_TIMEOUT=300
+      - SE_NODE_GRID_URL=http://selenium-hub:4444
+    restart: unless-stopped
     deploy:
       resources:
         limits:
           cpus: '1'
-          memory: 2G
+          memory: 4G
+    shm_size: 4g
 
   crawl:
     build:
