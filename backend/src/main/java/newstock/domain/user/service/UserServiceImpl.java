@@ -78,4 +78,19 @@ public class UserServiceImpl implements UserService {
 
         return UserResponse.of(user);
     }
+
+    // 회원 탈퇴
+    @Override
+    public void deleteUser(Integer userId, String accessToken) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
+
+        if (!user.isActivated()) {
+            throw new ValidationException(ExceptionCode.USER_ALREADY_DELETED);
+        }
+
+        user.setActivated(false);
+        userRepository.save(user);
+        log.info("회원 탈퇴 처리 완료 - userId: {}", userId);
+    }
 }
