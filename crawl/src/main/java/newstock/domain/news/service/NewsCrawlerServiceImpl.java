@@ -38,7 +38,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final Duration WAIT_TIMEOUT = Duration.ofSeconds(5);
-    private static final Duration OLDER_THAN_DURATION = Duration.ofMinutes(2); // 테스트용: 스케줄러 시간 기준 1분 전 이후 뉴스만 수집
+    private static final Duration OLDER_THAN_DURATION = Duration.ofMinutes(3); // 예: 스케줄러 기준 시간에서 3분 전
 
     // Selenium Grid URL을 환경 변수에서 가져옴
     @Value("${selenium.remote.url:http://selenium-hub:4444/wd/hub}")
@@ -46,7 +46,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 
     /**
      * 주어진 종목명에 대한 뉴스들을 첫 페이지만 수집한 후,
-     * 스케줄러 기준 시간으로부터 1분 이내(최근 뉴스)인 경우만 리스트로 반환합니다.
+     * 스케줄러 기준 시간(schedulerTime)에서 OLDER_THAN_DURATION(예: 3분 전) ~ schedulerTime 사이에 작성된 뉴스만 리스트로 반환합니다.
      */
     @Override
     public List<NewsItem> fetchNews(NewsCrawlerRequest newsCrawlerRequest) {
@@ -74,7 +74,7 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
                 return new ArrayList<>();
             }
 
-            // 스케줄러 기준 시간과 1분 전 기준 시간 계산
+            // 스케줄러 기준 시간과 threshold 시간(예: 3분 전) 계산
             Instant schedulerTime = Instant.parse(newsCrawlerRequest.getSchedulerTime());
             Instant thresholdTime = schedulerTime.minus(OLDER_THAN_DURATION);
 
@@ -84,7 +84,6 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
             for (NewsItem item : basicNewsItems) {
 
                 if (!CompanyKeywordUtil.isTitleContainsCompanyName(item.getTitle(), newsCrawlerRequest.getStockName())) {
-                    log.info("기사 제목에 해당 회사 키워드가 없어 건너뜁니다: {}", item.getTitle());
                     continue;
                 }
 
@@ -95,12 +94,12 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
                     continue;
                 }
 
-                // 작성 시간이 thresholdTime(1분 전) 이후인 경우에만 수집
+                // 작성 시간이 thresholdTime(예: 10:57:00) 이상이고 schedulerTime(예: 11:00:00) 미만인 경우에만 수집
                 if (item.getPublishedDate() != null) {
                     try {
                         LocalDateTime publishedTime = LocalDateTime.parse(item.getPublishedDate(), DATE_FORMATTER);
                         Instant publishedInstant = publishedTime.atZone(ZoneId.of("Asia/Seoul")).toInstant();
-                        if (!publishedInstant.isBefore(thresholdTime)) { // publishedInstant >= thresholdTime 인 경우
+                        if (publishedInstant.compareTo(thresholdTime) >= 0 && publishedInstant.isBefore(schedulerTime)) {
                             item.setStockId(newsCrawlerRequest.getStockId());
                             collectedNews.add(item);
                         }
@@ -127,12 +126,12 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
     private WebDriver createWebDriver() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments(
-            "--headless=new",  // 새 headless 모드 사용
-            "--no-sandbox", 
-            "--disable-dev-shm-usage", 
-            "--disable-gpu",
-            "--disable-extensions",
-            "--window-size=1920,1080"
+                "--headless=new",  // 새 headless 모드 사용
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-extensions",
+                "--window-size=1920,1080"
         );
         // 원격 WebDriver 시도
         try {
@@ -146,7 +145,6 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
         WebDriverManager.chromedriver().setup();
         return new ChromeDriver(options);
     }
-
 
     /**
      * 목록 페이지에서 li 태그들을 순회하며 기본 정보(제목, 네이버뉴스 링크)를 추출하여 리스트로 반환합니다.

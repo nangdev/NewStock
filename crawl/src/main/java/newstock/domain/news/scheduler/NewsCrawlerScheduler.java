@@ -33,7 +33,7 @@ public class NewsCrawlerScheduler {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    @Scheduled(cron = "0 0/2 * * * *")
+    @Scheduled(cron = "0 0/3 * * * *")
     public void scheduleNewsCrawling() {
         executor.submit(() -> {
             try {
