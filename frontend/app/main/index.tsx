@@ -17,19 +17,13 @@ type Stock = {
 
 
 export default function Main() {
-  // 테스트 데이터
-  // const [subscribedStocks, setSubscribedStocks] = useState([
-  //   { stockName: '삼성전자', stockCode: '005930', price: 0, changeRate: 0.0 },
-  //   { stockName: 'SK하이닉스', stockCode: '000660', price: 0, changeRate: 0.0 },
-  //   { stockName: '카카오', stockCode: '035720', price: 0, changeRate: 0.0 },
-  // ]);
   const router = useRouter();
   const { data, isLoading, isError } = useAllUserStockListQuery();
   const [subscribedStocks, setSubscribedStocks] = useState<Stock[]>([]);
   
   useEffect(() => {
     if (!data?.data.stockList) {
-      router.replace(`/stock/005930`)
+      // router.replace(`/stock/005930`)
       return;
     }
     setSubscribedStocks(data.data.stockList);
@@ -38,7 +32,7 @@ export default function Main() {
     const client = new Client({
       webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
       // webSocketFactory: () => new WebSocket('ws://10.0.2.2:8080/api/ws'),
-      // debug: (msg) => console.log('STOMP:', msg),
+      debug: (msg) => console.log('STOMP:', msg),
       onConnect: (frame) => {
         // 구독
         subscribedStocks.forEach((stock) => {

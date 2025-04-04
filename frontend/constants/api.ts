@@ -31,12 +31,12 @@ export const API_PATH = {
   },
   STOCK: {
     ALL: `${DOMAIN.STOCK}`,
-    DETAIL: (stockCode: string) => `${DOMAIN.STOCK}/info/${stockCode}`,
+    DETAIL: (stockId: number) => `${DOMAIN.STOCK}/info/${stockId}`,
     USER_STOCK: `${DOMAIN.STOCK}/interest`,
     USER_STOCK_EDIT: `${DOMAIN.STOCK}/interest`,
   },
   NEWS: {
-    TOP: `${DOMAIN.NEWS}/top`,
+    TOP: (stockId: number) => `${DOMAIN.NEWS}/top/${stockId}`,
     STOCK_NEWS: `${DOMAIN.NEWS}`,
     DETAIL: `${DOMAIN.NEWS}`,
     SCRAP: `${DOMAIN.NEWS}/scrap`,

@@ -6,7 +6,17 @@ export type AllStockNewsResType = BaseResType & {
     newsList: {
       newsId: number,
       title: string,
-      description: string,
+      score: number,
+      publishedDate: string, 
+    }[],
+  }
+}
+
+export type topFiveStockNewsResType = BaseResType & {
+  data: {
+    newsList: {
+      newsId: number,
+      title: string,
       score: number,
       publishedDate: string, 
     }[],

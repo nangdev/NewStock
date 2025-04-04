@@ -38,9 +38,9 @@ export const useAllUserStockListQuery = () => {
   });
 };
 
-export const useStockDetailInfoQuery = (stockCode: string) => {
+export const useStockDetailInfoQuery = (stockId: number) => {
   return useQuery({
     queryKey: ['stockDetailInfo'],
-    queryFn: () => getStockDetailInfo(stockCode),
+    queryFn: () => getStockDetailInfo(stockId),
   });
 };

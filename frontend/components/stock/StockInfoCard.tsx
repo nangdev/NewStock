@@ -1,22 +1,33 @@
 import { View, Text, Image } from "react-native";
 
 type Props = {
-  // stockId: number;
+  stockId: number;
   stockName: string;
   stockCode: string;
   price: number;
   changeRate: number;
   imgUrl: string;
-
+  totalPrice: number, // 시가총액
+  issuedNum: number,  // 발행주식수: lstgStqt
+  capital: number,  // 자본금
+  parValue: number, // 액면가
+  listingDate: string,  // 상장일자
+  industry: string, // 표준산업분류코드명
 };
 
 export default function StockInfoCard ({
-  // stockId,
+  stockId,
   stockName,
   stockCode,
   price,
   changeRate,
   imgUrl,
+  totalPrice, 
+  issuedNum, 
+  capital, 
+  parValue,
+  listingDate, 
+  industry, 
 }:Props) {
   console.log(stockCode)
   return (
@@ -44,15 +55,14 @@ export default function StockInfoCard ({
 
       <View className="flex-row  p-4">
         <View className="flex-1">
-          <InfoRow label="시가총액" content={200} />
-          <InfoRow label="기업명" content={200} />
-          <InfoRow label="상장일" content={200} />
-          <InfoRow label="홈페이지" content={200} />
+          <InfoRow label="시가총액" content={totalPrice} />
+          <InfoRow label="발행주식수" content={issuedNum} />
+          <InfoRow label="상장일" content={listingDate} />
         </View>
         <View className="flex-1">
-          <InfoRow label="실제기업가치" content={3200} />
-          <InfoRow label="대표이사" content={200} />
-          <InfoRow label="발행주식수" content={200} />
+          <InfoRow label="자본금" content={capital} />
+          <InfoRow label="액면가" content={parValue === 0 ? '-' : parValue} />
+          <InfoRow label="분류" content={industry} />
         </View>
       </View>
       

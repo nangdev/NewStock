@@ -5,6 +5,7 @@ import Collapsible from 'react-native-collapsible';
 import { useRouter } from 'expo-router';
 import { ROUTE } from 'constants/routes';
 import NewsListItem from 'components/stock/NewsListItem';
+import { useTopFiveNewsListQuery } from 'api/news/query';
 
 type StockProps = {
   stockId: number;
@@ -16,8 +17,8 @@ type StockProps = {
   hojaeIconUrl: string;
 };
 
-type NewsProps = {
-  newsId: string;
+type News = {
+  newsId: number;
   title: string;
   description: string;
   score: number;
@@ -36,21 +37,22 @@ type NewsProps = {
   const router = useRouter();
   const onPressItem = () => {
     router.navigate({
-      pathname: ROUTE.STOCK.DETAIL(stockId),
-      params: {stockId}
+      pathname: ROUTE.STOCK.DETAIL(stockId, stockCode),
+      params: {stockId, stockCode}
     })
   }
 
   const [expanded, setExpanded] = useState(false);
+  const {data, isLoading, isError} = useTopFiveNewsListQuery(stockId);
 
   // mock data
-  const newsList = [
-    { id: `${stockCode}-1`, title: `${stockName} 관련 뉴스 1`, time: '1시간 전' },
-    { id: `${stockCode}-2`, title: `${stockName} 관련 뉴스 2`, time: '2시간 전' },
-    { id: `${stockCode}-3`, title: `${stockName} 관련 뉴스 3`, time: '2시간 전' },
-    { id: `${stockCode}-4`, title: `${stockName} 관련 뉴스 4`, time: '2시간 전' },
-    { id: `${stockCode}-5`, title: `${stockName} 관련 뉴스 5`, time: '2시간 전' },
-  ];
+  // const newsList = [
+  //   { id: `${stockCode}-1`, title: `${stockName} 관련 뉴스 1`, time: '1시간 전' },
+  //   { id: `${stockCode}-2`, title: `${stockName} 관련 뉴스 2`, time: '2시간 전' },
+  //   { id: `${stockCode}-3`, title: `${stockName} 관련 뉴스 3`, time: '2시간 전' },
+  //   { id: `${stockCode}-4`, title: `${stockName} 관련 뉴스 4`, time: '2시간 전' },
+  //   { id: `${stockCode}-5`, title: `${stockName} 관련 뉴스 5`, time: '2시간 전' },
+  // ];
 
   return (
     <TouchableOpacity onPress={onPressItem}>
@@ -82,25 +84,15 @@ type NewsProps = {
         <Collapsible collapsed={!expanded}>
           
           <View className="bg-white mb-2">
-            {newsList.map((news) => (
+            {data?.data.newsList.map((news) => (
               <NewsListItem
-                newsId={news.id}
+                newsId={+news.newsId}
                 title={news.title}
                 description='desc'
                 score={10}
                 publishedDate='2025-03-14:20:08:49'
                 hojaeIconUrl=''
               />
-              // <View key={news.id} className="flex-row items-center my-1">
-              //   <Image
-              //     source={{ uri: hojaeIconUrl || 'https://via.placeholder.com/36' }}
-              //     className="w-9 h-9 rounded-md mr-4 bg-gray-200"
-              //   />
-              //   <View className="flex-1 flex-row justify-between items-center">
-              //     <Text className="text-sm">{news.title}</Text>
-              //     <Text className="text-xs text-gray-500">{news.time}</Text>
-              //   </View>
-              // </View>
             ))}
           </View>
         </Collapsible>

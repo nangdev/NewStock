@@ -1,7 +1,7 @@
 import { View, Text, Image } from "react-native";
 
 type Props = {
-  newsId: string;
+  newsId: number;
   title: string;
   description: string;
   score: number;
