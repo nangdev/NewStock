@@ -9,8 +9,6 @@ services:
       - "80:80"
       - "443:443"
     depends_on:
-      ai:
-        condition: service_healthy
       backend:
         condition: service_healthy
     restart: unless-stopped
@@ -44,8 +42,6 @@ services:
       - /home/ubuntu/imgs/stock_images:/app/uploads
     restart: unless-stopped
     depends_on:
-      ai:
-        condition: service_healthy
       mysql:
         condition: service_started
       redis:
@@ -110,8 +106,6 @@ services:
     env_file:
       - ./crawl/.env
     depends_on:
-      ai:
-        condition: service_healthy
       selenium-hub:
         condition: service_started
       mysql:
