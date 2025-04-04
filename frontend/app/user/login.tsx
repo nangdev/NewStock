@@ -5,6 +5,7 @@ import { ROUTE } from 'constants/routes';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Text, View, Image, TouchableOpacity } from 'react-native';
+import { registerForPushNotifications } from 'utils/pushNotification';
 
 export default function Login() {
   const router = useRouter();
@@ -16,9 +17,10 @@ export default function Login() {
     router.navigate(ROUTE.HOME);
   };
 
-  const onPressLogin = () => {
-    // Todo: FCM 기능 추가시 fcmToken 수정
-    mutate({ email, password, fcmToken: 'fcmToken123' });
+  const onPressLogin = async () => {
+    const fcmToken = await registerForPushNotifications();
+
+    mutate({ email, password, fcmToken });
   };
 
   const onPressKakaoLogin = () => {
