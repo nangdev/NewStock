@@ -33,6 +33,10 @@ export default function Home() {
     mutate();
   };
 
+  const onPressMyPage = () => {
+    router.navigate('/mypage');
+  };
+
   return (
     <View className="flex-1 items-center justify-center gap-2">
       <Image
@@ -63,6 +67,10 @@ export default function Home() {
 
       <CustomButton variant="semiRounded" onPress={onPressLogout}>
         로그아웃
+      </CustomButton>
+
+      <CustomButton variant="semiRounded" onPress={onPressMyPage}>
+        마이 페이지
       </CustomButton>
     </View>
   );
