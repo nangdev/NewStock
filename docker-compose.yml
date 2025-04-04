@@ -9,8 +9,7 @@ services:
       - "80:80"
       - "443:443"
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     restart: unless-stopped
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -20,12 +19,6 @@ services:
         limits:
           cpus: '0.5'
           memory: 256M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-      start_period: 180s
     
   backend:
     build:
@@ -42,21 +35,13 @@ services:
       - /home/ubuntu/imgs/stock_images:/app/uploads
     restart: unless-stopped
     depends_on:
-      mysql:
-        condition: service_started
-      redis:
-        condition: service_started
+      - mysql
+      - redis
     deploy:
       resources:
         limits:
           cpus: '1.5'
           memory: 2G
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-      start_period: 180s
   
   selenium-hub:
     image: selenium/hub:4.15.0
@@ -106,14 +91,10 @@ services:
     env_file:
       - ./crawl/.env
     depends_on:
-      selenium-hub:
-        condition: service_started
-      mysql:
-        condition: service_started
-      kafka:
-        condition: service_started
-      redis:
-        condition: service_started
+      - selenium-hub
+      - mysql
+      - kafka
+      - redis
     deploy:
       resources:
         limits:
@@ -211,12 +192,6 @@ services:
         limits:
           cpus: '3.5'
           memory: 8G
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-      start_period: 180s
 
 volumes:
   db-data:
