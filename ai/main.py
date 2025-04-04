@@ -1,39 +1,67 @@
-# 표준 라이브러리
+# === 표준 라이브러리 ===
 import logging
+import os
 from collections import Counter
-from typing import Tuple, Dict, List
+from contextlib import asynccontextmanager
+from typing import List, Dict
+import time
 
-# 외부 라이브러리
-import nltk
-from fastapi import FastAPI, HTTPException
+# === 외부 라이브러리 ===
+from fastapi import FastAPI, HTTPException, status, Response
 from pydantic import BaseModel
 from transformers import pipeline
 from konlpy.tag import Okt
 import torch.nn as nn
 import uvicorn
+from transformers import logging as hf_logging
+hf_logging.set_verbosity(hf_logging.ERROR)
 
-# 사용자 정의 모듈
+
+# === 내부 모듈 ===
 from utils.model_loader import load_all_models_and_tokenizers
 from utils.predictor import predict, compute_article_score, calculate_weighted_article_score
 from utils.preprocessor import preprocessing_single_news
 
-
-# === 로깅 설정 ===
+# === 전역 설정 ===
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("score_article")
 
-# === FastAPI 앱 및 글로벌 객체 초기화 ===
-app = FastAPI(title="News AI API")
+model_dict = {}
+summarizer = None
+models_loaded = False
 okt = Okt()
 
-# === 모델 및 요약기 초기화 ===
-try:
-    model_dict = load_all_models_and_tokenizers()
-    summarizer = pipeline("summarization", model="noahkim/KoT5_news_summarization")
-    logger.info("모든 모델과 요약기 로딩 완료")
-except Exception as e:
-    logger.exception("모델 로딩 실패")
-    raise RuntimeError(f"모델 로딩 실패: {str(e)}")
+
+# === FastAPI lifespan 핸들러 ===
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global model_dict, summarizer, models_loaded
+    try:
+        logger.info("💡 모델 서빙을 시작합니다...")
+
+        start_time = time.perf_counter()  # 시작 시간 측정
+
+        model_dict = load_all_models_and_tokenizers()
+        summarizer = pipeline("summarization", model="noahkim/KoT5_news_summarization")
+        models_loaded = True
+
+        duration = time.perf_counter() - start_time  # 경과 시간 계산
+
+        os.makedirs("tmp", exist_ok=True)
+        with open("tmp/models_loaded", "w") as f:
+            f.write("ok")
+
+        logger.info("✅ 모든 모델과 요약기 로딩 완료 (⏱ %.2f초 소요)", duration)
+        yield
+
+    except Exception as e:
+        logger.exception("❌ 모델 로딩 실패")
+        raise RuntimeError(f"모델 로딩 실패: {str(e)}")
+
+
+# === FastAPI 앱 생성 ===
+app = FastAPI(title="News AI API", lifespan=lifespan)
+
 
 # === 요청/응답 스키마 정의 ===
 class ScoreRequest(BaseModel):
@@ -67,10 +95,19 @@ class Article(BaseModel):
 class KeywordRequest(BaseModel):
     articles: List[Article]
 
+
 # === API 엔드포인트 정의 ===
 @app.get("/")
 async def home():
     return {"message": "Welcome to the News AI API!"}
+
+
+@app.get("/health")
+def health_check(response: Response):
+    if not models_loaded:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        return {"status": "unhealthy", "models_loaded": False}
+    return {"status": "healthy", "models_loaded": True}
 
 
 @app.post("/score", response_model=ScoreResponse)
@@ -100,7 +137,7 @@ async def score_article(input_data: ScoreRequest):
                 score = compute_article_score(predict(model, tokenizer, sentence, device))[1]
                 aspect_scores[category].append(score)
 
-        logger.info("카테고리별 점수 리스트: %s", aspect_scores)
+        logger.info("측면 별 점수 리스트: %s", aspect_scores)
 
         # 평균 점수 계산
         average_scores = {
@@ -108,8 +145,10 @@ async def score_article(input_data: ScoreRequest):
             for category, scores in aspect_scores.items()
         }
 
-        # 종합 점수 계산 (가중 평균 방식)
+        # 호/악재 점수 계산 (가중 평균 방식)
         article_score = calculate_weighted_article_score(aspect_scores)
+        logger.info("기사 호/악재 점수: %s", article_score)
+
 
         return ScoreResponse(content=cleaned_content, aspect_scores=average_scores, score=article_score)
 
