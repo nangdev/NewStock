@@ -27,6 +27,11 @@ deploy:
         git checkout $CI_COMMIT_REF_NAME &&
         git pull &&
         
+        # 스크립트 파일 권한 설정
+        chmod +x scripts/start_and_adjust.sh
+        chmod +x scripts/adjust_resources.sh
+        chmod +x scripts/start_services.sh
+        
         # 환경 변수 파일 생성
         # 공통 환경 변수
         echo \"MYSQL_DATABASE=$MYSQL_DATABASE\" > .env &&
@@ -64,8 +69,7 @@ deploy:
           
           # API 서버와 Nginx 재배포
           echo \"dev/service 브랜치: API 서버와 Nginx 배포 중...\"
-          docker-compose build backend nginx
-          docker-compose up -d --no-deps backend nginx
+          ./scripts/start_services.sh backend nginx
           
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/crawl\" ]]; then
           
@@ -85,14 +89,14 @@ deploy:
           
           # 크롤러만 재배포
           echo \"dev/crawl 브랜치: 크롤러 서비스 배포 중...\"
-          docker-compose build crawl
-          docker-compose up -d --no-deps crawl
+          ./scripts/start_services.sh crawl
 
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/ai\" ]]; then
 
           echo \"dev/ai 브랜치: AI 서비스 배포 중...\"
+          docker-compose down ai
           docker-compose build ai
-          docker-compose up -d --no-deps ai
+          ./scripts/start_services.sh ai
           
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/be\" ]]; then
           # 모든 환경 변수 설정
@@ -138,7 +142,7 @@ deploy:
           echo \"dev/be 브랜치: 모든 서비스 배포 중...\"
           docker-compose down
           docker-compose build
-          docker-compose up -d
+          ./scripts/start_services.sh
         fi
       "
   rules:
