@@ -10,7 +10,7 @@ export const useAllStockNewsListQuery = (
   sort: 'score' | 'time',
 ) => {
   return useQuery({
-    queryKey: ['stockNewsList'],
+    queryKey: ['stockNewsList', stockId, page, count, sort],
     queryFn: () => getAllStockNewsList(
       stockId,
       page,

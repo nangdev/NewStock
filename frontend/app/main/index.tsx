@@ -23,7 +23,7 @@ export default function Main() {
   
   useEffect(() => {
     if (!data?.data.stockList) {
-      // router.replace(`/stock/005930`)
+      router.replace(`/stock/1/005930`)
       return;
     }
     setSubscribedStocks(data.data.stockList);
@@ -32,7 +32,7 @@ export default function Main() {
     const client = new Client({
       webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
       // webSocketFactory: () => new WebSocket('ws://10.0.2.2:8080/api/ws'),
-      debug: (msg) => console.log('STOMP:', msg),
+      // debug: (msg) => console.log('STOMP:', msg),
       onConnect: (frame) => {
         // 구독
         subscribedStocks.forEach((stock) => {

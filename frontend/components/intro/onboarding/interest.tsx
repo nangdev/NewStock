@@ -16,7 +16,7 @@ import {
 
 export default function Interest() {
   const [searchText, setSearchText] = useState('');
-  const [myList, setMyList] = useState<number[]>([1]);
+  const [myList, setMyList] = useState<number[]>([0]);
   // Todo: 에러 처리
   const { data, isSuccess, isLoading } = useAllStockListQuery();
   const { mutate: changeUserRoleMutate } = useUserRoleMutation();

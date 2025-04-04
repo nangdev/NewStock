@@ -4,12 +4,14 @@ import StockInfoCard from "components/stock/StockInfoCard";
 import { useStockDetailInfoQuery } from "api/stock/query";
 import { useAllStockNewsListQuery } from "api/news/query";
 import NewsListItem from "components/stock/NewsListItem";
+import SortButton from "components/news/SortButton";
+
 import { useState } from "react";
 
 export default function StockDetail () {
   const { stockId, stockCode } = useLocalSearchParams();
-  const [page, setPage] = useState<number>(1);
-  const [count, setCount] = useState<number>(10);
+  const [page, setPage] = useState<number>(0);
+  const [count, setCount] = useState<number>(6);
   const [sort, setSort] = useState<'score' | 'time'>('score');
 
   const id = Number(Array.isArray(stockId) ? stockId[0] : stockId ?? 1);
@@ -55,7 +57,7 @@ export default function StockDetail () {
       
       <View className="flex-row justify-between items-center px-8 my-8">
         <Text className="text-xl">관련 뉴스</Text>
-        <Text>최신순</Text>
+        <SortButton sort={sort} setSort={setSort} />
       </View>
 
       <View className="bg-white rounded-2xl mx-8 my-2 shadow-md max-h-[400px]">
@@ -71,6 +73,9 @@ export default function StockDetail () {
               hojaeIconUrl={""}
             />
           ))}
+          <View className="flex-1  items-center">
+            <Text>hi</Text>
+          </View>
         </ScrollView>
       </View>
     </View>
