@@ -14,6 +14,11 @@ services:
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - /opt/certs:/certs:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
     
   backend:
     build:
@@ -23,6 +28,7 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_OPTS=-Xms512m -Xmx1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200
     env_file:
       - ./.env
     volumes:
@@ -31,23 +37,44 @@ services:
     depends_on:
       - mysql
       - redis
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2G
   
   selenium-hub:
     image: selenium/hub:4.15.0
     container_name: selenium-hub
     ports:
       - "4444:4444"
+    environment:
+      - GRID_MAX_SESSION=3
+      - GRID_BROWSER_TIMEOUT=180000
+      - GRID_TIMEOUT=180
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   chrome:
     image: selenium/node-chrome:4.15.0
-    shm_size: 2gb
+    shm_size: 1gb
     depends_on:
       - selenium-hub
     environment:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_MAX_SESSIONS=5
+      - SE_NODE_MAX_SESSIONS=2
+      - NODE_MAX_INSTANCES=2
+      - SE_NODE_SESSION_TIMEOUT=180
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
 
   crawl:
     build:
@@ -58,6 +85,9 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=selenium-grid
       - SELENIUM_REMOTE_URL=http://selenium-hub:4444/wd/hub
+      - JAVA_OPTS=-Xms512m -Xmx1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200
+      - CRAWLER_CONCURRENT_WORKERS=2
+      - CRAWLER_RATE_LIMIT=3000
     env_file:
       - ./crawl/.env
     depends_on:
@@ -65,6 +95,11 @@ services:
       - mysql
       - kafka
       - redis
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1.5G
   
   mysql:
     image: mysql:8.0.33
@@ -77,7 +112,13 @@ services:
       - MYSQL_USER=${MYSQL_USERNAME}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_INNODB_BUFFER_POOL_SIZE=256M
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
 
   redis:
     image: redis:7.2.4-alpine
@@ -85,8 +126,13 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 384M
 
   kafka:
     image: confluentinc/cp-kafka:7.4.0
@@ -99,34 +145,53 @@ services:
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_HEAP_OPTS=-Xmx512m -Xms256m
+      - KAFKA_JVM_PERFORMANCE_OPTS=-XX:+UseG1GC -XX:MaxGCPauseMillis=20
     depends_on:
       - zookeeper
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 768M
 
-  
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
       - ZOOKEEPER_TICK_TIME=2000
+      - JVMFLAGS=-Xmx256m -Xms128m
     ports:
       - "2181:2181"
     restart: unless-stopped
-
-
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 384M
+          
   ai:
     build:
       context: ./ai
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: ["/bin/bash", "/scripts/start_and_adjust.sh"]
     environment:
-      - ENVIRONMENT=production
+      - MODEL_BATCH_SIZE=4
+      - WORKERS=1
+      - MAX_CONCURRENT_REQUESTS=4
+      - INITIAL_CPU_LIMIT=3.5
+      - FINAL_CPU_LIMIT=1.5
     restart: unless-stopped
-    depends_on:
-      - mysql
-      - kafka
-
+    deploy:
+      resources:
+        limits:
+          cpus: '3.5'
+          memory: 8G
 
 volumes:
   db-data:
