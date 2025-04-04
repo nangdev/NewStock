@@ -1,20 +1,21 @@
 import { useKakaoLoginMutation } from 'api/auth/query';
 import * as Linking from 'expo-linking';
 import { useEffect } from 'react';
+import { registerForPushNotifications } from 'utils/pushNotification';
 
 export default function useKakaoOAuth() {
   const { mutate } = useKakaoLoginMutation();
 
   useEffect(() => {
-    const handleDeepLink = (event: { url: string }) => {
+    const handleDeepLink = async (event: { url: string }) => {
       const url = event.url;
       const code = new URL(url).searchParams.get('code');
+      const fcmToken = await registerForPushNotifications();
 
       if (code) {
-        // Todo: fcmToken 연동
         mutate({
           code,
-          fcmToken: 'fcmToken123',
+          fcmToken,
         });
       }
     };
