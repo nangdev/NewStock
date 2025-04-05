@@ -1,8 +1,13 @@
 package newstock.domain.user.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import newstock.controller.request.UserRequest;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,6 +19,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE users SET is_activated = false WHERE user_id = ?")
+@Where(clause = "is_activated = true")
+@Table(name = "users")
 public class User {
 
     @Id
@@ -59,6 +67,17 @@ public class User {
                 .email(userRequest.getEmail())
                 .password(encodedPassword)
                 .nickname(userRequest.getNickname())
+                .role((byte) 0)
+                .isActivated(true)
+                .build();
+    }
+
+    public static User ofKakao(Long kakaoId, String email, String nickname) {
+        return User.builder()
+                .kakaoId(kakaoId)
+                .email(email)
+                .nickname(nickname)
+                .socialProvider("kakao")
                 .role((byte) 0)
                 .isActivated(true)
                 .build();

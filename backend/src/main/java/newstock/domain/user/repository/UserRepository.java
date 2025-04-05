@@ -7,27 +7,15 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer>, UserCustomRepository  {
 
-    /**
-     * 이메일을 기반으로 사용자 조회
-     *
-     * @param email 사용자의 이메일
-     * @return 이메일이 일치하는 사용자 (Optional<User>)
-     */
+    // 이메일로 전체 사용자 조회
     Optional<User> findByEmail(String email);
 
-    /**
-     * 이메일 중복 체크
-     *
-     * @param email 중복 확인할 이메일
-     * @return 이메일이 존재하면 true, 없으면 false
-     */
-    boolean existsByEmail(String email);
+    // 이메일로 활성화된 사용자 조회
+    Optional<User> findByEmailAndIsActivatedTrue(String email);
 
-    /**
-     * 카카오 ID를 기반으로 사용자 조회
-     *
-     * @param kakaoId 카카오 사용자 고유 ID
-     * @return 카카오 ID가 일치하는 사용자 (Optional<User>)
-     */
-    Optional<User> findByKakaoId(Long kakaoId);
+    // 카카오 ID로 활성화된 사용자 조회
+    Optional<User> findByKakaoIdAndIsActivatedTrue(Long kakaoId);
+
+    // 활성화된 이메일이 존재하는지 여부
+    boolean existsByEmailAndIsActivatedTrue(String email);
 }
