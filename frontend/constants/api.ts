@@ -19,7 +19,7 @@ export const API_PATH = {
   USER: {
     INFO: DOMAIN.USER,
     CHECK_EMAIL: `${DOMAIN.USER}/check-email`,
-    SIGN_IN: DOMAIN.USER,
+    SIGN_UP: DOMAIN.USER,
     WITHDRAW: DOMAIN.USER,
     NEW: `${DOMAIN.USER}/new`,
   },

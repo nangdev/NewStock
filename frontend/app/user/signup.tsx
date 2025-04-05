@@ -1,5 +1,5 @@
 import { AntDesign } from '@expo/vector-icons';
-import { useCheckEmailMutation, useSignInMutation } from 'api/user/query';
+import { useCheckEmailMutation, useSignUpMutation } from 'api/user/query';
 import BlurOverlay from 'components/BlurOverlay';
 import CustomButton from 'components/CustomButton';
 import InputField from 'components/user/InputField';
@@ -18,7 +18,7 @@ export default function SignUp() {
   const [nickname, setNickname] = useState('');
   const [errorField, setErrorField] = useState<string | null>(null);
 
-  const { mutate: signInMutate } = useSignInMutation();
+  const { mutate: signUpMutate } = useSignUpMutation();
   const { mutate: checkEmailMutate, isSuccess, data } = useCheckEmailMutation();
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function SignUp() {
 
   const onSubmitSignUp = (): void => {
     if (!validateInputs()) return;
-    signInMutate({ email, password, nickname });
+    signUpMutate({ email, password, nickname });
   };
 
   return (

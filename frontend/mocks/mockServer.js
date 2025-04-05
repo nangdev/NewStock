@@ -47,7 +47,7 @@ export function makeServer({ environment = 'development' } = {}) {
       });
 
       // Memo: 회원가입
-      this.post(`${API_BASE_URL}/${API_PATH.USER.SIGN_IN}`, () => {
+      this.post(`${API_BASE_URL}/${API_PATH.USER.SIGN_UP}`, () => {
         return {};
       });
 

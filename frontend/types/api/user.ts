@@ -2,13 +2,13 @@ import { UserInfoType } from 'types/user';
 
 import { BaseResType } from './base';
 
-export type SignInReqType = {
+export type SignUpReqType = {
   email: string;
   password: string;
   nickname: string;
 };
 
-export type SignInResType = BaseResType;
+export type SignUpResType = BaseResType;
 
 export type EmailCheckReqType = {
   email: string;

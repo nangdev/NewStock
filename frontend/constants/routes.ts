@@ -9,4 +9,6 @@ export const ROUTE = {
     LOGIN: '/user/login',
     OAUTH: '/user/kakaoLogin',
   },
+  MYPAGE: '/mypage',
+  SET_INTEREST: '/mypage/setInterest',
 };

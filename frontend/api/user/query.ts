@@ -3,16 +3,15 @@ import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 import useUserStore from 'store/user';
 
-import { getCheckEmail, getUserInfo, postSignIn, putUserRole } from '.';
+import { getCheckEmail, getUserInfo, postSignUp, putUserRole } from '.';
 
-export const useSignInMutation = () => {
+export const useSignUpMutation = () => {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: postSignIn,
-    onSuccess: (data) => {
+    mutationFn: postSignUp,
+    onSuccess: () => {
       console.log('회원가입 성공');
-      console.log(data.message);
       router.navigate(ROUTE.USER.LOGIN);
     },
     onError: (error) => {

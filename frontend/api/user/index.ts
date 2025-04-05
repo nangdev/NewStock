@@ -2,15 +2,15 @@ import { API_PATH } from 'constants/api';
 import {
   EmailCheckReqType,
   EmailCheckResType,
-  SignInReqType,
-  SignInResType,
+  SignUpReqType,
+  SignUpResType,
   UserInfoResType,
 } from 'types/api/user';
 
 import { api } from '../axiosInstance';
 
-export const postSignIn = async ({ email, password, nickname }: SignInReqType) => {
-  const response = await api.post<SignInResType>(API_PATH.USER.SIGN_IN, {
+export const postSignUp = async ({ email, password, nickname }: SignUpReqType) => {
+  const response = await api.post<SignUpResType>(API_PATH.USER.SIGN_UP, {
     email,
     password,
     nickname,
