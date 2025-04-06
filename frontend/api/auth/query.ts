@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useUserInfoMutation } from 'api/user/query';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
+import useUserStore from 'store/user';
 import { removeToken, setToken } from 'utils/token';
 
 import { postKakaoLogin, postLogin, postLogout } from '.';
@@ -48,12 +49,14 @@ export const useKakaoLoginMutation = () => {
 
 export const useLogoutMutation = () => {
   const router = useRouter();
+  const { reset } = useUserStore();
 
   return useMutation({
     mutationFn: postLogout,
     onSuccess: async () => {
       await removeToken('accessToken');
       await removeToken('refreshToken');
+      reset();
 
       router.navigate(ROUTE.INTRO.INTRO);
     },

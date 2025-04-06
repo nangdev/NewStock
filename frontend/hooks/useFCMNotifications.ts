@@ -69,11 +69,11 @@ export default function useFCMNotifications() {
     switch (data.type) {
       case 'NEWS':
         if (data.newsId) {
-          router.push(`/news/${data.newsId}`);
+          router.navigate(`/news/${data.newsId}`);
         }
         break;
       case 'NEWS_LETTER':
-        router.push('/newsletter');
+        router.navigate('/newsletter');
         break;
       default:
         Toast.show({

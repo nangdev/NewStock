@@ -1,9 +1,17 @@
 import { useMutation } from '@tanstack/react-query';
+import { useLogoutMutation } from 'api/auth/query';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 import useUserStore from 'store/user';
 
-import { getCheckEmail, getUserInfo, postSignUp, putUserRole } from '.';
+import {
+  deleteUser,
+  getCheckEmail,
+  getUserInfo,
+  postSignUp,
+  putUserNickname,
+  putUserRole,
+} from '.';
 
 export const useSignUpMutation = () => {
   const router = useRouter();
@@ -65,6 +73,43 @@ export const useUserRoleMutation = () => {
     mutationFn: putUserRole,
     onSuccess: () => {
       console.log('유저 권한 변경 성공');
+    },
+    onError: (error) => {
+      // Todo: 에러 처리
+      console.error(error);
+    },
+  });
+};
+
+export const useUserNicknameMutation = () => {
+  const { setUserInfo, userInfo } = useUserStore();
+
+  return useMutation({
+    mutationFn: putUserNickname,
+    onSuccess: (data) => {
+      console.log('유저 닉네임 변경 성공');
+      setUserInfo({
+        userId: userInfo!.userId,
+        email: userInfo!.email,
+        role: userInfo!.role,
+        nickname: data.data.nickname,
+      });
+    },
+    onError: (error) => {
+      // Todo: 에러 처리
+      console.error(error);
+    },
+  });
+};
+
+export const useUserDeleteMutation = () => {
+  const { mutate } = useLogoutMutation();
+
+  return useMutation({
+    mutationFn: deleteUser,
+    onSuccess: () => {
+      console.log('회원 탈퇴 성공');
+      mutate();
     },
     onError: (error) => {
       // Todo: 에러 처리

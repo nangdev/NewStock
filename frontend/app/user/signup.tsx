@@ -133,7 +133,7 @@ export default function SignUp() {
           회원가입
         </CustomButton>
 
-        <Link className="self-end text-sm text-text_gray underline" href={ROUTE.USER.LOGIN}>
+        <Link className="self-end py-2 text-sm text-text_gray underline" href={ROUTE.USER.LOGIN}>
           이미 회원이신가요? 로그인하기
         </Link>
       </BlurOverlay>

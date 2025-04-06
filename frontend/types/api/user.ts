@@ -23,3 +23,13 @@ export type EmailCheckResType = BaseResType & {
 export type UserInfoResType = BaseResType & {
   data: UserInfoType;
 };
+
+export type UserNicknameReqType = {
+  nickname: string;
+};
+
+export type UserNicknameResType = BaseResType & {
+  data: {
+    nickname: string;
+  };
+};

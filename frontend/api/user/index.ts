@@ -5,6 +5,8 @@ import {
   SignUpReqType,
   SignUpResType,
   UserInfoResType,
+  UserNicknameReqType,
+  UserNicknameResType,
 } from 'types/api/user';
 
 import { api } from '../axiosInstance';
@@ -32,5 +34,15 @@ export const getUserInfo = async () => {
 
 export const putUserRole = async () => {
   const response = await api.put(API_PATH.USER.NEW);
+  return response.data;
+};
+
+export const putUserNickname = async ({ nickname }: UserNicknameReqType) => {
+  const response = await api.put<UserNicknameResType>(API_PATH.USER.NICKNAME, { nickname });
+  return response.data;
+};
+
+export const deleteUser = async () => {
+  const response = await api.delete(API_PATH.USER.WITHDRAW);
   return response.data;
 };
