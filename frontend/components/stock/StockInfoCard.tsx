@@ -55,13 +55,14 @@ export default function StockInfoCard ({
 
       <View className="flex-row  p-4">
         <View className="flex-1">
-          <InfoRow label="시가총액" content={totalPrice} />
-          <InfoRow label="발행주식수" content={issuedNum} />
-          <InfoRow label="상장일" content={listingDate} />
+          <InfoRow label="시가총액" content={`${totalPrice.toLocaleString()}억`} />
+          <InfoRow label="발행주식수" content={`${issuedNum.toLocaleString()}`} />
+          <InfoRow label="상장일" content={toFormattedDate(listingDate)} />
+          
         </View>
         <View className="flex-1">
-          <InfoRow label="자본금" content={capital} />
-          <InfoRow label="액면가" content={parValue === 0 ? '-' : parValue} />
+          <InfoRow label="자본금" content={`${toFormattedWon(capital)}억`} />
+          {/* <InfoRow label="액면가" content={parValue === 0 ? '-' : parValue} /> */}
           <InfoRow label="분류" content={industry} />
         </View>
       </View>
@@ -78,7 +79,7 @@ type Item = {
 }
 
 const InfoRow = ({label, content}: Item) => {
-  content = typeof content === 'number' ? content.toLocaleString() : content;
+  // content = typeof content === 'number' ? content.toLocaleString() : content;
   return (
     <View className="flex-row border-b border-gray-200 justify-between py-2 mx-2">
       <Text className="text-xs">{label}</Text>
@@ -86,3 +87,12 @@ const InfoRow = ({label, content}: Item) => {
     </View>
   );
 };
+
+const toFormattedDate = (date: string) => {
+  return `${date.substring(0, 4)}년 ${Number(date.substring(4, 6))}월 ${Number(date.substring(6, 8))}일`;
+}
+
+const toFormattedWon = (won: number) => {
+  // const num = Number(won);
+  return Math.floor(won / 100000000).toLocaleString();
+}

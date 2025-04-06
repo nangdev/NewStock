@@ -8,7 +8,7 @@ import SortButton from "components/news/SortButton";
 import { useState, useEffect } from "react";
 import stompService from "utils/stompService";
 import { IMessage } from "@stomp/stompjs";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Entypo } from "@expo/vector-icons";
 
 type News = {
   newsId: string;
@@ -71,7 +71,7 @@ export default function StockDetail () {
 
   return (
     <View className="">
-      <Text>stock detail page {id} {code}</Text>
+      {/* <Text>stock detail page {id} {code}</Text> */}
       <View className="mt-16">
         <StockInfoCard 
           stockId={id}
@@ -94,7 +94,7 @@ export default function StockDetail () {
         <SortButton sort={sort} setSort={setSort} />
       </View>
 
-      <View className="bg-white rounded-2xl mx-8 my-2 shadow-md max-h-[400px] pt-2">
+      <View className="bg-white rounded-2xl mx-8 my-2 shadow-md h-[400px] pt-2">
         <ScrollView>
           {newsListData?.data.newsList.map((news) => (
             <NewsListItem
@@ -107,12 +107,22 @@ export default function StockDetail () {
               hojaeIconUrl={""}
             />
           ))}
-          <View className="flex-row justify-center items-center mt-4 mb-2">
-            <AntDesign name='left' onPress={onPressLeft}/>
-            <Text className="mx-2">{page+1}</Text>
-            <AntDesign name='right' onPress={onPressRight}/>
-          </View>
         </ScrollView>
+        <View className="flex-row justify-center items-center mt-4 mb-2">
+          {
+            page > 0
+            ? <Entypo name="triangle-left" onPress={onPressLeft} size={18}/>
+            : <Entypo name="triangle-left" size={18} color={'transparent'}/>
+          }
+          
+          {
+            newsListData && page < newsListData?.data.totalPage-1
+            ? <Entypo name="triangle-right" onPress={onPressRight} size={18}/>
+            : <Entypo name="triangle-right" size={18} color={'transparent'}/>
+          }
+          
+          
+        </View>
       </View>
     </View>
   );

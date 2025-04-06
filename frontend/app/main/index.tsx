@@ -55,6 +55,7 @@ export default function Main() {
 
     return () => {
       stompService.unsubscribeAll();
+      // stompService.disconnect();
     }
   }, [data]);
 

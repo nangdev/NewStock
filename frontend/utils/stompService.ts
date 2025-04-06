@@ -12,8 +12,8 @@ class StompService {
     if (this.client && this.isConnected) return;
 
     this.client = new Client({
-      webSocketFactory: () => new WebSocket('ws://10.0.2.2:8080/api/ws'),
-      // debug: (msg) => console.log('STOMP:', msg),
+      webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
+      debug: (msg) => console.log('STOMP:', msg),
       onConnect: (frame) => {
         this.isConnected = true;
       },
