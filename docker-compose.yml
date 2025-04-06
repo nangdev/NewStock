@@ -60,21 +60,24 @@ services:
 
   chrome:
     image: selenium/node-chrome:4.15.0
-    shm_size: 1gb
+    shm_size: 3gb
     depends_on:
       - selenium-hub
     environment:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_MAX_SESSIONS=2
-      - NODE_MAX_INSTANCES=2
-      - SE_NODE_SESSION_TIMEOUT=180
+      - SE_NODE_MAX_SESSIONS=1
+      - NODE_MAX_INSTANCES=1
+      - SE_NODE_SESSION_TIMEOUT=300
+      - SE_NODE_GRID_URL=http://selenium-hub:4444
+      - SE_OPTS=--log-level FINE
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 1G
+          cpus: '1.5'
+          memory: 3G
+    restart: always
 
   crawl:
     build:
