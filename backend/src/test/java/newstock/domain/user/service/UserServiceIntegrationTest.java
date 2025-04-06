@@ -41,29 +41,29 @@ class UserServiceIntegrationTest {
     @Test
     void 회원가입_로그인_탈퇴_재가입_테스트() {
         userService.addUser(testUser);
-        assertThat(userRepository.existsByEmailAndIsActivatedTrue(testUser.getEmail())).isTrue();
-        log.info("✅ 회원가입 완료: email: {}", testUser.getEmail());
+        assertThat(userRepository.existsByEmailAndActivatedTrue(testUser.getEmail())).isTrue();
+        log.info("회원가입 완료: email: {}", testUser.getEmail());
 
         LoginRequest loginRequest = new LoginRequest(testUser.getEmail(), testUser.getPassword(), null);
         var loginResponse = authService.login(loginRequest);
         assertThat(loginResponse.getAccessToken()).isNotNull();
-        log.info("✅ 로그인 완료: accessToken={}", loginResponse.getAccessToken());
+        log.info("로그인 완료: accessToken={}", loginResponse.getAccessToken());
 
-        Integer userId = userRepository.findByEmailAndIsActivatedTrue(testUser.getEmail()).get().getUserId();
+        Integer userId = userRepository.findByEmailAndActivatedTrue(testUser.getEmail()).get().getUserId();
         userService.deleteUser(userId, loginResponse.getAccessToken());
-        log.info("✅ 회원 탈퇴 완료: userId={}", userId);
+        log.info("회원 탈퇴 완료: userId={}", userId);
 
         assertThatThrownBy(() -> authService.login(loginRequest))
                 .isInstanceOf(ValidationException.class);
-        log.info("✅ 탈퇴 유저 로그인 시도 → 예외 발생 확인");
+        log.info("탈퇴 유저 로그인 시도 → 예외 발생 확인");
 
         userService.addUser(testUser);
-        assertThat(userRepository.existsByEmailAndIsActivatedTrue(testUser.getEmail())).isTrue();
-        log.info("✅ 재가입 완료: {}", testUser.getEmail());
+        assertThat(userRepository.existsByEmailAndActivatedTrue(testUser.getEmail())).isTrue();
+        log.info("재가입 완료: {}", testUser.getEmail());
 
         var reLoginResponse = authService.login(loginRequest);
         assertThat(reLoginResponse.getAccessToken()).isNotNull();
-        log.info("✅ 재로그인 완료: accessToken={}", reLoginResponse.getAccessToken());
+        log.info("재로그인 완료: accessToken={}", reLoginResponse.getAccessToken());
     }
 }
 

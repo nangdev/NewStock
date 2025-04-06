@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByEmailAndIsActivatedTrue(request.getEmail())
+        User user = userRepository.findByEmailAndActivatedTrue(request.getEmail())
                 .orElseThrow(() -> new ValidationException(ExceptionCode.VALIDATION_ERROR));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -76,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void clearFcmToken(Integer userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserIdAndActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         user.setFcmToken(null);
@@ -91,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse reissueToken(String refreshToken, String fcmToken) {
         Integer userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserIdAndActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         if (!refreshToken.equals(user.getRefreshToken())) {
@@ -127,7 +127,7 @@ public class AuthServiceImpl implements AuthService {
         String email = userInfo.getKakaoAccount().getEmail();
         String nickname = userInfo.getKakaoAccount().getProfile().getNickname();
 
-        User user = userRepository.findByKakaoIdAndIsActivatedTrue(kakaoId)
+        User user = userRepository.findByKakaoIdAndActivatedTrue(kakaoId)
                 .orElseGet(() -> addNewKakaoUser(kakaoId, email, nickname)); // 없으면 회원가입
 
         CustomUserDetails userDetails = new CustomUserDetails(user);

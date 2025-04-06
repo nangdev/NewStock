@@ -43,8 +43,8 @@ public class AuthController {
 
         log.info("로그아웃 요청 - userId: {}", userId);
 
-        String token = bearerToken.replace("Bearer ", "");
-        authService.logout(userId, token);
+        String accessToken = bearerToken.replace("Bearer ", "");
+        authService.logout(userId, accessToken);
 
         return ResponseEntity.ok(Api.ok());
     }

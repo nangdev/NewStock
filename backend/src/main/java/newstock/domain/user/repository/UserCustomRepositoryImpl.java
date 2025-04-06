@@ -25,7 +25,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 jpaQueryFactory
                         .selectFrom(user)
                         .where(user.userId.eq(userId),
-                                user.isActivated.isTrue())
+                                user.activated.isTrue())
                         .fetchOne()
         );
     }
