@@ -13,7 +13,7 @@ class StompService {
 
     this.client = new Client({
       webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
-      debug: (msg) => console.log('STOMP:', msg),
+      // debug: (msg) => console.log('STOMP:', msg),
       onConnect: (frame) => {
         this.isConnected = true;
       },
@@ -28,7 +28,7 @@ class StompService {
   public subscribe(topic: string, onMessage: MessageCallback) {
     if (!this.client || !this.isConnected) return;
     if (this.subscriptions.has(topic)) return;
-    console.log(`subscribe >> ${topic}`)
+    // console.log(`subscribe >> ${topic}`)
     const sub = this.client.subscribe(`${this.prefix}/${topic}`, onMessage);
     this.subscriptions.set(topic, sub);
   }
@@ -36,7 +36,7 @@ class StompService {
   public unsubscribe(topic: string) {
     if (!this.client || !this.isConnected) return;
     if (!this.subscriptions.has(topic)) return;
-    console.log(`unsubscribe >> ${topic}`)
+    // console.log(`unsubscribe >> ${topic}`)
     const unsub = this.client.unsubscribe(`${this.prefix}/${topic}/`);
     this.subscriptions.delete(topic);
   }
@@ -47,7 +47,7 @@ class StompService {
     for (const topic of this.subscriptions.keys()) {
       this.unsubscribe(topic);
     }
-    console.log(`unsubscribe all topics`)
+    // console.log(`unsubscribe all topics`)
     this.subscriptions.clear();
   }
   
