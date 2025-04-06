@@ -23,7 +23,6 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - JAVA_OPTS=-Xms512m -Xmx1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200
     env_file:
       - ./.env
     volumes:
@@ -39,7 +38,7 @@ services:
     ports:
       - "4444:4444"
     environment:
-      - GRID_MAX_SESSION=3
+      - GRID_MAX_SESSION=4
       - GRID_BROWSER_TIMEOUT=180000
       - GRID_TIMEOUT=180
 
@@ -52,9 +51,6 @@ services:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_MAX_SESSIONS=1
-      - NODE_MAX_INSTANCES=1
-      - SE_NODE_SESSION_TIMEOUT=600
       - SE_NODE_GRID_URL=http://selenium-hub:4444
       - SE_OPTS=--log-level FINE
     restart: always
@@ -68,15 +64,6 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=selenium-grid
       - SELENIUM_REMOTE_URL=http://selenium-hub:4444/wd/hub
-      - JAVA_OPTS=-Xms1g -Xmx2g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError
-      - CRAWLER_CONCURRENT_WORKERS=1
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_SESSION_TIMEOUT_MS=60000
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_HEARTBEAT_INTERVAL_MS=20000
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_MAX_POLL_INTERVAL_MS=600000
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_MAX_POLL_RECORDS=10
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_RECONNECT_BACKOFF_MS=5000
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_RECONNECT_BACKOFF_MAX_MS=30000
-      - CRAWLER_RATE_LIMIT=5000
     env_file:
       - ./crawl/.env
     depends_on:
@@ -119,15 +106,6 @@ services:
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - KAFKA_HEAP_OPTS=-Xmx1g -Xms512m
-      - KAFKA_JVM_PERFORMANCE_OPTS=-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:+ExplicitGCInvokesConcurrent
-      - KAFKA_NUM_NETWORK_THREADS=6
-      - KAFKA_NUM_IO_THREADS=8
-      - KAFKA_SOCKET_SEND_BUFFER_BYTES=1048576
-      - KAFKA_SOCKET_RECEIVE_BUFFER_BYTES=1048576
-      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=5000
-      - KAFKA_CONNECTIONS_MAX_IDLE_MS=600000
     depends_on:
       - zookeeper
     restart: unless-stopped
@@ -138,8 +116,6 @@ services:
     image: confluentinc/cp-zookeeper:7.4.0
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
-      - ZOOKEEPER_TICK_TIME=2000
-      - JVMFLAGS=-Xmx512m -Xms256m
     ports:
       - "2181:2181"
     restart: unless-stopped
@@ -155,10 +131,6 @@ services:
     volumes:
       - ./scripts:/scripts
     entrypoint: ["/bin/bash", "/scripts/start_and_adjust.sh"]
-    environment:
-      - MODEL_BATCH_SIZE=4
-      - WORKERS=1
-      - MAX_CONCURRENT_REQUESTS=4
     restart: unless-stopped
 
 volumes:
