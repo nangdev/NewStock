@@ -64,6 +64,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=selenium-grid
       - SELENIUM_REMOTE_URL=http://selenium-hub:4444/wd/hub
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     env_file:
       - ./crawl/.env
     depends_on:
