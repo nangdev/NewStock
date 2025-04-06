@@ -91,4 +91,19 @@ public class UserController {
         return ResponseEntity.ok(Api.ok());
     }
 
+    /**
+     * 회원 탈퇴
+     */
+    @DeleteMapping("")
+    public ResponseEntity<Api<Void>> deleteUser(
+            @AuthenticationPrincipal Integer userId,
+            @RequestHeader("Authorization") String bearerToken) {
+
+        log.info("탈퇴 요청 - userId: {}", userId);
+
+        String accessToken = bearerToken.replace("Bearer ", "");
+        userService.deleteUser(userId, accessToken);
+
+        return ResponseEntity.ok(Api.ok());
+    }
 }

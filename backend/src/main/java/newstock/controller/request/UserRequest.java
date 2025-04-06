@@ -5,9 +5,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class UserRequest {
 
     @NotBlank(message = "이메일 주소를 입력해주세요.")
@@ -21,6 +23,7 @@ public class UserRequest {
             regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$",
             message = "비밀번호는 최소 1개의 숫자, 1개의 특수문자를 포함해야 합니다."
     )
+
     @Schema(description = "비밀번호 (숫자+문자+특수문자 포함)", example = "Ssafy123!")
     private String password;
 

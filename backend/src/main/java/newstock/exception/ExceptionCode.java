@@ -20,7 +20,7 @@ public enum ExceptionCode {
     EMAIL_SEND_FAILED("이메일 전송에 실패했습니다.", 2006, HttpStatus.INTERNAL_SERVER_ERROR),
     EMAIL_NOT_VERIFIED("이메일 인증이 필요합니다.", 2007, HttpStatus.BAD_REQUEST),
     EMAIL_ALREADY_VERIFIED("이미 인증된 이메일입니다.", 2008, HttpStatus.BAD_REQUEST),
-
+    USER_ALREADY_DELETED("이미 탈퇴한 회원입니다.", 2009, HttpStatus.BAD_REQUEST),
 
     // Repository에서 데이터베이스 조작시 발생할 수 있는 예외 작성
     DATABASE_ERROR("데이터베이스 조작 과정에서 예외가 발생했습니다.", 3001,HttpStatus.INTERNAL_SERVER_ERROR),

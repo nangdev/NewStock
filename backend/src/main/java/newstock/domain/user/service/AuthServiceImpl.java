@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmailAndIsActivatedTrue(request.getEmail())
                 .orElseThrow(() -> new ValidationException(ExceptionCode.VALIDATION_ERROR));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -127,7 +127,7 @@ public class AuthServiceImpl implements AuthService {
         String email = userInfo.getKakaoAccount().getEmail();
         String nickname = userInfo.getKakaoAccount().getProfile().getNickname();
 
-        User user = userRepository.findByKakaoId(kakaoId)
+        User user = userRepository.findByKakaoIdAndIsActivatedTrue(kakaoId)
                 .orElseGet(() -> addNewKakaoUser(kakaoId, email, nickname)); // 없으면 회원가입
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
@@ -150,13 +150,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private User addNewKakaoUser(Long kakaoId, String email, String nickname) {
-        User user = User.builder()
-                .kakaoId(kakaoId)
-                .email(email)
-                .nickname(nickname)
-                .socialProvider("kakao")
-                .role((byte) 0)
-                .build();
+        User user = User.ofKakao(kakaoId, email, nickname);
 
         return userRepository.save(user);
     }

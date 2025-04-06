@@ -12,4 +12,6 @@ public interface UserService {
     void updateUserRole(Integer userId);
 
     UserResponse getUserInfo(Integer userId);
+
+    void deleteUser(Integer userId, String accessToken);
 }
