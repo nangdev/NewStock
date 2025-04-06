@@ -12,6 +12,7 @@ const DOMAIN = {
   AUTH: 'auth',
   STOCK: 'stock',
   NEWS: 'news',
+  NOTIFICATION: 'notification',
 };
 
 /** Memo: API 명세서 도메인 및 endpoint 구조 적용 */
@@ -22,6 +23,7 @@ export const API_PATH = {
     SIGN_UP: DOMAIN.USER,
     WITHDRAW: DOMAIN.USER,
     NEW: `${DOMAIN.USER}/new`,
+    NICKNAME: `${DOMAIN.USER}/nickname`,
   },
   AUTH: {
     SOCIAL: `${DOMAIN.AUTH}/oauth/kakao/login`,
@@ -43,5 +45,10 @@ export const API_PATH = {
     SCRAP: `${DOMAIN.NEWS}/scrap`,
     SCRAP_ADD: `${DOMAIN.NEWS}/scrap`,
     SCRAP_DELETE: `${DOMAIN.NEWS}/scrap`,
+  },
+  NOTIFICATION: {
+    ALL: `${DOMAIN.NOTIFICATION}`,
+    DELETE: `${DOMAIN.NOTIFICATION}`,
+    READ: `${DOMAIN.NOTIFICATION}`,
   },
 };

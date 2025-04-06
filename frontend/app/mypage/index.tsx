@@ -1,18 +1,19 @@
 import { FontAwesome, MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { useLogoutMutation } from 'api/auth/query';
+import { useUserDeleteMutation } from 'api/user/query';
 import BlurOverlay from 'components/BlurOverlay';
-import CustomHeader from 'components/Header';
+import CustomHeader from 'components/Header/Header';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 import { View, Text, TouchableOpacity } from 'react-native';
-import Toast from 'react-native-toast-message';
 import useUserStore from 'store/user';
 
 export default function MyPage() {
   const router = useRouter();
   const userStore = useUserStore();
 
-  const { mutate } = useLogoutMutation();
+  const { mutate: logoutMutate } = useLogoutMutation();
+  const { mutate: userDeleteMutate } = useUserDeleteMutation();
 
   const menuItems = [
     {
@@ -25,18 +26,14 @@ export default function MyPage() {
     {
       label: '로그아웃',
       onPressItem: () => {
-        mutate();
+        logoutMutate();
       },
       icon: <MaterialIcons name="logout" size={24} color="#724EDB" />,
     },
     {
       label: '회원탈퇴',
       onPressItem: () => {
-        console.log('');
-        Toast.show({
-          type: 'info',
-          text1: '미구현 기능입니다',
-        });
+        userDeleteMutate();
       },
       icon: <AntDesign name="deleteuser" size={24} color="#724EDB" />,
     },
