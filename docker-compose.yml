@@ -136,5 +136,3 @@ services:
 volumes:
   db-data:
   redis-data:
-  kafka-data:
-  zookeeper-data:
