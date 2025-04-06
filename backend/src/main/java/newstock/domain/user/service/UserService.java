@@ -14,4 +14,6 @@ public interface UserService {
     UserResponse getUserInfo(Integer userId);
 
     void deleteUser(Integer userId, String accessToken);
+
+    UserResponse updateNickname(Integer userId, String newNickname);
 }

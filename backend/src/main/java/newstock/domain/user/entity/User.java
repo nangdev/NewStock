@@ -51,7 +51,7 @@ public class User {
     private Byte role; // 유저 권한 0이면 NEW(신규 회원), 1이면 USER(기존 유저)
 
     @Column(nullable = false)
-    private boolean isActivated;
+    private boolean activated;
 
     @CreatedDate
     @Column(updatable = false)
@@ -66,7 +66,7 @@ public class User {
                 .password(encodedPassword)
                 .nickname(userRequest.getNickname())
                 .role((byte) 0)
-                .isActivated(true)
+                .activated(true)
                 .build();
     }
 
@@ -77,13 +77,13 @@ public class User {
                 .nickname(nickname)
                 .socialProvider("kakao")
                 .role((byte) 0)
-                .isActivated(true)
+                .activated(true)
                 .build();
     }
 
     public void reactivate(UserRequest request, String encodedPassword) {
         this.password = encodedPassword;
         this.nickname = request.getNickname();
-        this.isActivated = true;
+        this.activated = true;
     }
 }

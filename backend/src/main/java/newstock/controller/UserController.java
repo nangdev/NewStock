@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import newstock.common.dto.Api;
 import newstock.controller.request.EmailRequest;
 import newstock.controller.request.EmailVerifyRequest;
+import newstock.controller.request.NicknameUpdateRequest;
 import newstock.controller.request.UserRequest;
 import newstock.controller.response.EmailCheckResponse;
 import newstock.controller.response.UserResponse;
@@ -89,6 +90,19 @@ public class UserController {
         emailVerificationService.verifyAuthCode(request.getEmail(), request.getAuthCode());
 
         return ResponseEntity.ok(Api.ok());
+    }
+
+    /**
+     * 닉네임 변경
+     */
+    @PutMapping("/nickname")
+    public ResponseEntity<Api<UserResponse>> updateNickname(
+            @AuthenticationPrincipal Integer userId,
+            @Valid @RequestBody NicknameUpdateRequest request) {
+        log.info("닉네임 변경 요청 - userId: {}", userId);
+        UserResponse response = userService.updateNickname(userId, request.getNickname());
+
+        return ResponseEntity.ok(Api.ok(response));
     }
 
     /**

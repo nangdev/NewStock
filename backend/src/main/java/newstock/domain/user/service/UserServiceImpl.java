@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
     // 이메일 중복 체크
     @Override
     public boolean existsByEmail(String email) {
-        boolean exists = userRepository.existsByEmailAndIsActivatedTrue(email);
+        boolean exists = userRepository.existsByEmailAndActivatedTrue(email);
         log.debug("이메일 중복 확인 - 이메일: {}, 존재 여부: {}", email, exists);
 
         return exists;
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUserRole(Integer userId) {
-        User user = userRepository.findByUserIdAndIsActivatedTrue(userId)
+        User user = userRepository.findByUserIdAndActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         if (user.getRole() != 0) {
@@ -89,16 +89,34 @@ public class UserServiceImpl implements UserService {
     // 유저 정보 조회
     @Override
     public UserResponse getUserInfo(Integer userId) {
-        User user = userRepository.findByUserIdAndIsActivatedTrue(userId)
+        User user = userRepository.findByUserIdAndActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         return UserResponse.of(user);
     }
 
+    // 닉네임 변경
+    @Override
+    public UserResponse updateNickname(Integer userId, String newNickname)
+    {
+        User user = userRepository.findByUserIdAndActivatedTrue(userId)
+                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
+
+        if (user.getNickname().equals(newNickname)) {
+            throw new ValidationException(ExceptionCode.SAME_NICKNAME_NOT_ALLOWED);
+        }
+        user.setNickname(newNickname);
+        userRepository.save(user);
+        log.info("닉네임 변경 완료 - userId: {}, nickname: {}", userId, newNickname);
+
+        return UserResponse.of(user);
+    }
+
+
     // 회원 탈퇴
     @Override
     public void deleteUser(Integer userId, String accessToken) {
-        User user = userRepository.findByUserIdAndIsActivatedTrue(userId)
+        User user = userRepository.findByUserIdAndActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         if (!user.isActivated()) {

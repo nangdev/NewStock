@@ -11,14 +11,14 @@ public interface UserRepository extends JpaRepository<User, Integer>, UserCustom
     Optional<User> findByEmail(String email);
 
     // 아이디로 활성화된 사용자 조회
-    Optional<User> findByUserIdAndIsActivatedTrue(Integer userId);
+    Optional<User> findByUserIdAndActivatedTrue(Integer userId);
 
     // 이메일로 활성화된 사용자 조회
-    Optional<User> findByEmailAndIsActivatedTrue(String email);
+    Optional<User> findByEmailAndActivatedTrue(String email);
 
     // 카카오 ID로 활성화된 사용자 조회
-    Optional<User> findByKakaoIdAndIsActivatedTrue(Long kakaoId);
+    Optional<User> findByKakaoIdAndActivatedTrue(Long kakaoId);
 
     // 활성화된 이메일이 존재하는지 여부
-    boolean existsByEmailAndIsActivatedTrue(String email);
+    boolean existsByEmailAndActivatedTrue(String email);
 }
