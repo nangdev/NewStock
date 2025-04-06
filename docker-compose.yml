@@ -110,8 +110,6 @@ services:
     depends_on:
       - zookeeper
     restart: unless-stopped
-    volumes:
-      - kafka-data:/var/lib/kafka/data
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -120,8 +118,6 @@ services:
     ports:
       - "2181:2181"
     restart: unless-stopped
-    volumes:
-      - zookeeper-data:/var/lib/zookeeper
 
   ai:
     build:
