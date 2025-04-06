@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import newstock.controller.request.UserRequest;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,7 +19,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE users SET is_activated = false WHERE user_id = ?")
-@Where(clause = "is_activated = true")
 @Table(name = "users")
 public class User {
 
@@ -81,5 +79,11 @@ public class User {
                 .role((byte) 0)
                 .isActivated(true)
                 .build();
+    }
+
+    public void reactivate(UserRequest request, String encodedPassword) {
+        this.password = encodedPassword;
+        this.nickname = request.getNickname();
+        this.isActivated = true;
     }
 }

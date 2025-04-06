@@ -30,74 +30,37 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void addUser(UserRequest userRequest) {
-        Optional<User> optionalUser = userRepository.findByEmail(userRequest.getEmail());
-
-        if (optionalUser.isPresent()) {
-            User existingUser = optionalUser.get();
-            if (existingUser.isActivated()) {
-                log.warn("중복된 이메일로 회원가입 시도 - email: {}", userRequest.getEmail());
-                throw new ValidationException(ExceptionCode.DUPLICATE_EMAIL);
-            }
-
-            // 재가입
-            existingUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-            existingUser.setNickname(userRequest.getNickname());
-            existingUser.setRole((byte) 0);
-            existingUser.setActivated(true);
-
-            userRepository.save(existingUser);
-            redisUtil.delete("email:verified:" + userRequest.getEmail());
-            log.info("🔁 비활성화 유저 복구 완료 - userId: {}, email: {}", existingUser.getUserId(), existingUser.getEmail());
-            return;
-        }
-
-        // ✅ 신규 가입 로직
+        String email = userRequest.getEmail();
         String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
 
-                // ⚠️ [임시 주석] 이메일 인증 우회 (테스트용)
+        Optional<User> existingUser = userRepository.findByEmail(userRequest.getEmail());
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            log.info("회원 가입 시도 이메일 - email: {}", user.getEmail());
+
+            // 재가입일 경우 복구 처리
+            if (!user.isActivated()) {
+                user.reactivate(userRequest, encodedPassword);
+                userRepository.save(user);
+                log.info("탈퇴 유저 복구 - userId: {}, email: {}", user.getUserId(), user.getEmail());
+                return;
+            } else {
+                log.warn("중복된 이메일로 회원가입 시도 - email: {}",  email);
+                throw new ValidationException(ExceptionCode.DUPLICATE_EMAIL);
+            }
+        }
+        // ⚠️ [임시 주석] 이메일 인증 우회 (테스트용)
 //        if (!Boolean.TRUE.equals(redisUtil.get("email:verified:" + userRequest.getEmail(), Boolean.class))) {
 //            throw new ValidationException(ExceptionCode.EMAIL_NOT_VERIFIED);
 //        }
-        User newUser = User.of(userRequest, encodedPassword);
-        User savedUser = userRepository.save(newUser);
 
-        redisUtil.delete("email:verified:" + userRequest.getEmail());
-        log.info("회원가입 성공 - userId: {}, email: {}", savedUser.getUserId(), savedUser.getEmail());
+        // 신규 가입
+        User newUser = User.of(userRequest, encodedPassword);
+        userRepository.save(newUser);
+//      ⚠️ [임시 주석]
+//   redisUtil.delete("email:verified:" + userRequest.getEmail());
+        log.info("회원 가입 완료 - userId: {}, email: {}", newUser.getUserId(), newUser.getEmail());
     }
-//        Optional<User> optionalUser = userRepository.findByEmail(userRequest.getEmail());
-//            // 이메일 중복 체크
-//            if (optionalUser.isPresent()) {
-//                User existingUser = optionalUser.get();
-//                if (existingUser.isActivated()) {
-//                    log.warn("중복된 이메일로 회원가입 시도 - email: {}", userRequest.getEmail());
-//                    throw new ValidationException(ExceptionCode.DUPLICATE_EMAIL);
-//            }
-//
-//            // 탈퇴 처리한 기존 유저면 복구 처리
-//            existingUser.setActivated(true);
-//            existingUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-//            existingUser.setNickname(userRequest.getNickname());
-//            existingUser.setRole((byte) 0);
-//
-//            userRepository.save(existingUser);
-//            redisUtil.delete("email:verified:" + userRequest.getEmail());
-//            log.info("비활성화 유저 복구 완료 - userId: {}, email: {}", existingUser.getUserId(), existingUser.getEmail());
-//            return;
-//        }
-//
-//        String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
-//
-//        // ⚠️ [임시 주석] 이메일 인증 우회 (테스트용)
-////        if (!Boolean.TRUE.equals(redisUtil.get("email:verified:" + userRequest.getEmail(), Boolean.class))) {
-////            throw new ValidationException(ExceptionCode.EMAIL_NOT_VERIFIED);
-////        }
-//
-//        User newUser = User.of(userRequest, encodedPassword);
-//        User savedUser = userRepository.save(newUser);
-//
-//        redisUtil.delete("email:verified:" + userRequest.getEmail());
-//        log.info("회원가입 성공 - userId: {}, email: {}", savedUser.getUserId(), savedUser.getEmail());
-//    }
 
     // 이메일 중복 체크
     @Override
@@ -145,8 +108,8 @@ public class UserServiceImpl implements UserService {
         user.setRefreshToken(null);
         user.setFcmToken(null);
         tokenBlacklistService.addToBlacklist(accessToken);
-
         user.setActivated(false);
+        userRepository.save(user);
         log.info("회원 탈퇴 처리 완료 - userId: {}", userId);
     }
 }
