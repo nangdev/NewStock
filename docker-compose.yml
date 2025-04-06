@@ -60,7 +60,7 @@ services:
 
   chrome:
     image: selenium/node-chrome:4.15.0
-    shm_size: 3gb
+    shm_size: 4gb
     depends_on:
       - selenium-hub
     environment:
@@ -69,14 +69,14 @@ services:
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_MAX_SESSIONS=1
       - NODE_MAX_INSTANCES=1
-      - SE_NODE_SESSION_TIMEOUT=300
+      - SE_NODE_SESSION_TIMEOUT=600
       - SE_NODE_GRID_URL=http://selenium-hub:4444
       - SE_OPTS=--log-level FINE
     deploy:
       resources:
         limits:
-          cpus: '1.5'
-          memory: 3G
+          cpus: '2'
+          memory: 4G
     restart: always
 
   crawl:
@@ -88,9 +88,15 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=selenium-grid
       - SELENIUM_REMOTE_URL=http://selenium-hub:4444/wd/hub
-      - JAVA_OPTS=-Xms512m -Xmx1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200
-      - CRAWLER_CONCURRENT_WORKERS=2
-      - CRAWLER_RATE_LIMIT=3000
+      - JAVA_OPTS=-Xms1g -Xmx2g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError
+      - CRAWLER_CONCURRENT_WORKERS=1
+      - CRAWLER_RATE_LIMIT=5000
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_SESSION_TIMEOUT_MS=60000
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_HEARTBEAT_INTERVAL_MS=20000
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_MAX_POLL_INTERVAL_MS=300000
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_MAX_POLL_RECORDS=10
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_RECONNECT_BACKOFF_MS=5000
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_RECONNECT_BACKOFF_MAX_MS=30000
     env_file:
       - ./crawl/.env
     depends_on:
@@ -101,9 +107,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 1.5G
-  
+          cpus: '2'
+          memory: 3G
+    restart: always
+
   mysql:
     image: mysql:8.0.33
     ports:
@@ -148,32 +155,42 @@ services:
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - KAFKA_HEAP_OPTS=-Xmx512m -Xms256m
-      - KAFKA_JVM_PERFORMANCE_OPTS=-XX:+UseG1GC -XX:MaxGCPauseMillis=20
+      - KAFKA_HEAP_OPTS=-Xmx1g -Xms512m
+      - KAFKA_JVM_PERFORMANCE_OPTS=-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:+ExplicitGCInvokesConcurrent
+      - KAFKA_NUM_NETWORK_THREADS=6
+      - KAFKA_NUM_IO_THREADS=8
+      - KAFKA_SOCKET_SEND_BUFFER_BYTES=1048576
+      - KAFKA_SOCKET_RECEIVE_BUFFER_BYTES=1048576
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=5000
+      - KAFKA_CONNECTIONS_MAX_IDLE_MS=600000
     depends_on:
       - zookeeper
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          cpus: '0.8'
-          memory: 768M
+          cpus: '1.5'
+          memory: 1.5G
+    volumes:
+      - kafka-data:/var/lib/kafka/data
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
       - ZOOKEEPER_TICK_TIME=2000
-      - JVMFLAGS=-Xmx256m -Xms128m
+      - JVMFLAGS=-Xmx512m -Xms256m
     ports:
       - "2181:2181"
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          cpus: '0.3'
-          memory: 384M
-          
+          cpus: '0.5'
+          memory: 512M
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper
+
   ai:
     build:
       context: ./ai
@@ -199,3 +216,5 @@ services:
 volumes:
   db-data:
   redis-data:
+  kafka-data:
+  zookeeper-data:
