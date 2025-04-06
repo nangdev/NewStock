@@ -1,5 +1,6 @@
 package newstock.domain.news.repository;
 
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import newstock.domain.news.entity.News;
@@ -26,10 +27,11 @@ public class NewsCustomRepositoryImpl implements NewsCustomRepository {
                         news.stockId.eq(stockId)
                                 .and(news.publishedDate.substring(0, 10).eq(LocalDate.now().toString()))
                 )
-                .orderBy(news.score.desc())
+                .orderBy(
+                        Expressions.numberTemplate(Integer.class, "abs({0})", news.score).desc()
+                )
                 .limit(5)
                 .fetch());
-
     }
 
     @Override

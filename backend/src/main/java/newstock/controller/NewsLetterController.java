@@ -3,18 +3,15 @@ package newstock.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import newstock.common.dto.Api;
-import newstock.domain.keyword.dto.KeywordResponse;
-import newstock.domain.newsletter.dto.NewsletterRequest;
-import newstock.domain.newsletter.dto.NewsletterResponse;
+import newstock.controller.request.NewsletterContentRequest;
+import newstock.controller.request.NewsletterRequest;
+import newstock.controller.response.NewsletterResponse;
 import newstock.domain.newsletter.service.NewsletterService;
 import newstock.domain.stock.dto.UserStockDto;
 import newstock.domain.stock.service.StockService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -39,6 +36,12 @@ public class NewsLetterController {
         NewsletterResponse newsletterResponse = newsletterService.getNewsletterByDate(NewsletterRequest.of(date,userStockList));
 
         return ResponseEntity.ok(Api.ok(newsletterResponse));
+    }
+
+    @PostMapping("/{stockId}")
+    public ResponseEntity<Api<Void>> addNewsLetter(@PathVariable Integer stockId, @RequestBody NewsletterContentRequest request) {
+        newsletterService.addNewsletterByContent(stockId, request);
+        return ResponseEntity.ok(Api.ok());
     }
 
 }

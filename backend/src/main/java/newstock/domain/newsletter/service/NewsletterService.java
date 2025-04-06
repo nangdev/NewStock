@@ -1,11 +1,14 @@
 package newstock.domain.newsletter.service;
 
-import newstock.domain.newsletter.dto.NewsletterRequest;
-import newstock.domain.newsletter.dto.NewsletterResponse;
+import newstock.controller.request.NewsletterContentRequest;
+import newstock.controller.request.NewsletterRequest;
+import newstock.controller.response.NewsletterResponse;
 
 public interface NewsletterService {
 
     NewsletterResponse getNewsletterByDate(NewsletterRequest newsletterRequest);
 
-    void addNewsletter(NewsletterRequest newsletterRequest);
+    void addNewsletter(Integer stockId);
+
+    void addNewsletterByContent(Integer stockId, NewsletterContentRequest content);
 }

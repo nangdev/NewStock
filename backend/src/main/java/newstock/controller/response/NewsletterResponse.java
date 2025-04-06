@@ -1,9 +1,10 @@
-package newstock.domain.newsletter.dto;
+package newstock.controller.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import newstock.domain.newsletter.dto.NewsletterDto;
 
 import java.util.List;
 

@@ -10,7 +10,6 @@ import newstock.controller.response.NewsScrapResponse;
 import newstock.controller.response.StockNewsResponse;
 import newstock.controller.response.TopNewsResponse;
 import newstock.domain.keyword.dto.Article;
-import newstock.domain.keyword.dto.KeywordRequest;
 import newstock.domain.news.dto.NewsDetailDto;
 import newstock.domain.news.dto.NewsScrapDto;
 import newstock.domain.news.dto.StockNewsDto;
@@ -27,6 +26,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -135,13 +136,11 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public List<Article> getNewsByStockIdAndDate(KeywordRequest keywordRequest) {
-        String date = keywordRequest.getDate();
-        String formattedDate = date.substring(0, 4) + "-" + date.substring(4, 6) + "-" + date.substring(6, 8);
+    public List<Article> getNewsByStockIdAndDate(Integer stockId) {
 
-        List<News> newsList = newsRepository.findNewsByStockIdAndDate(
-                keywordRequest.getStockId(), formattedDate
-        );
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        List<News> newsList = newsRepository.findNewsByStockIdAndDate(stockId, today);
 
         return newsList.stream()
                 .map(news -> Article.builder()
@@ -149,5 +148,4 @@ public class NewsServiceImpl implements NewsService {
                         .build())
                 .collect(Collectors.toList());
     }
-
 }

@@ -1,4 +1,4 @@
-package newstock.domain.newsletter.dto;
+package newstock.controller.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

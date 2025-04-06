@@ -4,7 +4,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import newstock.domain.keyword.entity.Keyword;
 import org.springframework.stereotype.Repository;
-import static newstock.domain.newsletter.entity.QKeyword.keyword;
+
+import static newstock.domain.keyword.entity.QKeyword.keyword;
 
 import java.util.List;
 
