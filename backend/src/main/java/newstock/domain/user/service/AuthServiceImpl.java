@@ -76,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void clearFcmToken(Integer userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserIdAndIsActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         user.setFcmToken(null);
@@ -91,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse reissueToken(String refreshToken, String fcmToken) {
         Integer userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserIdAndIsActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         if (!refreshToken.equals(user.getRefreshToken())) {

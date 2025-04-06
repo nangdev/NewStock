@@ -10,6 +10,9 @@ public interface UserRepository extends JpaRepository<User, Integer>, UserCustom
     // 이메일로 전체 사용자 조회
     Optional<User> findByEmail(String email);
 
+    // 아이디로 활성화된 사용자 조회
+    Optional<User> findByUserIdAndIsActivatedTrue(Integer userId);
+
     // 이메일로 활성화된 사용자 조회
     Optional<User> findByEmailAndIsActivatedTrue(String email);
 

@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUserRole(Integer userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserIdAndIsActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         if (user.getRole() != 0) {
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
     // 유저 정보 조회
     @Override
     public UserResponse getUserInfo(Integer userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserIdAndIsActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         return UserResponse.of(user);
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
     // 회원 탈퇴
     @Override
     public void deleteUser(Integer userId, String accessToken) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserIdAndIsActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         if (!user.isActivated()) {
