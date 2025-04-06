@@ -29,7 +29,7 @@ export default function StockInfoCard ({
   listingDate, 
   industry, 
 }:Props) {
-  console.log(stockCode)
+  
   return (
     <View className="bg-white rounded-2xl mx-8 my-2 shadow-md">
       <View className="flex-row items-center p-4">

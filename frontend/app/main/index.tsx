@@ -1,9 +1,10 @@
 import { Text, View, ScrollView } from 'react-native';
 import StockListItem from 'components/main/StockListItem';
-import { Client } from '@stomp/stompjs';
+import { Client, IMessage } from '@stomp/stompjs';
 import { useEffect, useState } from 'react';
 import { useAllUserStockListQuery } from 'api/stock/query';
 import { useRouter } from 'expo-router';
+import stompService from 'utils/stompService'
 
 type Stock = {
   stockId: number,
@@ -26,37 +27,34 @@ export default function Main() {
       router.replace(`/stock/1/005930`)
       return;
     }
-    setSubscribedStocks(data.data.stockList);
-    console.log(subscribedStocks)
-    // STOMP 연결
-    const client = new Client({
-      webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
-      // webSocketFactory: () => new WebSocket('ws://10.0.2.2:8080/api/ws'),
-      // debug: (msg) => console.log('STOMP:', msg),
-      onConnect: (frame) => {
-        // 구독
-        subscribedStocks.forEach((stock) => {
-          client.subscribe(`/topic/rtp/${stock.stockCode}`, (msg) => {
-            const parsed = JSON.parse(msg.body);
-            console.log(parsed)
-            setSubscribedStocks((prev) =>
-              prev.map((s) =>
-                s.stockCode === parsed.stockCode
-                  ? { ...s, closingPrice: parsed.price, rcPdcp: parsed.changeRate }
-                  : s
-              )
-            );
-          })
-        })
-      },
-      forceBinaryWSFrames: true,
-      appendMissingNULLonIncoming: true,
-    })
     
-    client.activate();
+    const latestStockList = data.data.stockList;
+    setSubscribedStocks(latestStockList);
+
+    const onMessage = (msg: IMessage) => {
+      const parsed = JSON.parse(msg.body);
+      // console.log(parsed)
+      setSubscribedStocks((prev) =>
+        prev.map((s) =>
+          s.stockCode === parsed.stockCode
+            ? { ...s, closingPrice: parsed.price, rcPdcp: parsed.changeRate }
+            : s
+        )
+      );
+    }
+
+    
+    stompService.connect();
+
+    if (stompService.isReady()) {
+      stompService.unsubscribeAll();
+      latestStockList.forEach((stock) => {
+        stompService.subscribe(stock.stockCode, onMessage);
+      })
+    }
 
     return () => {
-      client.deactivate();
+      stompService.unsubscribeAll();
     }
   }, [data]);
 
@@ -71,7 +69,7 @@ export default function Main() {
               stockCode={stock.stockCode}
               price={stock.closingPrice ? stock.closingPrice : 0}
               changeRate={Number(stock.rcPdcp ?? 0)}
-              imgUrl={stock.imgUrl}
+              imgUrl={stock.imgUrl ?? ''}
               hojaeIconUrl=''
           />
           ))}

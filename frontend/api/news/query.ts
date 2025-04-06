@@ -22,7 +22,7 @@ export const useAllStockNewsListQuery = (
 
 export const useTopFiveNewsListQuery = (stockId: number) => {
   return useQuery({
-    queryKey: ['topFiveNewsList'],
+    queryKey: ['topFiveNewsList', stockId],
     queryFn: () => getTopFiveStockNewsList(stockId)
   })
 }
