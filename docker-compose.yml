@@ -14,11 +14,6 @@ services:
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - /opt/certs:/certs:ro
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 256M
     
   backend:
     build:
@@ -37,11 +32,6 @@ services:
     depends_on:
       - mysql
       - redis
-    deploy:
-      resources:
-        limits:
-          cpus: '1.5'
-          memory: 2G
   
   selenium-hub:
     image: selenium/hub:4.15.0
@@ -52,11 +42,6 @@ services:
       - GRID_MAX_SESSION=3
       - GRID_BROWSER_TIMEOUT=180000
       - GRID_TIMEOUT=180
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
 
   chrome:
     image: selenium/node-chrome:4.15.0
@@ -72,11 +57,6 @@ services:
       - SE_NODE_SESSION_TIMEOUT=600
       - SE_NODE_GRID_URL=http://selenium-hub:4444
       - SE_OPTS=--log-level FINE
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 4G
     restart: always
 
   crawl:
@@ -90,13 +70,6 @@ services:
       - SELENIUM_REMOTE_URL=http://selenium-hub:4444/wd/hub
       - JAVA_OPTS=-Xms1g -Xmx2g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError
       - CRAWLER_CONCURRENT_WORKERS=1
-      - CRAWLER_RATE_LIMIT=5000
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_SESSION_TIMEOUT_MS=60000
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_HEARTBEAT_INTERVAL_MS=20000
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_MAX_POLL_INTERVAL_MS=300000
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_MAX_POLL_RECORDS=10
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_RECONNECT_BACKOFF_MS=5000
-      - SPRING_KAFKA_CONSUMER_PROPERTIES_RECONNECT_BACKOFF_MAX_MS=30000
     env_file:
       - ./crawl/.env
     depends_on:
@@ -104,11 +77,6 @@ services:
       - mysql
       - kafka
       - redis
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 3G
     restart: always
 
   mysql:
@@ -124,11 +92,6 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_INNODB_BUFFER_POOL_SIZE=256M
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
 
   redis:
     image: redis:7.2.4-alpine
@@ -138,11 +101,6 @@ services:
       - redis-data:/data
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 384M
 
   kafka:
     image: confluentinc/cp-kafka:7.4.0
@@ -166,11 +124,6 @@ services:
     depends_on:
       - zookeeper
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '1.5'
-          memory: 1.5G
     volumes:
       - kafka-data:/var/lib/kafka/data
 
@@ -183,11 +136,6 @@ services:
     ports:
       - "2181:2181"
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
     volumes:
       - zookeeper-data:/var/lib/zookeeper
 
@@ -204,14 +152,7 @@ services:
       - MODEL_BATCH_SIZE=4
       - WORKERS=1
       - MAX_CONCURRENT_REQUESTS=4
-      - INITIAL_CPU_LIMIT=3.5
-      - FINAL_CPU_LIMIT=1.5
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '3.5'
-          memory: 8G
 
 volumes:
   db-data:
