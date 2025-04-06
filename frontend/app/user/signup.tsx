@@ -1,5 +1,5 @@
 import { AntDesign } from '@expo/vector-icons';
-import { useCheckEmailMutation, useSignInMutation } from 'api/user/query';
+import { useCheckEmailMutation, useSignUpMutation } from 'api/user/query';
 import BlurOverlay from 'components/BlurOverlay';
 import CustomButton from 'components/CustomButton';
 import InputField from 'components/user/InputField';
@@ -18,7 +18,7 @@ export default function SignUp() {
   const [nickname, setNickname] = useState('');
   const [errorField, setErrorField] = useState<string | null>(null);
 
-  const { mutate: signInMutate } = useSignInMutation();
+  const { mutate: signUpMutate } = useSignUpMutation();
   const { mutate: checkEmailMutate, isSuccess, data } = useCheckEmailMutation();
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function SignUp() {
 
   const onSubmitSignUp = (): void => {
     if (!validateInputs()) return;
-    signInMutate({ email, password, nickname });
+    signUpMutate({ email, password, nickname });
   };
 
   return (
@@ -133,7 +133,7 @@ export default function SignUp() {
           회원가입
         </CustomButton>
 
-        <Link className="self-end text-sm text-text_gray underline" href={ROUTE.USER.LOGIN}>
+        <Link className="self-end py-2 text-sm text-text_gray underline" href={ROUTE.USER.LOGIN}>
           이미 회원이신가요? 로그인하기
         </Link>
       </BlurOverlay>

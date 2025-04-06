@@ -63,7 +63,7 @@ export default function Login() {
             <Image source={require('../../assets/image/kakao_login.png')} />
           </TouchableOpacity>
 
-          <Link className="self-end text-sm text-text_gray underline" href={ROUTE.USER.SIGNUP}>
+          <Link className="self-end py-2 text-sm text-text_gray underline" href={ROUTE.USER.SIGNUP}>
             회원이 아니신가요? 회원가입
           </Link>
         </View>

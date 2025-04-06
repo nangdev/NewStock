@@ -1,7 +1,7 @@
 import { API_BASE_URL, API_PATH } from 'constants/api';
 import { createServer, Response } from 'miragejs';
 
-import { mockAllStock } from './mockDataBase';
+import { mockAllStock, mockNotificationList } from './mockDataBase';
 
 export function makeServer({ environment = 'development' } = {}) {
   if (window.server) {
@@ -47,7 +47,7 @@ export function makeServer({ environment = 'development' } = {}) {
       });
 
       // Memo: 회원가입
-      this.post(`${API_BASE_URL}/${API_PATH.USER.SIGN_IN}`, () => {
+      this.post(`${API_BASE_URL}/${API_PATH.USER.SIGN_UP}`, () => {
         return {};
       });
 
@@ -84,6 +84,21 @@ export function makeServer({ environment = 'development' } = {}) {
 
       // Memo: 회원 관심 주식 수정
       this.put(`${API_BASE_URL}/${API_PATH.STOCK.USER_STOCK_EDIT}`, () => {
+        return {};
+      });
+
+      // Memo: 알림 목록 조회
+      this.get(`${API_BASE_URL}/${API_PATH.NOTIFICATION.ALL}`, () => {
+        return mockNotificationList;
+      });
+
+      // Memo: 알림 읽음
+      this.put(`${API_BASE_URL}/${API_PATH.NOTIFICATION.READ}/:unId`, (_, request) => {
+        return {};
+      });
+
+      // Memo: 알림 삭제
+      this.delete(`${API_BASE_URL}/${API_PATH.NOTIFICATION.DELETE}/:unId`, (_, request) => {
         return {};
       });
     },

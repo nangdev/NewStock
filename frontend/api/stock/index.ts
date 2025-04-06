@@ -1,6 +1,11 @@
 import { api } from 'api/axiosInstance';
 import { API_PATH } from 'constants/api';
-import { AllUserStockResType, AllStockResType, StockInterestReqType, StockInterestResType } from 'types/api/stock';
+import {
+  AllUserStockResType,
+  AllStockResType,
+  StockInterestReqType,
+  StockInterestResType,
+} from 'types/api/stock';
 
 export const getAllStockList = async () => {
   const response = await api.get<AllStockResType>(API_PATH.STOCK.ALL);
@@ -17,4 +22,4 @@ export const putStockInterest = async ({ stockIdList }: StockInterestReqType) =>
 export const getAllUserStockList = async () => {
   const response = await api.get<AllUserStockResType>(API_PATH.STOCK.USER_STOCK);
   return response.data;
-}
+};
