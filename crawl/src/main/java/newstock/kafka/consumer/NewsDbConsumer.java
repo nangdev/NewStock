@@ -21,7 +21,7 @@ import java.util.List;
 public class NewsDbConsumer {
 
     private final NewsService newsService;
-    private final ObjectMapper objectMapper; // 생성자 주입 방식으로 DI
+    private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Value("${kafka.topic.news-notification}")
@@ -31,16 +31,13 @@ public class NewsDbConsumer {
     public void listen(String message) {
         log.info("Kafka DB 저장 메시지 수신");
         try {
-            // 메시지를 NewsDbRequest 객체로 역직렬화
             NewsDbRequest dbRequest = objectMapper.readValue(message, NewsDbRequest.class);
             String stockName = dbRequest.getStockName();
 
-            // DB 저장 로직 수행 (DB 저장 성공 시 후속 이벤트 발행 등 추가 처리는 여기서 진행)
             List<NewsItem> newsItems = dbRequest.getFilteredNewsItems();
             newsService.addNewsItems(newsItems);
             log.info("DB 저장 완료, 종목: {} / 뉴스 개수: {}", stockName, dbRequest.getFilteredNewsItems().size());
 
-            // 점수 높은거로 거르기
             List<NotificationDto> scoreFilteredNotificationDtos = newsItems.stream()
                     .filter(newsItem -> newsItem.getScore() > 8)  // 뉴스 스코어 정해야됌
                     .map(NotificationDto::of)
