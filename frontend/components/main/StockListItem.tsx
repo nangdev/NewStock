@@ -83,8 +83,9 @@ type News = {
 
         <Collapsible collapsed={!expanded}>
           
-          <View className="bg-white mb-2">
-            {data?.data.newsList.map((news) => (
+          <View className="bg-white mb-2 items-center">
+            {data?.data.newsList && data?.data.newsList.length > 0
+            ? data?.data.newsList.map((news) => (
               <NewsListItem
                 newsId={+news.newsId}
                 title={news.title}
@@ -93,7 +94,17 @@ type News = {
                 publishedDate='2025-03-14:20:08:49'
                 hojaeIconUrl=''
               />
-            ))}
+            ))
+            : (
+              <View className='items-center mb-5'>
+                <Image
+                  source={require('assets/image/no_data.png')}
+                  style={{ width: 50, height: 50, resizeMode: 'contain' }}>
+                </Image>
+                <Text className='' style={{color: '#8A96A3'}}>오늘 관련 뉴스가 없어요</Text>
+              </View>
+            )
+          }
           </View>
         </Collapsible>
       </View>
