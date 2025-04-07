@@ -12,7 +12,6 @@ public class UserResponse {
 
     private Integer userId;
     private String email;
-    private String userName;
     private String nickname;
     private Byte role;
 
