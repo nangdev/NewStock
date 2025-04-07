@@ -4,7 +4,6 @@ import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import useUserStore from 'store/user';
-import Toast from 'react-native-toast-message';
 
 import {
   deleteUser,

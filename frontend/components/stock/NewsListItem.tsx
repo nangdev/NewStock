@@ -1,6 +1,6 @@
-import React from "react";
-import { View, Text, Image } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons';
+import React from 'react';
+import { View, Text } from 'react-native';
 
 type Props = {
   newsId: number;
@@ -8,31 +8,23 @@ type Props = {
   description: string;
   score: number;
   publishedDate: string;
-  hojaeIconUrl: string;
-}
+};
 
-
-function NewsListItem ({
-  newsId,
-  title,
-  description,
-  score,
-  publishedDate,
-  hojaeIconUrl
-}: Props) {
-
-  return(
+function NewsListItem({ newsId, title, score, publishedDate }: Props) {
+  return (
     <View key={newsId} className="flex-row items-center p-3">
-      {/* <Image
-        source={{ uri: hojaeIconUrl || 'https://via.placeholder.com/36' }}
-        className="w-9 h-9 rounded-md mr-4 bg-gray-200"
-      /> */}
-      {score > 0
-      ? <AntDesign name="smileo" size={24} color="red" className="pr-3"/>
-      : <AntDesign name="frowno" size={24} color="blue" className="pr-3"/>}
-      <View className="flex-1 flex-row justify-between items-center">
-        <Text className="text-sm flex-1" numberOfLines={1} ellipsizeMode="tail">{title}</Text>
-        <Text className="text-xs text-right text-gray-500 ml-4 mr-2">{toFormattedDate(publishedDate)}</Text>
+      {score > 0 ? (
+        <AntDesign name="smileo" size={24} color="red" className="pr-3" />
+      ) : (
+        <AntDesign name="frowno" size={24} color="blue" className="pr-3" />
+      )}
+      <View className="flex-1 flex-row items-center justify-between">
+        <Text className="flex-1 text-sm" numberOfLines={1} ellipsizeMode="tail">
+          {title}
+        </Text>
+        <Text className="ml-4 mr-2 text-right text-xs text-gray-500">
+          {toFormattedDate(publishedDate)}
+        </Text>
       </View>
     </View>
   );
@@ -40,8 +32,8 @@ function NewsListItem ({
 
 const toFormattedDate = (date: string) => {
   const now = new Date();
-  const published = new Date(date.replace(" ", "T")); // ISO 형식으로 변환
-  
+  const published = new Date(date.replace(' ', 'T')); // ISO 형식으로 변환
+
   const diffMs = now.getTime() - published.getTime();
   const diffSec = Math.floor(diffMs / 1000);
   const diffMin = Math.floor(diffSec / 60);
@@ -54,7 +46,6 @@ const toFormattedDate = (date: string) => {
   if (diffHr < 24) return `${diffHr}시간 전`;
   if (diffDay < 7) return `${diffDay}일 전`;
   return date.substring(0, 10); // "YYYY-MM-DD"
-
-}
+};
 
 export default React.memo(NewsListItem);

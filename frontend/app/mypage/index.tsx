@@ -2,14 +2,14 @@ import { FontAwesome, MaterialIcons, AntDesign, Feather } from '@expo/vector-ico
 import { useLogoutMutation } from 'api/auth/query';
 import { useUserDeleteMutation, useUserNicknameMutation } from 'api/user/query';
 import BlurOverlay from 'components/BlurOverlay';
+import CustomButton from 'components/CustomButton';
+import CustomFooter from 'components/Footer/Footer';
 import CustomHeader from 'components/Header/Header';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
-import { View, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
-import CustomButton from 'components/CustomButton';
-
-import useUserStore from 'store/user';
 import { useState } from 'react';
+import { View, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
+import useUserStore from 'store/user';
 
 export default function MyPage() {
   const router = useRouter();
@@ -63,7 +63,7 @@ export default function MyPage() {
 
   return (
     <>
-      <CustomHeader />
+      <CustomHeader title="마이 페이지" />
       <View className="flex-1 items-center justify-center">
         <BlurOverlay className="w-[90%] items-center gap-6 px-6 py-10">
           <View className="items-center gap-2">
@@ -105,10 +105,6 @@ export default function MyPage() {
               maxLength={10}
               className="rounded-lg border border-stroke px-4 py-3 text-base"
             />
-            {/* 
-            {(nicknameInput.trim().length < 2 || nicknameInput.trim().length > 10) && (
-              <Text className="mt-1 text-xs text-gray-400">닉네임은 2~10자여야 합니다</Text>
-            )} */}
 
             <View className="mt-6 flex-row justify-end gap-2">
               <CustomButton
@@ -129,6 +125,7 @@ export default function MyPage() {
           </View>
         </View>
       </Modal>
+      <CustomFooter />
     </>
   );
 }

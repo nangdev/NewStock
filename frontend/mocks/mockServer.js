@@ -1,7 +1,13 @@
 import { API_BASE_URL, API_PATH } from 'constants/api';
 import { createServer, Response } from 'miragejs';
 
-import { mockAllStock, mockNewsletter, mockNotificationList, mockUserStock } from './mockDataBase';
+import {
+  mockAllStock,
+  mockNewsletter,
+  mockNotificationList,
+  mockScrapNewsList,
+  mockUserStock,
+} from './mockDataBase';
 
 export function makeServer({ environment = 'development' } = {}) {
   if (window.server) {
@@ -110,6 +116,21 @@ export function makeServer({ environment = 'development' } = {}) {
       // Memo: 뉴스 레터 조회
       this.get(`${API_BASE_URL}/${API_PATH.NEWSLETTER}/:date`, () => {
         return mockNewsletter;
+      });
+
+      // Memo: 스크랩 뉴스 조회
+      this.get(`${API_BASE_URL}/${API_PATH.NEWS.SCRAP}`, () => {
+        return mockScrapNewsList;
+      });
+
+      // Memo: 스크랩 뉴스 추가
+      this.post(`${API_BASE_URL}/${API_PATH.NEWS.SCRAP_ADD}/:newsId`, () => {
+        return {};
+      });
+
+      // Memo: 스크랩 뉴스 삭제
+      this.delete(`${API_BASE_URL}/${API_PATH.NEWS.DELETE}/:newsId`, () => {
+        return {};
       });
     },
   });
