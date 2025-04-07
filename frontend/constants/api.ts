@@ -1,8 +1,5 @@
 // Memo: 개발 환경에서 백엔드 서버와 통신 확인 시 대신 사용
 export const API_URL = process.env.EXPO_PUBLIC_API_URL;
-// export const API_URL = __DEV__
-//   ? process.env.EXPO_PUBLIC_DEV_API_URL
-//   : process.env.EXPO_PUBLIC_API_URL;
 export const API_VERSION = process.env.EXPO_PUBLIC_API_VERSION;
 export const API_BASE_URL = `${API_URL}/${API_VERSION}`;
 export const KAKAO_REDIRECT_URI = `${process.env.EXPO_PUBLIC_API_URL}/api/kakao-redirect.html`;
@@ -13,6 +10,7 @@ const DOMAIN = {
   STOCK: 'stock',
   NEWS: 'news',
   NOTIFICATION: 'notification',
+  NEWSLETTER: 'newsletter',
 };
 
 /** Memo: API 명세서 도메인 및 endpoint 구조 적용 */
@@ -51,4 +49,5 @@ export const API_PATH = {
     DELETE: `${DOMAIN.NOTIFICATION}`,
     READ: `${DOMAIN.NOTIFICATION}`,
   },
+  NEWSLETTER: `${DOMAIN.NEWSLETTER}`,
 };

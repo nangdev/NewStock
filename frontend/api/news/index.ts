@@ -8,20 +8,18 @@ export const getAllStockNewsList = async (
   count: number,
   sort: 'score' | 'time'
 ) => {
-  const response = await api.get<AllStockNewsResType>(
-    API_PATH.NEWS.STOCK_NEWS, {
-      params: {
-        stockId,
-        page,
-        count,
-        sort,
-      }
-    }
-  );
+  const response = await api.get<AllStockNewsResType>(API_PATH.NEWS.STOCK_NEWS, {
+    params: {
+      stockId,
+      page,
+      count,
+      sort,
+    },
+  });
   return response.data;
-}
+};
 
 export const getTopFiveStockNewsList = async (stockId: number) => {
   const response = await api.get<AllStockNewsResType>(API_PATH.NEWS.TOP(stockId));
   return response.data;
-}
+};

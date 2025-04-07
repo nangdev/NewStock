@@ -6,25 +6,25 @@ import UserProvider from 'providers/UserProvider';
 import { useEffect } from 'react';
 import { ImageBackground } from 'react-native';
 import '../global.css';
-import Toast from 'react-native-toast-message';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
 
 const queryClient = new QueryClient();
 
 export default function Layout() {
   useFCMNotifications();
   // Memo: 백엔드 서버와 API 통신 테스트시 주석처리
-  // useEffect(() => {
-  //   let server = null;
+  useEffect(() => {
+    let server = null;
 
-  //   if (__DEV__) {
-  //     server = makeServer();
-  //   }
+    if (__DEV__) {
+      server = makeServer();
+    }
 
-  //   return () => {
-  //     server.shutdown();
-  //   };
-  // }, []);
+    return () => {
+      server.shutdown();
+    };
+  }, []);
 
   return (
     <ImageBackground

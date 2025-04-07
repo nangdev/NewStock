@@ -1,7 +1,7 @@
 import { API_BASE_URL, API_PATH } from 'constants/api';
 import { createServer, Response } from 'miragejs';
 
-import { mockAllStock, mockNotificationList } from './mockDataBase';
+import { mockAllStock, mockNewsletter, mockNotificationList, mockUserStock } from './mockDataBase';
 
 export function makeServer({ environment = 'development' } = {}) {
   if (window.server) {
@@ -82,6 +82,11 @@ export function makeServer({ environment = 'development' } = {}) {
         return mockAllStock;
       });
 
+      // Memo: 회원 관심 주식 조회
+      this.get(`${API_BASE_URL}/${API_PATH.STOCK.USER_STOCK}`, () => {
+        return mockUserStock;
+      });
+
       // Memo: 회원 관심 주식 수정
       this.put(`${API_BASE_URL}/${API_PATH.STOCK.USER_STOCK_EDIT}`, () => {
         return {};
@@ -93,13 +98,18 @@ export function makeServer({ environment = 'development' } = {}) {
       });
 
       // Memo: 알림 읽음
-      this.put(`${API_BASE_URL}/${API_PATH.NOTIFICATION.READ}/:unId`, (_, request) => {
+      this.put(`${API_BASE_URL}/${API_PATH.NOTIFICATION.READ}/:unId`, () => {
         return {};
       });
 
       // Memo: 알림 삭제
-      this.delete(`${API_BASE_URL}/${API_PATH.NOTIFICATION.DELETE}/:unId`, (_, request) => {
+      this.delete(`${API_BASE_URL}/${API_PATH.NOTIFICATION.DELETE}/:unId`, () => {
         return {};
+      });
+
+      // Memo: 뉴스 레터 조회
+      this.get(`${API_BASE_URL}/${API_PATH.NEWSLETTER}/:date`, () => {
+        return mockNewsletter;
       });
     },
   });
