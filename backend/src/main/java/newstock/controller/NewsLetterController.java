@@ -55,7 +55,7 @@ public class NewsLetterController {
 
     @PostMapping
     public ResponseEntity<Api<Void>> addNewsletterAndKeywords() {
-
+        newsletterService.addNewsletterAndKeyword();
         return ResponseEntity.ok(Api.ok());
     }
 }
