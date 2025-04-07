@@ -33,7 +33,10 @@ public class NewsletterScheduler {
 
             List<Article> articles =newsService.getNewsByStockIdAndDate(stockDto.getStockId());
 
-            KeywordAIResponse keywordAIResponse =keywordService.extractKeywords(KeywordAIRequest.of(articles));
+            if (articles.isEmpty())
+                continue;
+
+            KeywordAIResponse keywordAIResponse = keywordService.extractKeywords(KeywordAIRequest.of(articles));
 
             keywordService.addKeyword(KeywordList.of(keywordAIResponse.getKeywords(),stockDto.getStockId()));
 
