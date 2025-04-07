@@ -90,7 +90,7 @@ type News = {
                 newsId={+news.newsId}
                 title={news.title}
                 description='desc'
-                score={10}
+                score={news.score}
                 publishedDate={news.publishedDate}
                 hojaeIconUrl=''
               />

@@ -1,6 +1,6 @@
 import { api } from 'api/axiosInstance';
 import { API_PATH } from 'constants/api';
-import { AllStockNewsResType } from 'types/api/news';
+import { AllStockNewsResType, NewsDetailResType } from 'types/api/news';
 
 export const getAllStockNewsList = async (
   stockId: number,
@@ -23,5 +23,10 @@ export const getAllStockNewsList = async (
 
 export const getTopFiveStockNewsList = async (stockId: number) => {
   const response = await api.get<AllStockNewsResType>(API_PATH.NEWS.TOP(stockId));
+  return response.data;
+}
+
+export const getNewsDetailInfo = async (newsId: number) => {
+  const response = await api.get<NewsDetailResType>(API_PATH.NEWS.DETAIL(newsId));
   return response.data;
 }

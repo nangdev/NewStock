@@ -1,5 +1,5 @@
 import { ROUTE } from 'constants/routes';
-import { getAllStockNewsList, getTopFiveStockNewsList } from '.';
+import { getAllStockNewsList, getNewsDetailInfo, getTopFiveStockNewsList } from '.';
 import { useQuery } from '@tanstack/react-query';
 
 
@@ -23,6 +23,13 @@ export const useAllStockNewsListQuery = (
 export const useTopFiveNewsListQuery = (stockId: number) => {
   return useQuery({
     queryKey: ['topFiveNewsList', stockId],
-    queryFn: () => getTopFiveStockNewsList(stockId)
+    queryFn: () => getTopFiveStockNewsList(stockId),
+  })
+}
+
+export const useNewsDetailQuery = (newsId: number) => {
+  return useQuery({
+    queryKey: ['newsDetail', newsId],
+    queryFn: () => getNewsDetailInfo(newsId),
   })
 }
