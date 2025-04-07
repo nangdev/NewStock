@@ -19,7 +19,7 @@ export default function CustomHeader() {
     <BlurView
       intensity={50}
       tint="light"
-      className="absolute z-10 w-full flex-row items-center justify-between border-b border-gray-200 px-4 py-3 backdrop-blur-md">
+      className="absolute top-0 z-10 w-full flex-row items-center justify-between border-b border-gray-200 px-4 py-3 backdrop-blur-md">
       <TouchableOpacity onPress={() => navigation.goBack()} className="p-1">
         <Ionicons name="chevron-back" size={26} color="black" />
       </TouchableOpacity>

@@ -32,10 +32,11 @@ export default function NotificationPopover({
 }: NotificationPopoverProps) {
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
-  const translateY = useRef(new Animated.Value(-500)).current;
 
   const { mutate: readNotification } = useNotificationReadMutation();
   const { mutate: deleteNotification } = useNotificationDeleteMutation();
+
+  const translateY = useRef(new Animated.Value(-1000)).current;
 
   useEffect(() => {
     if (visible) {
@@ -43,12 +44,12 @@ export default function NotificationPopover({
       Animated.timing(translateY, {
         toValue: 0,
         duration: 300,
-        easing: Easing.out(Easing.ease),
+        easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }).start();
     } else {
       Animated.timing(translateY, {
-        toValue: -600,
+        toValue: -1000,
         duration: 300,
         easing: Easing.in(Easing.ease),
         useNativeDriver: true,
@@ -89,49 +90,58 @@ export default function NotificationPopover({
             <Text className="text-lg font-bold">주요 뉴스 알림</Text>
           </View>
 
-          <FlatList
-            data={notifications}
-            keyExtractor={(item) => item.unId.toString()}
-            renderItem={({ item }) => (
-              <View className="flex-row items-center justify-between border-b border-gray-200 py-3">
-                <TouchableOpacity
-                  onPress={() => handleRead(item.unId)}
-                  className="flex-1 flex-row items-center gap-2">
-                  {!item.isRead ? (
-                    <View className="h-2 w-2 rounded-full bg-red-500" />
-                  ) : (
-                    <View className="h-2 w-2" />
-                  )}
-                  <View className="gap-2">
-                    <View className="flex-row items-center gap-2">
-                      <Image
-                        source={require('../../assets/image/sample_samsung.png')}
-                        style={{ width: 16, height: 16, resizeMode: 'contain', borderRadius: 4 }}
-                      />
-                      <Text className={`${item.isRead ? 'text-gray-400' : 'text-text'}`}>
-                        {item.stockInfo.stockName}
+          {notifications.length ? (
+            <FlatList
+              data={notifications}
+              keyExtractor={(item) => item.unId.toString()}
+              renderItem={({ item }) => (
+                <View className="flex-row items-center justify-between border-b border-gray-200 py-3">
+                  <TouchableOpacity
+                    onPress={() => handleRead(item.unId)}
+                    className="flex-1 flex-row items-center gap-2">
+                    {!item.isRead ? (
+                      <View className="h-2 w-2 rounded-full bg-red-500" />
+                    ) : (
+                      <View className="h-2 w-2" />
+                    )}
+                    <View className="gap-2">
+                      <View className="flex-row items-center gap-2">
+                        <Image
+                          source={require('../../assets/image/sample_samsung.png')}
+                          style={{
+                            width: 16,
+                            height: 16,
+                            resizeMode: 'contain',
+                            borderRadius: 4,
+                          }}
+                        />
+                        <Text className={`${item.isRead ? 'text-gray-400' : 'text-text'}`}>
+                          {item.stockInfo.stockName}
+                        </Text>
+                      </View>
+                      <Text
+                        className={`${item.isRead ? 'text-gray-400' : 'text-text'}`}
+                        numberOfLines={1}>
+                        {item.newsInfo.title}
                       </Text>
                     </View>
-                    <Text
-                      className={`${item.isRead ? 'text-gray-400' : 'text-text'}`}
-                      numberOfLines={1}>
-                      {item.newsInfo.title}
+                  </TouchableOpacity>
+                  <View>
+                    <TouchableOpacity
+                      onPress={() => handleDelete(item.unId)}
+                      className="self-end p-2">
+                      <Ionicons name="trash-outline" size={20} color="gray" />
+                    </TouchableOpacity>
+                    <Text className="text-xs text-gray-400">
+                      {getTimeAgo(item.newsInfo.publishedDate)}
                     </Text>
                   </View>
-                </TouchableOpacity>
-                <View>
-                  <TouchableOpacity
-                    onPress={() => handleDelete(item.unId)}
-                    className="self-end p-2">
-                    <Ionicons name="trash-outline" size={20} color="gray" />
-                  </TouchableOpacity>
-                  <Text className="text-xs text-gray-400">
-                    {getTimeAgo(item.newsInfo.publishedDate)}
-                  </Text>
                 </View>
-              </View>
-            )}
-          />
+              )}
+            />
+          ) : (
+            <Text className="font-bold text-red-500">알림이 없습니다 !</Text>
+          )}
         </Animated.View>
       </Pressable>
     </Modal>

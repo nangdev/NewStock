@@ -21,4 +21,8 @@ export const ROUTE = {
   },
   MYPAGE: '/mypage',
   SET_INTEREST: '/mypage/setInterest',
+  NEWSLETTER: {
+    CALENDAR: '/newsletter',
+    INDEX: '/newsletter',
+  },
 };

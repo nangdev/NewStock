@@ -7,6 +7,7 @@ import NotificationModal from './NotificationModal';
 
 export default function NotificationButton() {
   const [visible, setVisible] = useState(false);
+  // Todo: 풀링 or 소켓통신으로 변경
   const { isSuccess, data, refetch } = useNotificationListQuery();
 
   const hasNotification = data?.data.notificationList.some((item) => !item.isRead);
