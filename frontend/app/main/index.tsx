@@ -64,7 +64,7 @@ export default function Main() {
         <ScrollView>
           {subscribedStocks.map((stock) => (
             <StockListItem
-              key={`${stock.stockCode}`}
+              key={stock.stockId}
               stockId={stock.stockId}
               stockName={stock.stockName}
               stockCode={stock.stockCode}
