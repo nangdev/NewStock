@@ -25,10 +25,10 @@ public class NewsletterScheduler {
 
     private final StockService stockService;
 
-    @Scheduled(cron = "0 30 17 * * ?")
+    //@Scheduled(cron = "0 30 17 * * ?")
     public void scheduleNewsLetter() {
 
-        List<StockDto> stockDtoList = stockService.getStockList();
+        List<StockDto> stockDtoList = stockService.getAllStockList();
         for (StockDto stockDto : stockDtoList) {
 
             List<Article> articles =newsService.getNewsByStockIdAndDate(stockDto.getStockId());
@@ -39,6 +39,5 @@ public class NewsletterScheduler {
 
             newsletterService.addNewsletter(stockDto.getStockId());
         }
-
     }
 }

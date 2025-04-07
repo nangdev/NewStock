@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 @EnableScheduling
 @RequiredArgsConstructor
 @Slf4j
-public class ScehedulerConfig {
+public class SchedulerConfig {
     private final KisWebSocketClient webSocketClient;
 
     /**

@@ -34,7 +34,7 @@ public class NewsLetterController {
      */
     @GetMapping("/{date}")
     @Operation(summary = "특정일 뉴스레터 조회", description = "유저의 관심종목 특정일 뉴스레터를 조회합니다.")
-    public ResponseEntity<Api<NewsletterResponse>> getNewsLetterByDate(@PathVariable String date, @AuthenticationPrincipal Integer userId) {
+    public ResponseEntity<Api<NewsletterResponse>> getNewsletterByDate(@PathVariable String date, @AuthenticationPrincipal Integer userId) {
         List<UserStockDto> userStockList = stockService.getUserStockList(userId);
         NewsletterResponse newsletterResponse = newsletterService.getNewsletterByDate(NewsletterRequest.of(date,userStockList));
 
@@ -42,7 +42,7 @@ public class NewsLetterController {
     }
 
     @PostMapping("/{stockId}")
-    public ResponseEntity<Api<Void>> addNewsLetter(@PathVariable Integer stockId, @RequestBody NewsletterContentRequest request) {
+    public ResponseEntity<Api<Void>> addNewsletter(@PathVariable Integer stockId, @RequestBody NewsletterContentRequest request) {
         newsletterService.addNewsletterByContent(stockId, request);
         return ResponseEntity.ok(Api.ok());
     }
@@ -53,4 +53,9 @@ public class NewsLetterController {
         return ResponseEntity.ok(Api.ok());
     }
 
+    @PostMapping
+    public ResponseEntity<Api<Void>> addNewsletterAndKeywords() {
+
+        return ResponseEntity.ok(Api.ok());
+    }
 }

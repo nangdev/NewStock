@@ -2,17 +2,17 @@ package newstock.domain.newsletter.service;
 
 import lombok.RequiredArgsConstructor;
 import newstock.controller.request.NewsletterContentRequest;
-import newstock.domain.keyword.dto.KeywordItem;
-import newstock.domain.keyword.dto.KeywordRequest;
-import newstock.domain.keyword.dto.KeywordResponse;
+import newstock.domain.keyword.dto.*;
 import newstock.domain.keyword.service.KeywordService;
 import newstock.domain.news.entity.News;
 import newstock.domain.news.repository.NewsRepository;
+import newstock.domain.news.service.NewsService;
 import newstock.domain.newsletter.dto.NewsletterDto;
 import newstock.controller.request.NewsletterRequest;
 import newstock.controller.response.NewsletterResponse;
 import newstock.domain.newsletter.entity.Newsletter;
 import newstock.domain.newsletter.repository.NewsletterRepository;
+import newstock.domain.stock.dto.StockDto;
 import newstock.domain.stock.service.StockService;
 import newstock.exception.ExceptionCode;
 import newstock.exception.type.DbException;
@@ -39,6 +39,8 @@ public class NewsletterServiceImpl implements NewsletterService {
     private final NewsRepository newsRepository;
 
     private final StockService stockService;
+
+    private final NewsService newsService;
 
     @Override
     public NewsletterResponse getNewsletterByDate(NewsletterRequest newsletterRequest) {
@@ -133,6 +135,22 @@ public class NewsletterServiceImpl implements NewsletterService {
                     // 에러 처리
                     System.err.println("ChatGPT 요청 중 오류 발생: " + error.getMessage());
                 });
+    }
+
+    @Override
+    public void addNewsletterAndKeyword() {
+
+            List<StockDto> stockDtoList = stockService.getAllStockList();
+            for (StockDto stockDto : stockDtoList) {
+
+                List<Article> articles =newsService.getNewsByStockIdAndDate(stockDto.getStockId());
+
+                KeywordAIResponse keywordAIResponse =keywordService.extractKeywords(KeywordAIRequest.of(articles));
+
+                keywordService.addKeyword(KeywordList.of(keywordAIResponse.getKeywords(),stockDto.getStockId()));
+
+                addNewsletter(stockDto.getStockId());
+            }
     }
 
 }
