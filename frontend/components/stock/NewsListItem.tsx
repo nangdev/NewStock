@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text, Image } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 
@@ -11,7 +12,7 @@ type Props = {
 }
 
 
-export default function NewsListItem ({
+function NewsListItem ({
   newsId,
   title,
   description,
@@ -40,7 +41,7 @@ export default function NewsListItem ({
 const toFormattedDate = (date: string) => {
   const now = new Date();
   const published = new Date(date.replace(" ", "T")); // ISO 형식으로 변환
-
+  
   const diffMs = now.getTime() - published.getTime();
   const diffSec = Math.floor(diffMs / 1000);
   const diffMin = Math.floor(diffSec / 60);
@@ -55,3 +56,5 @@ const toFormattedDate = (date: string) => {
   return date.substring(0, 10); // "YYYY-MM-DD"
 
 }
+
+export default React.memo(NewsListItem);
