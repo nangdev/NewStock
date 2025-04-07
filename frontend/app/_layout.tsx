@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { ImageBackground } from 'react-native';
 import '../global.css';
 import Toast from 'react-native-toast-message';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const queryClient = new QueryClient();
 
@@ -32,7 +33,9 @@ export default function Layout() {
       imageStyle={{ resizeMode: 'cover' }}>
       <QueryClientProvider client={queryClient}>
         <UserProvider>
-          <Slot />
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <Slot />
+          </GestureHandlerRootView>
           <Toast />
         </UserProvider>
       </QueryClientProvider>
