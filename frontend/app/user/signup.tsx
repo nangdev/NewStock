@@ -1,5 +1,5 @@
 import { AntDesign } from '@expo/vector-icons';
-import { useCheckEmailMutation, useSignInMutation } from 'api/user/query';
+import { useCheckEmailMutation, useSignUpMutation } from 'api/user/query';
 import BlurOverlay from 'components/BlurOverlay';
 import CustomButton from 'components/CustomButton';
 import InputField from 'components/user/InputField';
@@ -16,10 +16,9 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [nickname, setNickname] = useState('');
-  const [userName, setUserName] = useState('');
   const [errorField, setErrorField] = useState<string | null>(null);
 
-  const { mutate: signInMutate } = useSignInMutation();
+  const { mutate: signUpMutate } = useSignUpMutation();
   const { mutate: checkEmailMutate, isSuccess, data } = useCheckEmailMutation();
 
   useEffect(() => {
@@ -57,11 +56,6 @@ export default function SignUp() {
       Toast.show({ type: 'error', text1: '닉네임은 2~10자여야 합니다' });
       return false;
     }
-    if (!REGEX.SIGN_UP.NAME.test(userName)) {
-      setErrorField('userName');
-      Toast.show({ type: 'error', text1: '이름은 2~10자여야 합니다' });
-      return false;
-    }
     return true;
   };
 
@@ -76,7 +70,7 @@ export default function SignUp() {
 
   const onSubmitSignUp = (): void => {
     if (!validateInputs()) return;
-    signInMutate({ email, password, nickname, userName });
+    signUpMutate({ email, password, nickname });
   };
 
   return (
@@ -130,12 +124,6 @@ export default function SignUp() {
           placeholder="닉네임은 2~10자여야 합니다"
           className={errorField === 'nickname' ? 'border-red-500' : ''}
         />
-        <InputField
-          value={userName}
-          onChangeText={setUserName}
-          placeholder="이름은 2~10자여야 합니다"
-          className={errorField === 'userName' ? 'border-red-500' : ''}
-        />
 
         <CustomButton
           variant="semiRounded"
@@ -145,7 +133,7 @@ export default function SignUp() {
           회원가입
         </CustomButton>
 
-        <Link className="self-end text-sm text-text_gray underline" href={ROUTE.USER.LOGIN}>
+        <Link className="self-end py-2 text-sm text-text_gray underline" href={ROUTE.USER.LOGIN}>
           이미 회원이신가요? 로그인하기
         </Link>
       </BlurOverlay>

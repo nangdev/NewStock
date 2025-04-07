@@ -5,12 +5,14 @@ export const API_URL = process.env.EXPO_PUBLIC_API_URL;
 //   : process.env.EXPO_PUBLIC_API_URL;
 export const API_VERSION = process.env.EXPO_PUBLIC_API_VERSION;
 export const API_BASE_URL = `${API_URL}/${API_VERSION}`;
+export const KAKAO_REDIRECT_URI = `${process.env.EXPO_PUBLIC_API_URL}/api/kakao-redirect.html`;
 
 const DOMAIN = {
   USER: 'users',
   AUTH: 'auth',
   STOCK: 'stock',
   NEWS: 'news',
+  NOTIFICATION: 'notification',
 };
 
 /** Memo: API 명세서 도메인 및 endpoint 구조 적용 */
@@ -18,12 +20,13 @@ export const API_PATH = {
   USER: {
     INFO: DOMAIN.USER,
     CHECK_EMAIL: `${DOMAIN.USER}/check-email`,
-    SIGN_IN: DOMAIN.USER,
+    SIGN_UP: DOMAIN.USER,
     WITHDRAW: DOMAIN.USER,
     NEW: `${DOMAIN.USER}/new`,
+    NICKNAME: `${DOMAIN.USER}/nickname`,
   },
   AUTH: {
-    SOCIAL: `${DOMAIN.AUTH}/social-login`,
+    SOCIAL: `${DOMAIN.AUTH}/oauth/kakao/login`,
     LOGIN: `${DOMAIN.AUTH}/login`,
     LOGOUT: `${DOMAIN.AUTH}/logout`,
     ACCESS: `${DOMAIN.AUTH}/access`,
@@ -42,5 +45,10 @@ export const API_PATH = {
     SCRAP: `${DOMAIN.NEWS}/scrap`,
     SCRAP_ADD: `${DOMAIN.NEWS}/scrap`,
     SCRAP_DELETE: `${DOMAIN.NEWS}/scrap`,
+  },
+  NOTIFICATION: {
+    ALL: `${DOMAIN.NOTIFICATION}`,
+    DELETE: `${DOMAIN.NOTIFICATION}`,
+    READ: `${DOMAIN.NOTIFICATION}`,
   },
 };

@@ -7,6 +7,7 @@ export type AllStockResType = BaseResType & {
       stockCode: string;
       stockName: string;
       isInterested: boolean;
+      imgUrl: string;
     }[];
   };
 };
@@ -19,14 +20,7 @@ export type StockInterestResType = BaseResType;
 
 export type AllUserStockResType = BaseResType & {
   data: {
-    stockList: {
-      stockId: number,
-      stockCode: string,
-      stockName: string,
-      closingPrice: number,
-      rcPdcp: number,
-      imgUrl: string,
-    }[];
+    stockList: StockType[];
   }
 }
 
@@ -46,3 +40,12 @@ export type StockDetailInfoResType = BaseResType & {
     stdIccn: string,
   }
 }
+
+export type StockType = {
+  stockId: number;
+  stockCode: string;
+  stockName: string;
+  closingPrice: number;
+  rcPdcp: number;
+  imgUrl: string;
+};

@@ -2,12 +2,14 @@ import { useUserInfoMutation } from 'api/user/query';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import useKakaoOAuth from 'hooks/useKakaoOAuth';
 import { useEffect } from 'react';
 import { getToken } from 'utils/token';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function UserProvider({ children }: { children: React.ReactNode }) {
+  useKakaoOAuth();
   const router = useRouter();
   const { mutateAsync } = useUserInfoMutation();
 
