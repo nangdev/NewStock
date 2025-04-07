@@ -6,6 +6,7 @@ import newstock.common.dto.Api;
 import newstock.controller.request.NewsletterContentRequest;
 import newstock.controller.request.NewsletterRequest;
 import newstock.controller.response.NewsletterResponse;
+import newstock.domain.keyword.service.KeywordService;
 import newstock.domain.newsletter.service.NewsletterService;
 import newstock.domain.stock.dto.UserStockDto;
 import newstock.domain.stock.service.StockService;
@@ -21,6 +22,8 @@ import java.util.List;
 public class NewsLetterController {
 
     private final NewsletterService newsletterService;
+
+    private final KeywordService keywordService;
 
     private final StockService stockService;
 
@@ -46,7 +49,8 @@ public class NewsLetterController {
 
     @PostMapping("/keywords/{stockId}")
     public ResponseEntity<Api<Void>> addKeywords(@PathVariable Integer stockId, @RequestBody NewsletterContentRequest request) {
-
+        keywordService.addKeywordByContent(stockId, request);
+        return ResponseEntity.ok(Api.ok());
     }
 
 }
