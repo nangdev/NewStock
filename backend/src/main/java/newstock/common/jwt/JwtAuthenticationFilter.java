@@ -55,9 +55,12 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         // JWT 검사 생략할 경로들 조건문
         if ((path.equals("/v1/users") && method.equalsIgnoreCase("POST")) ||
                 path.equals("/v1/users/check-email") ||
+                path.equals("/v1/users/send-email") ||
+                path.equals("/v1/users/verify-email") ||
                 path.equals("/v1/auth/refresh") ||
                 path.equals("/v1/auth/login") ||
-                path.equals("/v1/auth/oauth/kakao/callback") ||
+                path.equals("/v1/auth/oauth/kakao/login") ||
+                path.equals("/kakao-redirect.html") ||
                 path.equals("/swagger-ui.html") ||
                 path.startsWith("/swagger-ui") ||
                 path.startsWith("/v3/api-docs") ||

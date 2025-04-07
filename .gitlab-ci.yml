@@ -27,6 +27,11 @@ deploy:
         git checkout $CI_COMMIT_REF_NAME &&
         git pull &&
         
+        # 스크립트 파일 권한 설정
+        chmod +x scripts/start_and_adjust.sh
+        chmod +x scripts/adjust_resources.sh
+        chmod +x scripts/start_services.sh
+        
         # 환경 변수 파일 생성
         # 공통 환경 변수
         echo \"MYSQL_DATABASE=$MYSQL_DATABASE\" > .env &&
@@ -56,11 +61,16 @@ deploy:
           echo \"REDIS_HOST=$REDIS_HOST\" >> backend/.env &&
           echo \"REDIS_PORT=$REDIS_PORT\" >> backend/.env &&
           echo \"REDIS_TIMEOUT=$REDIS_TIMEOUT\" >> backend/.env &&
+          echo \"MAIL_HOST=$MAIL_HOST\" >> backend/.env &&
+          echo \"MAIL_PORT=$MAIL_PORT\" >> backend/.env &&
+          echo \"MAIL_USERNAME=$MAIL_USERNAME\" >> backend/.env &&
+          echo \"MAIL_PASSWORD=$MAIL_PASSWORD\" >> backend/.env &&
+          echo \"KAKAO_REDIRECT_URL=$KAKAO_REDIRECT_URL\" >> backend/.env &&
           
-          # API 서버와 Nginx 재배포
-          echo \"dev/service 브랜치: API 서버와 Nginx 배포 중...\"
+          # API 서버와 Nginx 재빌드 및 배포
+          echo \"dev/service 브랜치: API 서버와 Nginx 빌드 및 배포 중...\"
           docker-compose build backend nginx
-          docker-compose up -d --no-deps backend nginx
+          ./scripts/start_services.sh backend nginx
           
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/crawl\" ]]; then
           
@@ -78,16 +88,17 @@ deploy:
           echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> crawl/.env &&
           echo \"NEWS_AI_URL=$NEWS_AI_URL\" >> crawl/.env &&
           
-          # 크롤러만 재배포
-          echo \"dev/crawl 브랜치: 크롤러 서비스 배포 중...\"
+          # 크롤러 재빌드 및 배포
+          echo \"dev/crawl 브랜치: 크롤러 서비스 빌드 및 배포 중...\"
           docker-compose build crawl
-          docker-compose up -d --no-deps crawl
+          ./scripts/start_services.sh crawl chrome selenium-hub
 
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/ai\" ]]; then
 
           echo \"dev/ai 브랜치: AI 서비스 배포 중...\"
+          docker-compose down ai
           docker-compose build ai
-          docker-compose up -d --no-deps ai
+          ./scripts/start_services.sh ai
           
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/be\" ]]; then
           # 모든 환경 변수 설정
@@ -109,7 +120,12 @@ deploy:
           echo \"REDIS_HOST=$REDIS_HOST\" >> backend/.env &&
           echo \"REDIS_PORT=$REDIS_PORT\" >> backend/.env &&
           echo \"REDIS_TIMEOUT=$REDIS_TIMEOUT\" >> backend/.env &&
-          
+          echo \"MAIL_HOST=$MAIL_HOST\" >> backend/.env &&
+          echo \"MAIL_PORT=$MAIL_PORT\" >> backend/.env &&
+          echo \"MAIL_USERNAME=$MAIL_USERNAME\" >> backend/.env &&
+          echo \"MAIL_PASSWORD=$MAIL_PASSWORD\" >> backend/.env &&
+          echo \"KAKAO_REDIRECT_URL=$KAKAO_REDIRECT_URL\" >> backend/.env &&
+
           # 크롤러 환경 변수
           echo \"APP_NAME=$APP_NAME\" > crawl/.env &&
           echo \"MYSQL_HOST=$MYSQL_HOST\" >> crawl/.env &&
@@ -128,7 +144,7 @@ deploy:
           echo \"dev/be 브랜치: 모든 서비스 배포 중...\"
           docker-compose down
           docker-compose build
-          docker-compose up -d
+          ./scripts/start_services.sh
         fi
       "
   rules:

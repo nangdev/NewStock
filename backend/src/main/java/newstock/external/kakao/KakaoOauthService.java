@@ -27,9 +27,6 @@ public class KakaoOauthService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${kakao.redirect-uri}")
-    private String kakaoRedirectUri;
-
     // 인가 코드로 카카오 토큰 요청
     public KakaoTokenResponse getToken(String code) {
 

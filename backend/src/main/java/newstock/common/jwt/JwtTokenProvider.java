@@ -155,7 +155,7 @@ public class JwtTokenProvider {
                     .getBody();
 
             Integer userId = Integer.parseInt(claims.getSubject());
-            User user = userRepository.findById(userId)
+            User user = userRepository.findByUserIdAndActivatedTrue(userId)
                     .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
             CustomUserDetails userDetails = new CustomUserDetails(user);

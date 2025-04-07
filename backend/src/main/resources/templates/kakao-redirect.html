@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Kakao Oauth Deeplink Page</title>
+</head>
+<body>
+<script th:inline="javascript">
+    const code = new URLSearchParams(window.location.search).get("code");
+    const redirectUrl = /*[[${kakaoRedirectUrl}]]*/ "";
+    window.location.href = `${redirectUrl}?code=${code}`;
+</script>
+</body>
+</html>

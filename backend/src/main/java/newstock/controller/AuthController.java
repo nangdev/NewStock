@@ -1,6 +1,7 @@
 package newstock.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import newstock.common.dto.Api;
 import newstock.controller.request.KakaoLoginRequest;
@@ -9,8 +10,8 @@ import newstock.controller.request.RefreshRequest;
 import newstock.controller.response.LoginResponse;
 import newstock.domain.user.service.AuthService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,8 +43,8 @@ public class AuthController {
 
         log.info("로그아웃 요청 - userId: {}", userId);
 
-        String token = bearerToken.replace("Bearer ", "");
-        authService.logout(userId, token);
+        String accessToken = bearerToken.replace("Bearer ", "");
+        authService.logout(userId, accessToken);
 
         return ResponseEntity.ok(Api.ok());
     }
@@ -65,7 +66,7 @@ public class AuthController {
     /**
      * 카카오 로그인
      */
-    @PostMapping("/oauth/kakao/callback")
+    @PostMapping("/oauth/kakao/login")
     public ResponseEntity<Api<LoginResponse>> kakaoLogin(@RequestBody KakaoLoginRequest request) {
         LoginResponse response = authService.loginWithKakao(request.getCode(), request.getFcmToken());
 
