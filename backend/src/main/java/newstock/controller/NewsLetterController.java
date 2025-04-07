@@ -44,4 +44,9 @@ public class NewsLetterController {
         return ResponseEntity.ok(Api.ok());
     }
 
+    @PostMapping("/keywords/{stockId}")
+    public ResponseEntity<Api<Void>> addKeywords(@PathVariable Integer stockId, @RequestBody NewsletterContentRequest request) {
+
+    }
+
 }
