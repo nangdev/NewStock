@@ -91,7 +91,7 @@ type News = {
                 title={news.title}
                 description='desc'
                 score={10}
-                publishedDate='2025-03-14:20:08:49'
+                publishedDate={news.publishedDate}
                 hojaeIconUrl=''
               />
             ))
