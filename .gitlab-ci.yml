@@ -59,6 +59,8 @@ deploy:
           echo \"MAIL_USERNAME=$MAIL_USERNAME\" >> backend/.env &&
           echo \"MAIL_PASSWORD=$MAIL_PASSWORD\" >> backend/.env &&
           echo \"KAKAO_REDIRECT_URL=$KAKAO_REDIRECT_URL\" >> backend/.env &&
+          echo \"OPENAI_API_KEY=$OPENAI_API_KEY\" >> backend/.env &&
+          echo \"NEWS_AI_URL=$NEWS_AI_URL\" >> backend/.env &&
           
           # API 서버와 Nginx 재빌드 및 배포
           echo \"dev/service 브랜치: API 서버와 Nginx 빌드 및 배포 중...\"
@@ -114,7 +116,9 @@ deploy:
           echo \"MAIL_PORT=$MAIL_PORT\" >> backend/.env &&
           echo \"MAIL_USERNAME=$MAIL_USERNAME\" >> backend/.env &&
           echo \"MAIL_PASSWORD=$MAIL_PASSWORD\" >> backend/.env &&
-          echo \"KAKAO_REDIRECT_URL=$KAKAO_REDIRECT_URL\" >> backend/.env &&
+          echo \"OPENAI_API_KEY=$OPENAI_API_KEY\" >> backend/.env &&
+          echo \"NEWS_AI_URL=$NEWS_AI_URL\" >> backend/.env &&
+
 
           # 크롤러 환경 변수
           echo \"APP_NAME=$APP_NAME\" > crawl/.env &&
