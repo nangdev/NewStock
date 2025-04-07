@@ -3,7 +3,6 @@ package newstock.exception;
 import lombok.extern.slf4j.Slf4j;
 import newstock.common.dto.Api;
 import newstock.exception.type.InternalException;
-import newstock.exception.type.ValidationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,7 +28,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Api<Integer>> handleGlobalException(Exception ex) {
         log.error("예상치 못한 오류 발생:", ex);
 
-        ExceptionCode ec = ExceptionCode.EXTERNAL_API_ERROR;
+        ExceptionCode ec = ExceptionCode.INTERNAL_SERVER_ERROR;
 
         return ResponseEntity.status(ec.getStatus()).body(Api.ERROR(ec.getMessage(), ec.getCode()));
     }
