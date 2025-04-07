@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y wget gnupg2 \
     && apt-get update && apt-get install -y google-chrome-stable \
     && apt-get clean
 
-# Chrome binary 환경 변수 설정
 ENV CHROME_BIN=/usr/bin/google-chrome
 
 COPY --from=build /app/build/libs/*.jar app.jar
