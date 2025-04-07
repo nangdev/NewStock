@@ -145,6 +145,9 @@ public class NewsletterServiceImpl implements NewsletterService {
 
                 List<Article> articles =newsService.getNewsByStockIdAndDate(stockDto.getStockId());
 
+                if(articles.isEmpty())
+                    continue;
+
                 KeywordAIResponse keywordAIResponse =keywordService.extractKeywords(KeywordAIRequest.of(articles));
 
                 keywordService.addKeyword(KeywordList.of(keywordAIResponse.getKeywords(),stockDto.getStockId()));
