@@ -1,4 +1,4 @@
-import { View, ScrollView, Text } from "react-native";
+import { View, ScrollView, Text, Image } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import StockInfoCard from "components/stock/StockInfoCard";
 import { useStockDetailInfoQuery } from "api/stock/query";
@@ -95,7 +95,9 @@ export default function StockDetail () {
       </View>
 
       <View className="bg-white rounded-2xl mx-8 my-2 shadow-md h-[400px] pt-2">
-        <ScrollView>
+        { newsListData && newsListData.data.newsList.length > 0
+        ?
+        (<><ScrollView>
           {newsListData?.data.newsList.map((news) => (
             <NewsListItem
               key={news.newsId}
@@ -120,9 +122,15 @@ export default function StockDetail () {
             ? <Entypo name="triangle-right" onPress={onPressRight} size={18}/>
             : <Entypo name="triangle-right" size={18} color={'transparent'}/>
           }
-          
-          
-        </View>
+        </View></>)
+        : <View className="flex-1 items-center justify-center">
+            <Image
+              source={require('assets/image/no_data.png')}
+              style={{ width: 50, height: 50, resizeMode: 'contain' }}>
+            </Image>
+            <Text className='' style={{color: '#8A96A3'}}>관련 뉴스가 없어요</Text>
+          </View>
+      }
       </View>
     </View>
   );
