@@ -1,8 +1,10 @@
 import { Text, View, ScrollView } from 'react-native';
 import StockListItem from 'components/main/StockListItem';
-import { Client } from '@stomp/stompjs';
+import { Client, IMessage } from '@stomp/stompjs';
 import { useEffect, useState } from 'react';
 import { useAllUserStockListQuery } from 'api/stock/query';
+import { useRouter } from 'expo-router';
+import stompService from 'utils/stompService'
 
 type Stock = {
   stockId: number,
@@ -13,70 +15,66 @@ type Stock = {
   imgUrl: string,
 }
 
-export default function Main() {
 
-  // 테스트 데이터
-  // const [subscribedStocks, setSubscribedStocks] = useState([
-  //   { stockName: '삼성전자', stockCode: '005930', price: 0, changeRate: 0.0 },
-  //   { stockName: 'SK하이닉스', stockCode: '000660', price: 0, changeRate: 0.0 },
-  //   { stockName: '카카오', stockCode: '035720', price: 0, changeRate: 0.0 },
-  // ]);
-  
+
+export default function Main() {
+  const router = useRouter();
   const { data, isLoading, isError } = useAllUserStockListQuery();
   const [subscribedStocks, setSubscribedStocks] = useState<Stock[]>([]);
   
   useEffect(() => {
-    if (!data?.data.stockList) return;
-
-    setSubscribedStocks(data.data.stockList);
-    console.log(subscribedStocks)
-    // STOMP 연결
-    const client = new Client({
-      webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
-      // webSocketFactory: () => new WebSocket('ws://10.0.2.2:8080/api/ws'),
-      // debug: (msg) => console.log('STOMP:', msg),
-      onConnect: (frame) => {
-        // 구독
-        data.data.stockList.forEach((stock) => {
-          client.subscribe(`/topic/rtp/${stock.stockCode}`, (msg) => {
-            const parsed = JSON.parse(msg.body);
-            // console.log(msg.body)
-            setSubscribedStocks((prev) =>
-              prev.map((s) =>
-                s.stockCode === parsed.stockCode
-                  ? { ...s, closingPrice: parsed.price, rcPdcp: parsed.changeRate }
-                  : s
-              )
-            );
-          })
-        })
-      },
-      forceBinaryWSFrames: true,
-      appendMissingNULLonIncoming: true,
-    })
+    if (!data?.data.stockList) {
+      router.replace(`/stock/1/005930`)
+      return;
+    }
     
-    client.activate();
+    const latestStockList = data.data.stockList;
+    setSubscribedStocks(latestStockList);
+
+    const onMessage = (msg: IMessage) => {
+      const parsed = JSON.parse(msg.body);
+      // console.log(parsed)
+      setSubscribedStocks((prev) =>
+        prev.map((s) =>
+          s.stockCode === parsed.stockCode
+            ? { ...s, closingPrice: parsed.price, rcPdcp: parsed.changeRate }
+            : s
+        )
+      );
+    }
+
+    
+    stompService.connect();
+
+    if (stompService.isReady()) {
+      stompService.unsubscribeAll();
+      latestStockList.forEach((stock) => {
+        stompService.subscribe(stock.stockCode, onMessage);
+      })
+    }
 
     return () => {
-      client.deactivate();
+      stompService.unsubscribeAll();
+      // stompService.disconnect();
     }
   }, [data]);
 
   return (
     <View>
-      <ScrollView>
-        {subscribedStocks.map((stock) => (
-          <StockListItem
-            key={stock.stockCode}
-            stockName={stock.stockName}
-            stockCode={stock.stockCode}
-            price={stock.closingPrice ? stock.closingPrice : 0}
-            changeRate={stock.rcPdcp ? stock.rcPdcp : 0}
-            imgUrl={stock.imgUrl}
-            hojaeIconUrl=''
-        />
-        ))}
-      </ScrollView>
+        <ScrollView>
+          {subscribedStocks.map((stock) => (
+            <StockListItem
+              key={stock.stockCode}
+              stockId={stock.stockId}
+              stockName={stock.stockName}
+              stockCode={stock.stockCode}
+              price={stock.closingPrice ? stock.closingPrice : 0}
+              changeRate={Number(stock.rcPdcp ?? 0)}
+              imgUrl={stock.imgUrl ?? ''}
+              hojaeIconUrl=''
+          />
+          ))}
+        </ScrollView>
     </View>
   );
 }

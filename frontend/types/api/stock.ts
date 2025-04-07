@@ -21,8 +21,25 @@ export type StockInterestResType = BaseResType;
 export type AllUserStockResType = BaseResType & {
   data: {
     stockList: StockType[];
-  };
-};
+  }
+}
+
+export type StockDetailInfoResType = BaseResType & {
+  data: {
+    stockId: number,
+    stockName: string,
+    closingPrice: number,
+    rcPdcp: number,
+    stockImage: string,
+    totalPrice: string,
+    capital: string,
+    lstgStqt: string,
+    parValue: string,
+    issuePrice: string,
+    listingDate: string,
+    stdIccn: string,
+  }
+}
 
 export type StockType = {
   stockId: number;
