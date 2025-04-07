@@ -9,4 +9,5 @@ public interface NewsCustomRepository {
 
     Optional<List<News>> getTopNewsListByStockId(Integer stockId);
 
+    List<News> findNewsByStockIdAndDate(Integer stockId, String publishedDate);
 }

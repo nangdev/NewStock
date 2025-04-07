@@ -9,6 +9,7 @@ import newstock.controller.response.NewsDetailResponse;
 import newstock.controller.response.NewsScrapResponse;
 import newstock.controller.response.StockNewsResponse;
 import newstock.controller.response.TopNewsResponse;
+import newstock.domain.keyword.dto.Article;
 import newstock.domain.news.dto.NewsDetailDto;
 import newstock.domain.news.dto.NewsScrapDto;
 import newstock.domain.news.dto.StockNewsDto;
@@ -25,6 +26,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -132,4 +135,17 @@ public class NewsServiceImpl implements NewsService {
         newsScrapRepository.deleteById(scrapId);
     }
 
+    @Override
+    public List<Article> getNewsByStockIdAndDate(Integer stockId) {
+
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        List<News> newsList = newsRepository.findNewsByStockIdAndDate(stockId, today);
+
+        return newsList.stream()
+                .map(news -> Article.builder()
+                        .content(news.getContent())
+                        .build())
+                .collect(Collectors.toList());
+    }
 }

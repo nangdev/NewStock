@@ -54,6 +54,14 @@ public class StockService {
         return stockDtoList;
     }
 
+    public List<StockDto> getAllStockList() {
+
+        return stockRepository.findAll()
+                .stream()
+                .map(StockDto::of)
+                .toList();
+    }
+
     public List<UserStockDto> getUserStockList(Integer userId) {
         List<UserStockDto> userStockDtoList = stockRepository.findUserStocksByUserId(userId);
 
