@@ -120,17 +120,6 @@ services:
       - "2181:2181"
     restart: unless-stopped
 
-  ai:
-    build:
-      context: ./ai
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./scripts:/scripts
-    entrypoint: ["/bin/bash", "/scripts/start_and_adjust.sh"]
-    restart: unless-stopped
-
 volumes:
   db-data:
   redis-data:

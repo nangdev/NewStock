@@ -25,11 +25,6 @@ deploy:
         git checkout $CI_COMMIT_REF_NAME &&
         git pull &&
         
-        # 스크립트 파일 권한 설정
-        chmod +x scripts/start_and_adjust.sh
-        chmod +x scripts/adjust_resources.sh
-        chmod +x scripts/start_services.sh
-        
         # 환경 변수 파일 생성
         # 공통 환경 변수
         echo \"MYSQL_DATABASE=$MYSQL_DATABASE\" > .env &&
@@ -69,7 +64,7 @@ deploy:
           echo \"dev/service 브랜치: API 서버와 Nginx 빌드 및 배포 중...\"
           docker-compose down backend nginx
           docker-compose build backend nginx
-          ./scripts/start_services.sh backend nginx
+          docker-compose up -d backend nginx
           
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/crawl\" ]]; then
           
@@ -93,15 +88,8 @@ deploy:
           echo \"dev/crawl 브랜치: 크롤러 서비스 빌드 및 배포 중...\"
           docker-compose down crawl chrome selenium-hub
           docker-compose build crawl chrome selenium-hub
-          ./scripts/start_services.sh crawl chrome selenium-hub
+          docker-compose up -d crawl chrome selenium-hub
 
-        elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/ai\" ]]; then
-
-          echo \"dev/ai 브랜치: AI 서비스 배포 중...\"
-          docker-compose down ai
-          docker-compose build ai
-          ./scripts/start_services.sh ai
-          
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/be\" ]]; then
           # 모든 환경 변수 설정
           echo \"APP_NAME=$APP_NAME\" > backend/.env &&
@@ -148,11 +136,10 @@ deploy:
           echo \"dev/be 브랜치: 모든 서비스 배포 중...\"
           docker-compose down
           docker-compose build
-          ./scripts/start_services.sh
+          docker-compose up -d
         fi
       "
   rules:
     - if: '$CI_COMMIT_REF_NAME == "dev/service"'
     - if: '$CI_COMMIT_REF_NAME == "dev/crawl"'
-    - if: '$CI_COMMIT_REF_NAME == "dev/ai"'
     - if: '$CI_COMMIT_REF_NAME == "dev/be"'
