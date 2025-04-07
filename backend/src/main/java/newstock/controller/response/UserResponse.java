@@ -12,7 +12,6 @@ public class UserResponse {
 
     private Integer userId;
     private String email;
-    private String userName;
     private String nickname;
     private Byte role;
 
@@ -20,7 +19,6 @@ public class UserResponse {
         return UserResponse.builder()
                 .userId(user.getUserId())
                 .email(user.getEmail())
-                .userName(user.getUserName())
                 .nickname(user.getNickname())
                 .role(user.getRole())
                 .build();

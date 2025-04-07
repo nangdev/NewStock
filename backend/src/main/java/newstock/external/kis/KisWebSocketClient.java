@@ -5,23 +5,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.websocket.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import newstock.domain.stock.repository.StockRepository;
 import newstock.domain.stock.service.StockPriceService;
-import newstock.exception.ExceptionCode;
-import newstock.exception.type.ExternalApiException;
 import newstock.external.kis.dto.KisBodyDto;
 import newstock.external.kis.dto.KisHeaderDto;
 import newstock.external.kis.dto.KisInputDto;
-import newstock.external.kis.dto.KisStockInfoDto;
+import newstock.external.kis.dto.KisRealTimeStockPriceDto;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 
 @ClientEndpoint
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class KisWebSocketClient {
     private Session session;
@@ -29,6 +29,7 @@ public class KisWebSocketClient {
     private final KisOAuthClient authClient;
     private final ObjectMapper objectMapper;
     private final StockPriceService stockPriceService;
+    private final StockRepository stockRepository;
 
     public boolean isConnected() {
         return session != null && session.isOpen();
@@ -60,9 +61,7 @@ public class KisWebSocketClient {
             header.setTrType("1");
             header.setContentType("utf-8");
 
-            List<String> codes = Arrays.stream(KospiStock.values())
-                    .map(KospiStock::getCode)
-                    .toList();
+            List<String> codes = stockRepository.findCodesAll();
 
             for (String code : codes) {
                 KisWebSocketSubMsg msg = new KisWebSocketSubMsg();
@@ -116,7 +115,7 @@ public class KisWebSocketClient {
                     int price = Integer.parseInt(parsedData[2]);
                     double changeRate = Double.parseDouble(parsedData[5]);
 
-                    KisStockInfoDto stockInfoDto = KisStockInfoDto.builder()
+                    KisRealTimeStockPriceDto RTStockInfoDto = KisRealTimeStockPriceDto.builder()
                             .stockCode(stockCode)
                             .time(time)
                             .price(price)
@@ -124,7 +123,7 @@ public class KisWebSocketClient {
                             .build();
 
                     // websocket 브로커
-                    stockPriceService.sendStockInfo(stockInfoDto);
+                    stockPriceService.sendStockInfo(RTStockInfoDto);
                 }
 
             }
@@ -134,9 +133,9 @@ public class KisWebSocketClient {
     }
 
     @OnClose
-    public void onClose(Session session) {
+    public void onClose(Session session, CloseReason closeReason) {
         this.session = null;
-        log.info("한투 웹소켓 연결 종료");
+        log.info("한투 웹소켓 연결 종료: {}", closeReason.getReasonPhrase());
     }
 
     private boolean isJson(String message) {

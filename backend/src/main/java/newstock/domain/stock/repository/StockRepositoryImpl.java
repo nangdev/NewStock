@@ -26,9 +26,10 @@ public class StockRepositoryImpl implements StockRepositoryCustom {
                         stock.closingPrice,
                         stock.rcPdcp,
                         stock.imgUrl))
-                .from(userStock)
-                .join(stock).on(userStock.stockId.eq(stock.stockId))
+                .from(stock)
+                .join(userStock).on(stock.stockId.eq(userStock.stockId))
                 .where(userStock.userId.eq(userId))
+                .orderBy(userStock.id.asc())
                 .fetch();
     }
 

@@ -7,4 +7,5 @@ FROM eclipse-temurin:17.0.12_7-jre-jammy
 COPY --from=build /app/build/libs/*.jar app.jar
 COPY .env /.env
 EXPOSE 8080
+ENV TZ=Asia/Seoul
 ENTRYPOINT ["java", "-jar", "/app.jar"]

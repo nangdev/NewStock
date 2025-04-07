@@ -3,22 +3,18 @@ package newstock.domain.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import newstock.controller.request.LoginRequest;
+import newstock.common.jwt.TokenBlacklistService;
+import newstock.common.redis.RedisUtil;
 import newstock.controller.request.UserRequest;
-import newstock.controller.response.LoginResponse;
 import newstock.controller.response.UserResponse;
-import newstock.domain.user.dto.JwtToken;
 import newstock.domain.user.entity.User;
 import newstock.domain.user.repository.UserRepository;
-import newstock.common.jwt.JwtTokenProvider;
-
 import newstock.exception.ExceptionCode;
 import newstock.exception.type.ValidationException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,70 +23,59 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisUtil redisUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
+    // 회원 가입
     @Override
     @Transactional
     public void addUser(UserRequest userRequest) {
-        // 이메일 중복 체크
-        if (userRepository.existsByEmail(userRequest.getEmail())) {
-            log.warn("중복된 이메일로 회원가입 시도 - email: {}", userRequest.getEmail());
-            throw new ValidationException(ExceptionCode.DUPLICATE_EMAIL);
-        }
-
+        String email = userRequest.getEmail();
         String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
 
-        User newUser = User.of(userRequest, encodedPassword);
-        User savedUser = userRepository.save(newUser);
+        Optional<User> existingUser = userRepository.findByEmail(userRequest.getEmail());
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            log.info("회원 가입 시도 이메일 - email: {}", user.getEmail());
 
-        log.info("회원가입 성공 - userId: {}, email: {}", savedUser.getUserId(), savedUser.getEmail());
+            // 재가입일 경우 복구 처리
+            if (!user.isActivated()) {
+                user.reactivate(userRequest, encodedPassword);
+                userRepository.save(user);
+                log.info("탈퇴 유저 복구 - userId: {}, email: {}", user.getUserId(), user.getEmail());
+                return;
+            } else {
+                log.warn("중복된 이메일로 회원가입 시도 - email: {}",  email);
+                throw new ValidationException(ExceptionCode.DUPLICATE_EMAIL);
+            }
+        }
+        // ⚠️ [임시 주석] 이메일 인증 우회 (테스트용)
+//        if (!Boolean.TRUE.equals(redisUtil.get("email:verified:" + userRequest.getEmail(), Boolean.class))) {
+//            throw new ValidationException(ExceptionCode.EMAIL_NOT_VERIFIED);
+//        }
+
+        // 신규 가입
+        User newUser = User.of(userRequest, encodedPassword);
+        userRepository.save(newUser);
+//      ⚠️ [임시 주석]
+//   redisUtil.delete("email:verified:" + userRequest.getEmail());
+        log.info("회원 가입 완료 - userId: {}, email: {}", newUser.getUserId(), newUser.getEmail());
     }
 
-    // 이메일 중복 체크 기능
+    // 이메일 중복 체크
     @Override
     public boolean existsByEmail(String email) {
-        boolean exists = userRepository.existsByEmail(email);
+        boolean exists = userRepository.existsByEmailAndActivatedTrue(email);
         log.debug("이메일 중복 확인 - 이메일: {}, 존재 여부: {}", email, exists);
 
-        return userRepository.existsByEmail(email);
-    }
-
-    // 로그인
-    @Override
-    @Transactional
-    public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ValidationException(ExceptionCode.VALIDATION_ERROR, "이메일 또는 비밀번호가 일치하지 않습니다."));
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new ValidationException(ExceptionCode.VALIDATION_ERROR, "이메일 또는 비밀번호가 일치하지 않습니다.");
-        }
-
-        CustomUserDetails userDetails = new CustomUserDetails(user);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-
-        JwtToken token = jwtTokenProvider.generateToken(authentication);
-
-        user.setAccessToken(token.getAccessToken());
-        user.setRefreshToken(token.getRefreshToken());
-
-        if (request.getFcmToken() != null && !request.getFcmToken().isBlank()) {
-            user.setFcmToken(request.getFcmToken());
-        }
-        userRepository.save(user);
-
-        return LoginResponse.builder()
-                .accessToken(token.getAccessToken())
-                .refreshToken(token.getRefreshToken())
-                .build();
+        return exists;
     }
 
     // 회원가입 후 최초 로그인 시, 유저 권한을 1(USER)로 변경
     @Override
     @Transactional
     public void updateUserRole(Integer userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserIdAndActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         if (user.getRole() != 0) {
@@ -101,11 +86,48 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    // 유저 정보 조회
     @Override
     public UserResponse getUserInfo(Integer userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserIdAndActivatedTrue(userId)
                 .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
 
         return UserResponse.of(user);
+    }
+
+    // 닉네임 변경
+    @Override
+    public UserResponse updateNickname(Integer userId, String newNickname)
+    {
+        User user = userRepository.findByUserIdAndActivatedTrue(userId)
+                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
+
+        if (user.getNickname().equals(newNickname)) {
+            throw new ValidationException(ExceptionCode.SAME_NICKNAME_NOT_ALLOWED);
+        }
+        user.setNickname(newNickname);
+        userRepository.save(user);
+        log.info("닉네임 변경 완료 - userId: {}, nickname: {}", userId, newNickname);
+
+        return UserResponse.of(user);
+    }
+
+
+    // 회원 탈퇴
+    @Override
+    public void deleteUser(Integer userId, String accessToken) {
+        User user = userRepository.findByUserIdAndActivatedTrue(userId)
+                .orElseThrow(() -> new ValidationException(ExceptionCode.USER_NOT_FOUND));
+
+        if (!user.isActivated()) {
+            throw new ValidationException(ExceptionCode.USER_ALREADY_DELETED);
+        }
+
+        user.setRefreshToken(null);
+        user.setFcmToken(null);
+        tokenBlacklistService.addToBlacklist(accessToken);
+        user.setActivated(false);
+        userRepository.save(user);
+        log.info("회원 탈퇴 처리 완료 - userId: {}", userId);
     }
 }
