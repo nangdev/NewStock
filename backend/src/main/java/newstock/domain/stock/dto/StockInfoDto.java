@@ -34,7 +34,7 @@ public class StockInfoDto {
 
     private String stockImage;
 
-    private Integer totalPrice;  // 시가 총액
+    private String totalPrice;  // 시가 총액
 
     private String capital; // 자본금
 
@@ -47,7 +47,7 @@ public class StockInfoDto {
     private String stdIccn; // 업종 이름
 
     // 자본금 포맷팅 (원 단위로 표시되어 있음)
-    public String getFormattedCapital() {
+    private static String getFormattedCapital(String capital) {
         if (capital == null || capital.isEmpty()) {
             return "-";
         }
@@ -65,7 +65,7 @@ public class StockInfoDto {
     }
     
     // 시가총액 포맷팅 (백만원 단위로 표시되어 있음)
-    public String getFormattedTotalPrice() {
+    private static String getFormattedTotalPrice(Integer totalPrice) {
         if (totalPrice == null) {
             return "-";
         }
@@ -76,17 +76,16 @@ public class StockInfoDto {
         double trillions = totalPrice / 1000.0;
         
         if (trillions >= 1000) {
-            // 1조원 이상인 경우
+            // 1조원 이상
             return df.format(trillions / 1000) + "조 " + df.format(trillions % 1000) + "억원";
         } else {
-            // 1조원 미만인 경우
+            // 1조원 미만
             return df.format(trillions) + "억원";
         }
     }
-    
-    // 상장일자 포맷팅 (YYYYMMDD → YYYY.MM.DD)
-    public String getFormattedListingDate() {
-        if (listingDate == null || listingDate.isEmpty() || listingDate.length() != 8) {
+
+    private static String getFormattedListingDate(String listingDate) {
+        if (listingDate == null || listingDate.length() != 8) {
             return "-";
         }
         
@@ -106,9 +105,9 @@ public class StockInfoDto {
                 .closingPrice(stock.getClosingPrice())
                 .rcPdcp(stock.getRcPdcp())
                 .stockImage(StockInfoDto.getBase64Image(stock.getImgUrl()))
-                .totalPrice(stock.getTotalPrice())
-                .capital(stock.getCapital())
-                .listingDate(stock.getListingDate())
+                .totalPrice(getFormattedTotalPrice(stock.getTotalPrice()))
+                .capital(getFormattedCapital(stock.getCapital()))
+                .listingDate(getFormattedListingDate(stock.getListingDate()))
                 .stdIccn(stock.getStdIccn())
                 .lstgStqt(stock.getLstgStqt())
                 .ctpdPrice(stock.getCtpdPrice())
