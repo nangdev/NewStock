@@ -47,8 +47,12 @@ public class StockService {
 
         List<UserStock> userStockList = userStockRepository.findUserStocksByUserId(userId);
 
-        for (UserStock userStock : userStockList) {
-            stockDtoList.get(userStock.getStockId() - 1).setInterested(true);
+        try {
+            for (UserStock userStock : userStockList) {
+                stockDtoList.get(userStock.getStockId() - 1).setInterested(true);
+            }
+        }catch (Exception e){
+            throw new InternalException(ExceptionCode.INTERNAL_SERVER_ERROR);
         }
 
         return stockDtoList;
