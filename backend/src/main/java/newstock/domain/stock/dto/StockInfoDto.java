@@ -46,57 +46,6 @@ public class StockInfoDto {
 
     private String stdIccn; // 업종 이름
 
-    // 자본금 포맷팅 (원 단위로 표시되어 있음)
-    private static String getFormattedCapital(String capital) {
-        if (capital == null || capital.isEmpty()) {
-            return "-";
-        }
-        
-        try {
-            long capitalValue = Long.parseLong(capital);
-            DecimalFormat df = new DecimalFormat("#,###");
-            
-            // 자본금을 억 단위로 변환
-            double billions = capitalValue / 100000000.0;
-            return df.format(billions) + "억원";
-        } catch (NumberFormatException e) {
-            return capital;
-        }
-    }
-    
-    // 시가총액 포맷팅 (백만원 단위로 표시되어 있음)
-    private static String getFormattedTotalPrice(Integer totalPrice) {
-        if (totalPrice == null) {
-            return "-";
-        }
-        
-        DecimalFormat df = new DecimalFormat("#,###");
-        
-        // totalPrice가 백만원 단위이므로 10억원 단위로 변환
-        double trillions = totalPrice / 1000.0;
-        
-        if (trillions >= 1000) {
-            // 1조원 이상
-            return df.format(trillions / 1000) + "조 " + df.format(trillions % 1000) + "억원";
-        } else {
-            // 1조원 미만
-            return df.format(trillions) + "억원";
-        }
-    }
-
-    private static String getFormattedListingDate(String listingDate) {
-        if (listingDate == null || listingDate.length() != 8) {
-            return "-";
-        }
-        
-        try {
-            LocalDate date = LocalDate.parse(listingDate, DateTimeFormatter.ofPattern("yyyyMMdd"));
-            return date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-        } catch (Exception e) {
-            return listingDate;
-        }
-    }
-
     public static StockInfoDto of(Stock stock) {
         return StockInfoDto.builder()
                 .stockId(stock.getStockId())
@@ -104,15 +53,64 @@ public class StockInfoDto {
                 .stockCode(stock.getStockCode())
                 .closingPrice(stock.getClosingPrice())
                 .rcPdcp(stock.getRcPdcp())
-                .stockImage(StockInfoDto.getBase64Image(stock.getImgUrl()))
+                .stockImage(getBase64Image(stock.getImgUrl()))
                 .totalPrice(getFormattedTotalPrice(stock.getTotalPrice()))
                 .capital(getFormattedCapital(stock.getCapital()))
                 .listingDate(getFormattedListingDate(stock.getListingDate()))
                 .stdIccn(stock.getStdIccn())
-                .lstgStqt(stock.getLstgStqt())
+                .lstgStqt("총 "+stock.getLstgStqt()+"주")
                 .ctpdPrice(stock.getCtpdPrice())
                 .build();
     }
+
+    // 자본금 포맷팅 (원 단위로 표시되어 있음)
+    private static String getFormattedCapital(String capital) {
+        if (capital == null || capital.isEmpty()) {
+            return "-";
+        }
+
+        try {
+            long capitalValue = Long.parseLong(capital);
+            DecimalFormat df = new DecimalFormat("#,###");
+
+            // 자본금을 억 단위로 변환
+            double billions = capitalValue / 100000000.0;
+            return df.format(billions) + "억원";
+        } catch (NumberFormatException e) {
+            return capital;
+        }
+    }
+
+    // 시가총액 포맷팅 (백만원 단위로 표시되어 있음)
+    private static String getFormattedTotalPrice(Integer totalPrice) {
+        if (totalPrice == null) {
+            return "-";
+        }
+
+        DecimalFormat df = new DecimalFormat("#,###");
+
+        if (totalPrice >= 10) {
+            // 1조원 이상
+            return df.format(totalPrice / 10000) + "조 " + df.format(totalPrice % 10000) + "억원";
+        } else {
+            // 1조원 미만
+            return df.format(totalPrice) + "억원";
+        }
+    }
+
+    private static String getFormattedListingDate(String listingDate) {
+        if (listingDate == null || listingDate.length() != 8) {
+            return "-";
+        }
+
+        try {
+            LocalDate date = LocalDate.parse(listingDate, DateTimeFormatter.ofPattern("yyyyMMdd"));
+            return date.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"));
+        } catch (Exception e) {
+            return listingDate;
+        }
+    }
+
 
     private static String getBase64Image(String imgUrl) {
         File imageFile = new File(imgUrl);
