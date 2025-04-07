@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useLogoutMutation } from 'api/auth/query';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
+import Toast from 'react-native-toast-message';
 import useUserStore from 'store/user';
 
 import {
@@ -19,7 +20,8 @@ export const useSignUpMutation = () => {
   return useMutation({
     mutationFn: postSignUp,
     onSuccess: () => {
-      console.log('회원가입 성공');
+      Toast.show({ type: 'success', text1: '회원가입에 성공했습니다' });
+
       router.navigate(ROUTE.USER.LOGIN);
     },
     onError: (error) => {

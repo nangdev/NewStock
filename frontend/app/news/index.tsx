@@ -3,7 +3,7 @@ import CustomFooter from 'components/Footer/Footer';
 import CustomHeader from 'components/Header/Header';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import useUserStore from 'store/user';
 
 export default function NewsPage() {
@@ -25,23 +25,24 @@ export default function NewsPage() {
         <Text className="text-lg font-bold text-text">
           {userInfo.userInfo?.nickname}님의 종목이에요
         </Text>
-        <View className="flex-row flex-wrap justify-center gap-8 px-4">
-          {data?.data.stockList.map((stock) => {
-            return (
-              // Todo: 이미지 경로 수정
-              <TouchableOpacity
-                key={stock.stockId}
-                className="items-center"
-                onPress={() => onPressStock(stock.stockId)}>
-                <Image
-                  style={{ width: 150, height: 150 }}
-                  source={require('../../assets/image/sample_samsung.png')}
-                />
-                <Text className="font-bold text-text">{stock.stockName}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+          <View className="flex-row flex-wrap justify-center gap-8 px-4">
+            {data?.data.stockList.map((stock) => {
+              return (
+                <TouchableOpacity
+                  key={stock.stockId}
+                  className="items-center"
+                  onPress={() => onPressStock(stock.stockId)}>
+                  <Image
+                    style={{ width: 150, height: 150, resizeMode: 'contain', borderRadius: 12 }}
+                    source={{ uri: `data:image/png;base64,${stock.imgUrl}` }}
+                  />
+                  <Text className="font-bold text-text">{stock.stockName}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </ScrollView>
       </View>
       <CustomFooter />
     </>
