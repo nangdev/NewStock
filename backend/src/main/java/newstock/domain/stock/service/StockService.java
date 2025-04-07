@@ -52,6 +52,7 @@ public class StockService {
                 stockDtoList.get(userStock.getStockId() - 1).setInterested(true);
             }
         }catch (Exception e){
+            System.out.println(e.getMessage());
             throw new InternalException(ExceptionCode.INTERNAL_SERVER_ERROR);
         }
 
