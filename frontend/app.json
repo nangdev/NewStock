@@ -11,7 +11,7 @@
     "experiments": {
       "tsconfigPaths": true
     },
-    "plugins": ["@react-native-firebase/app", "expo-secure-store"],
+    "plugins": ["expo-secure-store"],
     "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/logo.png",

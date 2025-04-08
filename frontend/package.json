@@ -12,8 +12,6 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.4",
-    "@react-native-firebase/app": "^21.13.0",
-    "@react-native-firebase/messaging": "^21.13.0",
     "@stomp/stompjs": "^7.1.0",
     "@tanstack/react-query": "^5.69.0",
     "axios": "^1.8.4",
