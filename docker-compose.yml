@@ -38,13 +38,13 @@ services:
     ports:
       - "4444:4444"
     environment:
-      - GRID_MAX_SESSION=6
+      - GRID_MAX_SESSION=5
       - GRID_BROWSER_TIMEOUT=180000
       - GRID_TIMEOUT=180
 
-  chrome-1:
+  chrome:
     image: selenium/node-chrome:4.15.0
-    shm_size: 2gb
+    shm_size: 6gb
     depends_on:
       - selenium-hub
     environment:
@@ -52,36 +52,7 @@ services:
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_GRID_URL=http://selenium-hub:4444
-      - SE_NODE_MAX_SESSIONS=2
-      - SE_OPTS=--log-level INFO
-    restart: always
-
-  chrome-2:
-    image: selenium/node-chrome:4.15.0
-    shm_size: 2gb
-    depends_on:
-      - selenium-hub
-    environment:
-      - SE_EVENT_BUS_HOST=selenium-hub
-      - SE_EVENT_BUS_PUBLISH_PORT=4442
-      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_GRID_URL=http://selenium-hub:4444
-      - SE_NODE_MAX_SESSIONS=2
-      - SE_OPTS=--log-level INFO
-    restart: always
-
-  
-  chrome-3:
-    image: selenium/node-chrome:4.15.0
-    shm_size: 2gb
-    depends_on:
-      - selenium-hub
-    environment:
-      - SE_EVENT_BUS_HOST=selenium-hub
-      - SE_EVENT_BUS_PUBLISH_PORT=4442
-      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_GRID_URL=http://selenium-hub:4444
-      - SE_NODE_MAX_SESSIONS=2
+      - SE_NODE_MAX_SESSIONS=5
       - SE_OPTS=--log-level INFO
     restart: always
 
