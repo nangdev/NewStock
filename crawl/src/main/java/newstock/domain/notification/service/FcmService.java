@@ -69,7 +69,7 @@ public class FcmService {
                     notification.put("body", notificationNewsDto.getDescription());
                     
                     Map<String, String> data = new HashMap<>();
-                    data.put("type", "NOTICE");
+                    data.put("type", "NEWS");
                     data.put("newsId", Integer.toString(notificationNewsDto.getNewsId()));
                     data.put("click_action", "MOVE_TO_NEWS");
                     
@@ -85,6 +85,8 @@ public class FcmService {
                             objectMapper.writeValueAsString(message),
                             headers
                     );
+
+                    log.info(entity.toString());
                     
                     ResponseEntity<String> response = restTemplate.exchange(
                             url,
