@@ -80,12 +80,13 @@ export default function StockDetail () {
           price={price ?? data?.data.closingPrice ?? 0}
           changeRate={Number(changeRate ?? data?.data.rcPdcp ?? 0)}
           imgUrl={data?.data.stockImage ?? ''}
-          totalPrice={Number(data?.data.totalPrice ?? 0)}
-          issuedNum={Number(data?.data.lstgStqt ?? 0)}
-          capital={Number(data?.data.capital ?? 0)}
+          totalPrice={data?.data.totalPrice ?? ''}
+          issuedNum={data?.data.lstgStqt ?? ''}
+          capital={data?.data.capital ?? ''}
           parValue={Number(data?.data.parValue ?? 0)}
           listingDate={data?.data.listingDate ?? ''}
-          industry={data?.data.stdIccn ?? ''}          
+          industry={data?.data.stdIccn ?? ''}
+          priceChanged={data?.data.ctpdPrice ?? 0}       
         />
       </View>
       
@@ -111,17 +112,21 @@ export default function StockDetail () {
           ))}
         </ScrollView>
         <View className="flex-row justify-center items-center mt-4 mb-2">
-          {
-            page > 0
-            ? <Entypo name="triangle-left" onPress={onPressLeft} size={18}/>
-            : <Entypo name="triangle-left" size={18} color={'transparent'}/>
-          }
-          
-          {
-            newsListData && page < newsListData?.data.totalPage-1
-            ? <Entypo name="triangle-right" onPress={onPressRight} size={18}/>
-            : <Entypo name="triangle-right" size={18} color={'transparent'}/>
-          }
+          <AntDesign
+            name='left'
+            onPress={page > 0 ? onPressLeft : () => {}}
+            size={14}
+            color={page > 0 ? 'black' : 'transparent'}
+            className="mx-2"
+          />
+          <AntDesign
+            name='right'
+            onPress={page < newsListData?.data.totalPage-1 ? onPressRight : () => {}}
+            size={14}
+            color={page < newsListData?.data.totalPage-1 ? 'black' : 'transparent'}
+            className="mx-2"
+          />
+       
         </View></>)
         : <View className="flex-1 items-center justify-center">
             <Image

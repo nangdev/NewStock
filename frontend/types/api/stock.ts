@@ -38,6 +38,7 @@ export type StockDetailInfoResType = BaseResType & {
     issuePrice: string,
     listingDate: string,
     stdIccn: string,
+    ctpdPrice: number,
   }
 }
 
