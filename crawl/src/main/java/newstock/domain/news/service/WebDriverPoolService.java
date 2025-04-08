@@ -36,7 +36,7 @@ public class WebDriverPoolService {
     public void initialize() {
         log.info("WebDriver 풀 초기화 시작. 풀 크기: {}", poolSize);
 
-        for (int i = 0; i < 5; i++) { // 처음에는 2개만 생성
+        for (int i = 0; i < 4; i++) { // 처음에는 2개만 생성
             try {
                 WebDriver driver = createDriver();
                 if (driver != null) {
