@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Slot } from 'expo-router';
+import { Slot, Stack } from 'expo-router';
 import useFCMNotifications from 'hooks/useFCMNotifications';
 import { makeServer } from 'mocks/mockServer';
 import UserProvider from 'providers/UserProvider';
@@ -34,7 +34,9 @@ export default function Layout() {
       <QueryClientProvider client={queryClient}>
         <UserProvider>
           <GestureHandlerRootView style={{ flex: 1 }}>
-            <Slot />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Slot />
+            </Stack>
           </GestureHandlerRootView>
           <Toast />
         </UserProvider>

@@ -1,6 +1,11 @@
 export const getTimeAgo = (dateString: string) => {
   const date = new Date(dateString);
   const now = new Date();
+  // Memo: 한국 시간 기준
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (timeZone !== 'Asia/Seoul') {
+    now.setHours(now.getHours() + 9);
+  }
   const diff = (now.getTime() - date.getTime()) / 1000;
 
   if (diff < 60) return '방금 전';

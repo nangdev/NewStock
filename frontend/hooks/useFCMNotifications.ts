@@ -1,69 +1,153 @@
-import * as Notifications from 'expo-notifications';
+// import * as Notifications from 'expo-notifications';
+// import { useRouter } from 'expo-router';
+// import { useEffect, useRef } from 'react';
+// import { Platform } from 'react-native';
+// import Toast from 'react-native-toast-message';
+// import { registerForPushNotifications } from 'utils/pushNotification';
+
+// export default function useFCMNotifications() {
+//   const router = useRouter();
+//   const notificationListener = useRef<Notifications.EventSubscription>();
+//   const responseListener = useRef<Notifications.EventSubscription>();
+
+//   useEffect(() => {
+//     async function setupPushNotifications() {
+//       await registerForPushNotifications();
+
+//       Notifications.setNotificationHandler({
+//         handleNotification: async () => ({
+//           shouldShowAlert: true,
+//           shouldPlaySound: true,
+//           shouldSetBadge: false,
+//         }),
+//       });
+
+//       // Memo: 앱이 실행 중일 때 (foreground) 알림 처리
+//       notificationListener.current = Notifications.addNotificationReceivedListener(
+//         (notification) => {
+//           console.log('푸시 알림 도착:', notification);
+//           handleNotificationAction(notification.request.content.data);
+//         }
+//       );
+
+//       // Memo: 알림을 클릭했을 때 (background, quit state)
+//       responseListener.current = Notifications.addNotificationResponseReceivedListener(
+//         (response) => {
+//           console.log('푸시 알림 클릭:', response);
+//           handleNotificationAction(response.notification.request.content.data);
+//         }
+//       );
+//     }
+
+//     setupPushNotifications();
+
+//     return () => {
+//       if (notificationListener.current)
+//         Notifications.removeNotificationSubscription(notificationListener.current);
+//       if (responseListener.current)
+//         Notifications.removeNotificationSubscription(responseListener.current);
+//     };
+//   }, []);
+
+//   // Memo: 앱이 종료되었다가 실행된 경우 (quit state)
+//   useEffect(() => {
+//     if (Platform.OS === 'android') {
+//       Notifications.getLastNotificationResponseAsync().then((response) => {
+//         if (response) {
+//           console.log('앱이 종료되었다가 실행된 경우:', response);
+//           handleNotificationAction(response.notification.request.content.data);
+//         }
+//       });
+//     }
+//   }, []);
+
+//   // Memo: 알림 데이터에 따라 라우팅 처리
+//   const handleNotificationAction = (data: { type?: string; newsId?: number }) => {
+//     const today = new Date();
+//     today.setHours(today.getHours() + 9);
+//     const yyyy = today.getFullYear();
+//     const mm = String(today.getMonth() + 1).padStart(2, '0');
+//     const dd = String(today.getDate()).padStart(2, '0');
+//     const formattedDate = `${yyyy}${mm}${dd}`;
+
+//     if (!data?.type) return;
+
+//     switch (data.type) {
+//       case 'NEWS':
+//         if (data.newsId) {
+//           router.navigate(`/news/${data.newsId}`);
+//         }
+//         break;
+//       case 'NEWS_LETTER':
+//         router.navigate(`/newsletter/${new Date(formattedDate)}`);
+//         break;
+//       default:
+//         Toast.show({
+//           type: 'error',
+//           text1: '알 수 없는 알림 유형입니다',
+//           text2: `데이터 타입: ${data.type}`,
+//         });
+
+//         console.warn('알 수 없는 알림 유형:', data.type);
+//     }
+//   };
+// }
+
+import messaging from '@react-native-firebase/messaging';
 import { useRouter } from 'expo-router';
-import { useEffect, useRef } from 'react';
-import { Platform } from 'react-native';
+import { useEffect } from 'react';
 import Toast from 'react-native-toast-message';
 import { registerForPushNotifications } from 'utils/pushNotification';
 
 export default function useFCMNotifications() {
   const router = useRouter();
-  const notificationListener = useRef<Notifications.EventSubscription>();
-  const responseListener = useRef<Notifications.EventSubscription>();
 
   useEffect(() => {
-    async function setupPushNotifications() {
-      await registerForPushNotifications();
-
-      Notifications.setNotificationHandler({
-        handleNotification: async () => ({
-          shouldShowAlert: true,
-          shouldPlaySound: true,
-          shouldSetBadge: false,
-        }),
-      });
-
-      // Memo: 앱이 실행 중일 때 (foreground) 알림 처리
-      notificationListener.current = Notifications.addNotificationReceivedListener(
-        (notification) => {
-          console.log('푸시 알림 도착:', notification);
-          handleNotificationAction(notification.request.content.data);
-        }
-      );
-
-      // Memo: 알림을 클릭했을 때 (background, quit state)
-      responseListener.current = Notifications.addNotificationResponseReceivedListener(
-        (response) => {
-          console.log('푸시 알림 클릭:', response);
-          handleNotificationAction(response.notification.request.content.data);
-        }
-      );
+    async function setup() {
+      const token = await registerForPushNotifications();
+      console.log('FCM Token Register Complete:', token);
     }
 
-    setupPushNotifications();
+    setup();
+
+    // foreground 알림 처리
+    const unsubscribeOnMessage = messaging().onMessage(async (remoteMessage: any) => {
+      console.log('Foreground 알림 수신:', remoteMessage);
+      handleNotificationAction(remoteMessage.data);
+    });
+
+    // background or quit → 알림 클릭 처리
+    const unsubscribeOnNotificationOpened = messaging().onNotificationOpenedApp(
+      (remoteMessage: any) => {
+        console.log('Background 알림 클릭:', remoteMessage);
+        handleNotificationAction(remoteMessage.data);
+      }
+    );
+
+    // 앱이 완전히 종료되었다가 켜졌을 때 알림 클릭
+    messaging()
+      .getInitialNotification()
+      .then((remoteMessage: any) => {
+        if (remoteMessage) {
+          console.log('Quit State 알림 클릭:', remoteMessage);
+          handleNotificationAction(remoteMessage.data);
+        }
+      });
 
     return () => {
-      if (notificationListener.current)
-        Notifications.removeNotificationSubscription(notificationListener.current);
-      if (responseListener.current)
-        Notifications.removeNotificationSubscription(responseListener.current);
+      unsubscribeOnMessage();
+      unsubscribeOnNotificationOpened();
     };
   }, []);
 
-  // Memo: 앱이 종료되었다가 실행된 경우 (quit state)
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      Notifications.getLastNotificationResponseAsync().then((response) => {
-        if (response) {
-          console.log('앱이 종료되었다가 실행된 경우:', response);
-          handleNotificationAction(response.notification.request.content.data);
-        }
-      });
-    }
-  }, []);
-
-  // Memo: 알림 데이터에 따라 라우팅 처리
-  // Todo: 백엔드와 소통 후 데이터 타입, content 변경
   const handleNotificationAction = (data: { type?: string; newsId?: number }) => {
+    const today = new Date();
+    today.setHours(today.getHours() + 9);
+    const yy = `${today.getFullYear()}`.slice(2);
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const formattedDate = `${yy}${mm}${dd}`;
+
     if (!data?.type) return;
 
     switch (data.type) {
@@ -73,7 +157,7 @@ export default function useFCMNotifications() {
         }
         break;
       case 'NEWS_LETTER':
-        router.navigate('/newsletter');
+        router.navigate(`/newsletter/${new Date(formattedDate)}`);
         break;
       default:
         Toast.show({
