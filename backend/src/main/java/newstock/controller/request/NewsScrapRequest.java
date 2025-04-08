@@ -15,9 +15,9 @@ public class NewsScrapRequest {
 
     private String sort;
 
-    private int userId;
+    private Integer userId;
 
-    public static NewsScrapRequest of(Integer stockId, int page, int count, String sort, int userId) {
+    public static NewsScrapRequest of(Integer stockId, int page, int count, String sort, Integer userId) {
         return NewsScrapRequest.builder()
                 .stockId(stockId)
                 .page(page)
