@@ -22,6 +22,18 @@ class StompService {
       },
       onStompError: () => {
         this.isConnecting = false;
+        console.log('STOMP ERROR!')
+      },
+      onWebSocketClose: (closeEvent) => {
+        console.log('<<< Socket disconnected from server', closeEvent);
+        this.isConnected = false;
+        this.isConnecting = false;
+      },
+      onWebSocketError: (event) => {
+        console.log('<<< Socket error', event);
+        this.isConnected = false;
+        this.isConnecting = false;
+        this.client?.deactivate();
       },
       forceBinaryWSFrames: true,
       appendMissingNULLonIncoming: true,
