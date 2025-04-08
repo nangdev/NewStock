@@ -129,7 +129,7 @@ public class NewsServiceImpl implements NewsService {
     public void deleteNewsScrapByNewsId(NewsScrapDto newsScrapDto) {
 
         Integer scrapId = newsScrapRepository
-                .findIdByNewsIdAndUserId(newsScrapDto.getUserId(), newsScrapDto.getNewsId())
+                .findIdByNewsIdAndUserId(newsScrapDto.getNewsId(), newsScrapDto.getUserId())
                 .orElseThrow(() -> new DbException(ExceptionCode.NEWS_SCRAP_NOT_FOUND));
 
         newsScrapRepository.deleteById(scrapId);
