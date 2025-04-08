@@ -7,12 +7,13 @@ type Props = {
   price: number;
   changeRate: number;
   imgUrl: string;
-  totalPrice: number, // 시가총액
-  issuedNum: number,  // 발행주식수: lstgStqt
-  capital: number,  // 자본금
+  totalPrice: string, // 시가총액
+  issuedNum: string,  // 발행주식수: lstgStqt
+  capital: string,  // 자본금
   parValue: number, // 액면가
   listingDate: string,  // 상장일자
   industry: string, // 표준산업분류코드명
+  priceChanged: number,
 };
 
 export default function StockInfoCard ({
@@ -55,13 +56,13 @@ export default function StockInfoCard ({
 
       <View className="flex-row  p-4">
         <View className="flex-1">
-          <InfoRow label="시가총액" content={`${totalPrice.toLocaleString()}억`} />
-          <InfoRow label="발행주식수" content={`${issuedNum.toLocaleString()}`} />
-          <InfoRow label="상장일" content={toFormattedDate(listingDate)} />
+          <InfoRow label="시가총액" content={totalPrice} />
+          <InfoRow label="발행주식수" content={issuedNum} />
+          <InfoRow label="상장일" content={listingDate} />
           
         </View>
         <View className="flex-1">
-          <InfoRow label="자본금" content={`${toFormattedWon(capital)}억`} />
+          <InfoRow label="자본금" content={capital} />
           {/* <InfoRow label="액면가" content={parValue === 0 ? '-' : parValue} /> */}
           <InfoRow label="분류" content={industry} />
         </View>

@@ -15,7 +15,7 @@ export const ROUTE = {
   NEWS: {
     STOCK_NEWS: (stockId: number) => `/news/${stockId}`,
     TOP: (stockId: number) => `/news/top/${stockId}`,
-    DETAIL: '/news',
+    DETAIL: (newsId: number) => `/news/${newsId}`,
     SCRAP: '/news/scrap',
     STOCK: '/news/stock',
   },
