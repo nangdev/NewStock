@@ -4,10 +4,20 @@
     "strict": true,
     "module": "ESNext",
     "jsx": "react-jsx",
-
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": [
+        "src/*"
+      ],
+      "assets/*": [
+        "./assets/*"
+      ]
     }
-  }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "svg.d.ts",
+    "nativewind-env.d.ts"
+  ]
 }
