@@ -209,3 +209,5 @@ pip-selfcheck.json
 # === 임시 상태 파일 (예: 모델 로딩 상태) 무시 ===
 tmp/*
 !tmp/.gitkeep
+
+ai/models/*.pt
