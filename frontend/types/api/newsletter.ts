@@ -10,7 +10,7 @@ export type NewsletterResType = BaseResType & {
       stockId: number;
       content: string;
       keywordList: {
-        keyword: string;
+        word: string;
         count: number;
       }[];
     }[];
