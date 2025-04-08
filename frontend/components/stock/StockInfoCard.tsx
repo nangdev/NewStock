@@ -1,4 +1,6 @@
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, Pressable, Modal } from 'react-native';
+import { useState } from 'react';
+import { AntDesign } from '@expo/vector-icons';
 
 type Props = {
   stockId: number;
@@ -30,25 +32,35 @@ export default function StockInfoCard({
 }: Props) {
   return (
     <View className="mx-8 my-2 rounded-2xl bg-white shadow-md">
-      <View className="flex-row items-center p-4">
+      <View className="ml-1 mt-1 flex-row items-center p-4">
+        {/* 왼쪽: 로고 */}
         <Image
           source={{ uri: `data:image/png;base64,${imgUrl}` }}
           className="mr-6 h-16 w-16 rounded-xl bg-gray-200"
         />
-        <View className="flex-1">
-          <Text className="text-base font-bold">{stockName ? stockName : 'SSAFY'}</Text>
-          <Text className="text-xs text-gray-500">{stockCode}</Text>
-        </View>
-        <View className="mr-6 flex-1 items-end">
-          <Text className="text-base font-bold">{price.toLocaleString()} 원</Text>
-          <Text
-            className={`mt-1 text-sm ${
-              changeRate > 0 ? 'text-red-500' : changeRate === 0 ? 'text-black' : 'text-blue-500'
-            }`}>
-            {changeRate.toFixed(2)}%
-          </Text>
+
+        {/* 오른쪽: 텍스트 전체 */}
+        <View className="mr-2 flex-1">
+          {/* 1줄: 이름 + 주가 */}
+          <View className="flex-row items-center justify-between">
+            <Text className="text-base font-bold">{stockName ? stockName : 'SSAFY'}</Text>
+            <Text className="text-base font-bold">{price.toLocaleString()} 원</Text>
+          </View>
+
+          {/* 2줄: 종목코드 + 등락률 */}
+          <View className="mt-1 flex-row items-center justify-between">
+            <Text className="text-xs text-gray-500">{stockCode}</Text>
+            <Text
+              className={`text-sm ${
+                changeRate > 0 ? 'text-red-500' : changeRate === 0 ? 'text-black' : 'text-blue-500'
+              }`}>
+              {changeRate.toFixed(2)}%
+            </Text>
+          </View>
         </View>
       </View>
+
+      <View className="mx-4 border-t border-gray-200" />
 
       <View className="flex-row  p-4">
         <View className="flex-1">
@@ -59,6 +71,7 @@ export default function StockInfoCard({
         <View className="flex-1">
           <InfoRow label="자본금" content={capital} />
           <InfoRow label="분류" content={industry} />
+          <View className="h-[24px]" /> {/* 상장일과 같은 높이를 맞추기 위한 빈 공간 */}
         </View>
       </View>
     </View>
@@ -71,10 +84,36 @@ type Item = {
 };
 
 const InfoRow = ({ label, content }: Item) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(false);
+
   return (
-    <View className="mx-2 flex-row justify-between border-b border-gray-200 py-2">
-      <Text className="text-xs">{label}</Text>
-      <Text className="text-xs">{content}</Text>
+    <View className="mx-2 min-h-[32px] flex-row justify-between border-b border-gray-200 py-2">
+      <Text className="text-xs font-semibold">{label}</Text>
+      <View className="flex-1 items-end">
+        <Pressable onPress={() => isTruncated && setShowTooltip(true)}>
+          <Text
+            className="text-right text-xs"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            onTextLayout={(e) => {
+              const isOverflowing = e.nativeEvent.lines.length > 1;
+              setIsTruncated(isOverflowing);
+            }}>
+            {content}
+          </Text>
+        </Pressable>
+        {showTooltip && (
+          <View className="absolute bottom-[120%] right-0 z-50 max-w-[180px] rounded-md bg-gray-400/90 px-3 py-2">
+            <View className="flex-row items-start justify-between">
+              <Text className="pr-2 text-xs text-white">{content}</Text>
+              <Pressable onPress={() => setShowTooltip(false)} hitSlop={10}>
+                <AntDesign name="close" size={12} color="#fff" />
+              </Pressable>
+            </View>
+          </View>
+        )}
+      </View>
     </View>
   );
 };

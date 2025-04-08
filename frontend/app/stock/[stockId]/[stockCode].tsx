@@ -79,8 +79,10 @@ export default function StockDetail() {
       </View>
 
       <View className="my-4 flex-row items-center justify-between px-8">
-        <Text className="text-xl">관련 뉴스</Text>
-        <SortButton sort={sort} setSort={setSort} />
+        <Text className="ml-2 mt-1 text-xl font-semibold">관련 뉴스</Text>
+        <View className="mt-1">
+          <SortButton sort={sort} setSort={setSort} />
+        </View>
       </View>
 
       <View className="mx-8 my-2 h-[405px] rounded-2xl bg-white pt-2 shadow-md">
