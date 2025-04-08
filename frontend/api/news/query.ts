@@ -29,19 +29,19 @@ export const useTopFiveNewsListQuery = (stockId: number) => {
 };
 
 export const useNewsScrapListQuery = ({
-  stockCode,
+  stockId,
   page,
   count,
   sort,
 }: {
-  stockCode: string;
+  stockId: number;
   page: number;
   count: number;
   sort: string;
 }) => {
   return useQuery({
-    queryKey: ['newsScrapList'],
-    queryFn: () => getNewsScrapList(stockCode, page, count, sort),
+    queryKey: ['newsScrapList', page, count, sort],
+    queryFn: () => getNewsScrapList(stockId, page, count, sort),
   });
 };
 
