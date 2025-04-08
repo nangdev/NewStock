@@ -283,3 +283,71 @@ export const mockNewsletter = {
     ],
   },
 };
+
+export const mockScrapNewsList = {
+  data: {
+    totalPage: 3,
+    newsList: [
+      {
+        newsId: 1,
+        title: '삼성전자, 반도체 수출 역대 최대',
+        description:
+          '삼성전자가 반도체 수출 역대 최대치를 기록했다. 이는 글로벌 반도체 시장의 회복세에 기인한다.',
+        publishedDate: '2025-03-14 12:00:00',
+        score: 10,
+      },
+      {
+        newsId: 2,
+        title: 'SK하이닉스, AI 서버 수요 증가 수혜',
+        description:
+          'SK하이닉스가 AI 서버 수요 증가로 인해 매출 증가가 예상된다. 이는 반도체 시장의 성장과 맞물려 있다.',
+        publishedDate: '2025-03-14 15:30:00',
+        score: 8,
+      },
+      {
+        newsId: 3,
+        title: '카카오, 신규 서비스 출시 예정',
+        publishedDate: '2025-03-14 16:00:00',
+        description:
+          '카카오는 신규 서비스를 출시할 예정이다. 이는 카카오의 서비스 다각화 전략의 일환으로 보인다.',
+        score: 7,
+      },
+      {
+        newsId: 4,
+        title: 'LG에너지솔루션, 배터리 대규모 수주',
+        publishedDate: '2025-03-14 17:00:00',
+        description:
+          'LG에너지솔루션이 배터리 대규모 수주를 발표했다. 이는 전기차 시장의 성장과 맞물려 있다.',
+        score: 9,
+      },
+      {
+        newsId: 5,
+        title: '현대차, 전기차 글로벌 판매 1위 도전',
+        description: '현대차가 전기차 글로벌 판매 1위 도전을 선언했지만, 쉽지 않아보인다.',
+        publishedDate: '2025-03-14 17:30:00',
+        score: 3,
+      },
+      {
+        newsId: 6,
+        title: '현대차, 전기차 글로벌 판매 1위 도전',
+        description: '현대차가 전기차 글로벌 판매 1위 도전을 선언했지만, 쉽지 않아보인다.',
+        publishedDate: '2025-03-14 17:30:00',
+        score: 3,
+      },
+      {
+        newsId: 7,
+        title: '현대차, 전기차 글로벌 판매 1위 도전',
+        description: '현대차가 전기차 글로벌 판매 1위 도전을 선언했지만, 쉽지 않아보인다.',
+        publishedDate: '2025-03-14 17:30:00',
+        score: 3,
+      },
+      {
+        newsId: 8,
+        title: '현대차, 전기차 글로벌 판매 1위 도전',
+        description: '현대차가 전기차 글로벌 판매 1위 도전을 선언했지만, 쉽지 않아보인다.',
+        publishedDate: '2025-03-14 17:30:00',
+        score: 3,
+      },
+    ],
+  },
+};

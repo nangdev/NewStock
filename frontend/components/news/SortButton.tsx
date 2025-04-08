@@ -1,6 +1,6 @@
-import { View, Text, Pressable } from "react-native";
-import { useState } from "react";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons';
+import { useState } from 'react';
+import { View, Text, Pressable } from 'react-native';
 
 type Props = {
   sort: 'score' | 'time';
@@ -14,21 +14,19 @@ export default function SortButton({ sort, setSort }: Props) {
     { label: '관련도순', value: 'score' },
   ];
 
-  const selectedLabel = options.find(o => o.value === sort)?.label ?? '';
+  const selectedLabel = options.find((o) => o.value === sort)?.label ?? '';
 
   return (
     <View className="relative">
       <Pressable
         onPress={() => setIsOpen(!isOpen)}
-        className="flex-row items-center px-3 py-1.5 bg-purple-100 rounded-full"
-      >
-      
-      <AntDesign name={'down'} size={14} color="#6B46C1" className="mr-2"/>
-      <Text className="text-purple-700 font-medium">{selectedLabel}</Text>
+        className="flex-row items-center rounded-full bg-purple-100 px-3 py-1.5">
+        <AntDesign name="down" size={14} color="#6B46C1" className="mr-2" />
+        <Text className="font-medium text-purple-700">{selectedLabel}</Text>
       </Pressable>
 
       {isOpen && (
-        <View className="absolute top-12 -left-4 w-28 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+        <View className="absolute -left-4 top-12 z-50 w-28 rounded-lg border border-gray-200 bg-white shadow-lg">
           {options.map((option) => (
             <Pressable
               key={option.value}
@@ -36,8 +34,7 @@ export default function SortButton({ sort, setSort }: Props) {
                 setSort(option.value);
                 setIsOpen(false);
               }}
-              className="px-4 py-2"
-            >
+              className="px-4 py-2">
               <Text className="text-gray-800">{option.label}</Text>
             </Pressable>
           ))}

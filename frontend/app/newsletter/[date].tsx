@@ -1,21 +1,43 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNewsletterListQuery } from 'api/newsletter/query';
+import { useAllUserStockListQuery } from 'api/stock/query';
 import CustomFooter from 'components/Footer/Footer';
 import CustomHeader from 'components/Header/Header';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import { Text, View, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { VictoryPie, VictoryTheme } from 'victory-native';
 
 export default function NewsLetter() {
   const { date }: { date: string } = useLocalSearchParams();
-  const { data, isSuccess, isLoading } = useNewsletterListQuery({ date });
+  const { data, isError, isLoading } = useNewsletterListQuery({ date });
+  const { data: userStockData } = useAllUserStockListQuery();
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  if (isLoading) return <Text className="py-20 text-center">로딩중...</Text>;
-  if (!isSuccess || !data.data.newsletterList.length)
-    return <Text className="py-20 text-center">뉴스레터가 없습니다</Text>;
+  if (isLoading)
+    return (
+      <View className="h-full w-full items-center justify-center">
+        <ActivityIndicator size="large" color="#724EDB" />
+      </View>
+    );
+  if (isError || !data?.data.newsletterList.length) {
+    return (
+      <>
+        <CustomHeader />
+        <View className="h-full w-full items-center justify-center gap-8">
+          <View className="items-center">
+            <Image
+              source={require('../../assets/image/no_data.png')}
+              style={{ width: 50, height: 50, resizeMode: 'contain' }}
+            />
+            <Text style={{ color: '#8A96A3' }}>해당 날짜의 뉴스 레터가 없어요 !</Text>
+          </View>
+        </View>
+        <CustomFooter />
+      </>
+    );
+  }
 
   const newsletterList = data.data.newsletterList;
   const currentNewsletter = newsletterList[currentIndex];
@@ -30,13 +52,15 @@ export default function NewsLetter() {
     setCurrentIndex(currentIndex + 1);
   };
 
+  const stockName = userStockData?.data.stockList.find(
+    (stock) => stock.stockId === currentNewsletter.stockId
+  )?.stockName;
+
   return (
     <>
       <CustomHeader />
       <View className="px-6 py-20">
-        <Text className="mb-4 mt-2 text-center text-xl font-bold">
-          {currentNewsletter.stockId} 뉴스레터
-        </Text>
+        <Text className="mb-4 mt-2 text-center text-xl font-bold">{stockName} 뉴스레터</Text>
 
         <View className="mb-8 rounded-lg border bg-white p-4">
           <View className="mb-6 items-center">

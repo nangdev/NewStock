@@ -7,5 +7,6 @@ export const useNewsletterListQuery = ({ date }: NewsletterReqType) => {
   return useQuery({
     queryKey: ['newsletter'],
     queryFn: () => getNewsletterList({ date }),
+    retry: false,
   });
 };

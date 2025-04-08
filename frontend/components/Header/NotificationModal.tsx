@@ -140,7 +140,13 @@ export default function NotificationPopover({
               )}
             />
           ) : (
-            <Text className="font-bold text-red-500">알림이 없습니다 !</Text>
+            <View className="flex-1 items-center justify-center">
+              <Image
+                source={require('../../assets/image/no_data.png')}
+                style={{ width: 50, height: 50, resizeMode: 'contain' }}
+              />
+              <Text style={{ color: '#8A96A3' }}>뉴스 알림이 없어요</Text>
+            </View>
           )}
         </Animated.View>
       </Pressable>
