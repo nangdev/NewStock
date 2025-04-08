@@ -49,7 +49,6 @@ public class NewsAiConsumer {
                     continue;
                 }
                 item.setScore(analysisResponse.getScore());
-                item.setContent(analysisResponse.getContent());
                 try {
                     SummarizationResponse summarizationResponse = newsAiService.summarize(
                             SummarizationRequest.of(item.getContent(), 300, 40, false)
