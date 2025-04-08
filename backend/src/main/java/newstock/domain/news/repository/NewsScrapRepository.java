@@ -9,5 +9,4 @@ public interface NewsScrapRepository extends JpaRepository<NewsScrap,Integer>, N
 
     boolean existsByNewsIdAndUserId(Integer newsId, Integer userId);
 
-    Optional<Integer> findIdByNewsIdAndUserId(Integer newsId, Integer userId);
 }

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static newstock.domain.news.entity.QNews.news;
 import static newstock.domain.news.entity.QNewsScrap.newsScrap;
@@ -55,5 +56,16 @@ public class NewsScrapCustomRepositoryImpl implements NewsScrapCustomRepository 
                 .fetch();
 
         return new PageImpl<>(results, pageable, total != null ? total : 0);
+    }
+
+    @Override
+    public Optional<Integer> findIdByNewsIdAndUserId(Integer newsId, Integer userId) {
+
+        return Optional.ofNullable(jpaQueryFactory
+                .select(newsScrap.scrapId)
+                .from(newsScrap)
+                .where(newsScrap.newsId.eq(newsId)
+                        .and(newsScrap.userId.eq(userId)))
+                .fetchOne());
     }
 }
