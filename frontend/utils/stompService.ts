@@ -5,20 +5,39 @@ type MessageCallback = (message: IMessage) => any;
 class StompService {
   private client: Client | null = null;
   private isConnected: boolean = false;
+  private isConnecting: boolean = false;
   private subscriptions: Map<string, StompSubscription> = new Map();
   public prefix: string = '/topic/rtp'
 
   public connect() {
-    if (this.client && this.isConnected) return;
+    if (this.client && (this.isConnected || this.isConnecting)) return;
+    this.isConnecting = true;
 
     this.client = new Client({
       webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
       // debug: (msg) => console.log('STOMP:', msg),
       onConnect: (frame) => {
         this.isConnected = true;
+        this.isConnecting = false;
+      },
+      onStompError: () => {
+        this.isConnecting = false;
+        console.log('STOMP ERROR!')
+      },
+      onWebSocketClose: (closeEvent) => {
+        console.log('<<< Socket disconnected from server', closeEvent);
+        this.isConnected = false;
+        this.isConnecting = false;
+      },
+      onWebSocketError: (event) => {
+        console.log('<<< Socket error', event);
+        this.isConnected = false;
+        this.isConnecting = false;
+        this.client?.deactivate();
       },
       forceBinaryWSFrames: true,
       appendMissingNULLonIncoming: true,
+      reconnectDelay: 10000,
     })
 
     this.client.activate();

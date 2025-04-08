@@ -30,14 +30,14 @@ export const getNewsDetailInfo = async (newsId: number) => {
 };
 
 export const getNewsScrapList = async (
-  stockCode: string,
+  stockId: number,
   page: number,
   count: number,
   sort: string
 ) => {
   const response = await api.get<NewsScrapResType>(API_PATH.NEWS.SCRAP, {
     params: {
-      stockCode,
+      stockId,
       page,
       count,
       sort,
@@ -47,11 +47,11 @@ export const getNewsScrapList = async (
 };
 
 export const postNewsScrap = async (newsId: number) => {
-  const response = await api.post(API_PATH.NEWS.SCRAP_ADD, { params: { newsId } });
+  const response = await api.post(API_PATH.NEWS.SCRAP_ADD(newsId),);
   return response.data;
 };
 
 export const deleteNewsScrap = async (newsId: number) => {
-  const response = await api.delete(API_PATH.NEWS.SCRAP_DELETE, { params: { newsId } });
+  const response = await api.delete(API_PATH.NEWS.SCRAP_DELETE(newsId));
   return response.data;
 };
