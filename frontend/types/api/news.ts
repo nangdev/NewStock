@@ -37,3 +37,20 @@ export type NewsType = {
   score: number;
   publishedDate: string;
 };
+
+export type NewsDetailResType = BaseResType & {
+  data: {
+    newsInfo: {
+      title: string;
+      content: string;
+      newsImage: string;
+      url: string;
+      press: string;
+      pressLogo: string;
+      publishedDate: string;
+      newsSummary: string;
+      score: number;
+    };
+    isScraped: boolean;
+  };
+};

@@ -13,10 +13,10 @@ type Props = {
   parValue: number; // 액면가
   listingDate: string; // 상장일자
   industry: string; // 표준산업분류코드명
+  priceChanged: number;
 };
 
 export default function StockInfoCard({
-  stockId,
   stockName,
   stockCode,
   price,
@@ -54,7 +54,7 @@ export default function StockInfoCard({
         <View className="flex-1">
           <InfoRow label="시가총액" content={totalPrice} />
           <InfoRow label="발행주식수" content={issuedNum} />
-          <InfoRow label="상장일" content={toFormattedDate(listingDate)} />
+          <InfoRow label="상장일" content={listingDate} />
         </View>
         <View className="flex-1">
           <InfoRow label="자본금" content={capital} />
@@ -77,8 +77,4 @@ const InfoRow = ({ label, content }: Item) => {
       <Text className="text-xs">{content}</Text>
     </View>
   );
-};
-
-const toFormattedDate = (date: string) => {
-  return `${date.substring(0, 4)}년 ${Number(date.substring(6, 8))}월 ${Number(date.substring(10, 12))}일`;
 };

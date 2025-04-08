@@ -74,6 +74,7 @@ export default function StockDetail() {
           parValue={Number(data?.data.parValue ?? 0)}
           listingDate={data?.data.listingDate ?? ''}
           industry={data?.data.stdIccn ?? ''}
+          priceChanged={data?.data.ctpdPrice ?? 0}
         />
       </View>
 

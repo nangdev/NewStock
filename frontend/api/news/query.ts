@@ -4,6 +4,7 @@ import {
   deleteNewsScrap,
   getAllStockNewsList,
   getNewsScrapList,
+  getNewsDetailInfo,
   getTopFiveStockNewsList,
   postNewsScrap,
 } from '.';
@@ -67,5 +68,12 @@ export const useDeleteNewsScrapMutation = () => {
       // Todo: 에러 처리
       console.error(error);
     },
+  });
+};
+
+export const useNewsDetailQuery = (newsId: number) => {
+  return useQuery({
+    queryKey: ['newsDetail', newsId],
+    queryFn: () => getNewsDetailInfo(newsId),
   });
 };

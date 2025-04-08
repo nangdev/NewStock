@@ -5,7 +5,6 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View, Dimensions, Text } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import Toast from 'react-native-toast-message';
 
 const { width } = Dimensions.get('window');
 

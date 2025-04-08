@@ -1,6 +1,8 @@
 import { AntDesign } from '@expo/vector-icons';
+import { ROUTE } from 'constants/routes';
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 type Props = {
   newsId: number;
@@ -11,8 +13,17 @@ type Props = {
 };
 
 function NewsListItem({ newsId, title, score, publishedDate }: Props) {
+  const router = useRouter();
+
+  const onPressNewsItem = () => {
+    router.navigate({
+      pathname: ROUTE.NEWS.DETAIL(newsId),
+      params: { newsId },
+    });
+  };
+
   return (
-    <View key={newsId} className="flex-row items-center p-3">
+    <TouchableOpacity key={newsId} className="flex-row items-center p-3" onPress={onPressNewsItem}>
       {score > 0 ? (
         <AntDesign name="smileo" size={24} color="red" className="pr-3" />
       ) : (
@@ -26,7 +37,7 @@ function NewsListItem({ newsId, title, score, publishedDate }: Props) {
           {toFormattedDate(publishedDate)}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

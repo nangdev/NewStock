@@ -55,19 +55,20 @@ function StockListItem({ stockId, stockName, stockCode, price, changeRate, imgUr
         </View>
 
         <Collapsible collapsed={!expanded}>
-          <View className="mb-2 items-center bg-white">
-            {data?.data.newsList && data?.data.newsList.length > 0 ? (
-              data?.data.newsList.map((news) => (
-                <NewsListItem
-                  newsId={+news.newsId}
-                  title={news.title}
-                  description="desc"
-                  score={10}
-                  publishedDate={news.publishedDate}
-                />
-              ))
-            ) : (
-              <View className="mb-5 items-center">
+          
+          <View className="bg-white mb-2 items-center">
+            {data?.data.newsList && data?.data.newsList.length > 0
+            ? data?.data.newsList.map((news) => (
+              <NewsListItem
+                newsId={+news.newsId}
+                title={news.title}
+                description='desc'
+                score={news.score}
+                publishedDate={news.publishedDate}
+              />
+            ))
+            : (
+              <View className='items-center mb-5'>
                 <Image
                   source={require('assets/image/no_data.png')}
                   style={{ width: 50, height: 50, resizeMode: 'contain' }}
