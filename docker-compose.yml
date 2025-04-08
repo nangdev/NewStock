@@ -83,6 +83,8 @@ services:
     env_file:
       - ./crawl/.env
     depends_on:
+      - chrome-1
+      - chrome-2
       - selenium-hub
       - mysql
       - kafka

@@ -88,9 +88,9 @@ deploy:
           
           # 크롤러 재빌드 및 배포
           echo \"dev/crawl 브랜치: 크롤러 서비스 빌드 및 배포 중...\"
-          docker-compose down crawl chrome selenium-hub
-          docker-compose build crawl chrome selenium-hub
-          docker-compose up -d crawl chrome selenium-hub
+          docker-compose down crawl chrome-1 chrome-2 selenium-hub
+          docker-compose build crawl chrome-1 chrome-2 selenium-hub
+          docker-compose up -d crawl chrome-1 chrome-2 selenium-hub
 
         elif [[ \"$CI_COMMIT_REF_NAME\" == \"dev/be\" ]]; then
           # 모든 환경 변수 설정
