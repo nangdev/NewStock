@@ -56,25 +56,29 @@ public class NewsServiceImpl implements NewsService {
     public StockNewsResponse getNewsListByStockId(StockNewsRequest stockNewsRequest) {
 
         Sort sort;
+        Page<News> newsPage;
+        Pageable pageable = PageRequest.of(stockNewsRequest.getPage(), stockNewsRequest.getCount());
+
         if ("score".equalsIgnoreCase(stockNewsRequest.getSort())) {
-            sort = Sort.by("score").descending();
+            // score 정렬의 경우 커스텀 쿼리에서 정렬하므로, pageable에 sort는 따로 추가하지 않는다.
+            newsPage = newsRepository.findNewsByStockIdOrderByScoreAbs(stockNewsRequest.getStockId(), pageable);
         } else {
+            // 기본 정렬: publishedDate 내림차순
             sort = Sort.by("publishedDate").descending();
+            pageable = PageRequest.of(stockNewsRequest.getPage(), stockNewsRequest.getCount(), sort);
+            newsPage = newsRepository.findByStockId(stockNewsRequest.getStockId(), pageable);
         }
-
-        Pageable pageable = PageRequest.of(stockNewsRequest.getPage(), stockNewsRequest.getCount(), sort);
-
-        Page<News> newsPage = newsRepository.findByStockId(stockNewsRequest.getStockId(), pageable);
 
         int totalPage = newsPage.getTotalPages();
         if(newsPage.isEmpty()){
             return StockNewsResponse.of(0, Collections.emptyList());
         }
 
-        return StockNewsResponse.of(totalPage,newsPage.stream()
+        return StockNewsResponse.of(totalPage, newsPage.stream()
                 .map(StockNewsDto::of)
                 .collect(Collectors.toList()));
     }
+
 
     @Override
     public NewsDetailResponse getNewsDetailByNewsId(NewsDetailRequest newsDetailRequest) {
