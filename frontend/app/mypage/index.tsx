@@ -1,4 +1,4 @@
-import { FontAwesome, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
+import { FontAwesome6, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
 import { useLogoutMutation } from 'api/auth/query';
 import { useUserDeleteMutation, useUserNicknameMutation } from 'api/user/query';
 import BlurOverlay from 'components/BlurOverlay';
@@ -10,7 +10,6 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
 import useUserStore from 'store/user';
-
 export default function MyPage() {
   const router = useRouter();
   const userStore = useUserStore();
@@ -36,14 +35,14 @@ export default function MyPage() {
         setNicknameInput(userStore.userInfo?.nickname ?? '');
         setModalVisible(true);
       },
-      icon: <Feather name="edit-2" size={24} color="#724EDB" />,
+      icon: <FontAwesome6 name="edit" size={22} color="#724EDB" />,
     },
     {
       label: '관심 종목 수정',
       onPressItem: () => {
         router.navigate(ROUTE.SET_INTEREST);
       },
-      icon: <FontAwesome name="star" size={24} color="#724EDB" />,
+      icon: <AntDesign name="star" size={24} color="#724EDB" />,
     },
     {
       label: '로그아웃',
@@ -57,7 +56,7 @@ export default function MyPage() {
       onPressItem: () => {
         userDeleteMutate();
       },
-      icon: <AntDesign name="deleteuser" size={24} color="#724EDB" />,
+      icon: <AntDesign name="deleteuser" size={25} color="#724EDB" />,
     },
   ];
 
@@ -66,14 +65,14 @@ export default function MyPage() {
       <CustomHeader title="마이 페이지" />
       <View className="flex-1 items-center justify-center">
         <BlurOverlay className="w-[90%] items-center gap-6 px-6 py-10">
-          <View className="items-center gap-2">
-            <Text className="text-md text-text_gray">
+          <View className="mt-2 items-center">
+            <Text className="text-lg text-text_gray">
               안녕하세요
               <Text className="font-bold text-primary"> {userStore.userInfo?.nickname}</Text>님
             </Text>
           </View>
 
-          <View className="mt-6 w-full gap-4">
+          <View className="mb-4 mt-2 w-full gap-4">
             {menuItems.map((item) => (
               <TouchableOpacity
                 key={item.label}

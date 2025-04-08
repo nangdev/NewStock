@@ -1,6 +1,7 @@
-import { AntDesign } from '@expo/vector-icons';
+import NegativeIcon from 'assets/icons/negative.svg';
+import PositiveIcon from 'assets/icons/positive.svg';
 import { ROUTE } from 'constants/routes';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { getTimeAgo } from 'utils/date';
@@ -25,11 +26,14 @@ function NewsListItem({ newsId, title, score, publishedDate }: Props) {
 
   return (
     <TouchableOpacity key={newsId} className="flex-row items-center p-3" onPress={onPressNewsItem}>
-      {score > 0 ? (
-        <AntDesign name="smileo" size={24} color="red" className="pr-3" />
-      ) : (
-        <AntDesign name="frowno" size={24} color="blue" className="pr-3" />
-      )}
+      <View className="mr-1 self-center">
+        {score > 0 ? (
+          <PositiveIcon width={23} height={23} fill="#f30606" />
+        ) : (
+          <NegativeIcon width={23} height={23} fill="#0658ca" />
+        )}
+      </View>
+
       <View className="flex-1 flex-row items-center justify-between">
         <Text className="flex-1 text-sm" numberOfLines={1} ellipsizeMode="tail">
           {title}
