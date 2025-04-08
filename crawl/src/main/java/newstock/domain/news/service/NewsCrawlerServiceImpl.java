@@ -37,12 +37,10 @@ import java.util.List;
 public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final Duration WAIT_TIMEOUT = Duration.ofSeconds(5);
+    private static final Duration WAIT_TIMEOUT = Duration.ofSeconds(10);
     private static final Duration OLDER_THAN_DURATION = Duration.ofMinutes(3); // 예: 스케줄러 기준 시간에서 3분 전
 
-    // Selenium Grid URL을 환경 변수에서 가져옴
-    @Value("${selenium.remote.url:http://selenium-hub:4444/wd/hub}")
-    private String remoteUrl;
+    private final WebDriverPoolService webDriverPoolService;
 
     /**
      * 주어진 종목명에 대한 뉴스들을 첫 페이지만 수집한 후,
@@ -52,7 +50,13 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
     public List<NewsItem> fetchNews(NewsCrawlerRequest newsCrawlerRequest) {
         WebDriver driver = null;
         try {
-            driver = createWebDriver();
+             // 풀에서 웹드라이버 가져오기
+            driver = webDriverPoolService.getDriver();
+            if (driver == null) {
+                log.error("웹드라이버를 가져올 수 없습니다. 크롤링을 중단합니다.");
+                return new ArrayList<>();
+            }
+
             WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
 
             // 뉴스 목록 페이지 URL 구성 (첫 페이지만 탐색)
@@ -61,8 +65,9 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
                     "&sm=tab_opt&sort=1&photo=0&field=0&pd=0&ds=&de=&docid=&related=0&mynews=0" +
                     "&office_type=0&office_section_code=0&news_office_checked=&nso=so%3Add%2Cp%3Aall" +
                     "&is_sug_officeid=0&office_category=0&service_area=0&start=1";
-            driver.get(listPageUrl);
-            try {
+
+           try {
+                driver.get(listPageUrl);
                 wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("ul.list_news")));
             } catch (TimeoutException e) {
                 log.info("뉴스 목록을 찾을 수 없습니다. 크롤링을 종료합니다.");
@@ -113,37 +118,11 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
             log.error("뉴스 크롤링 중 오류 발생: {}", e.getMessage(), e);
             return new ArrayList<>();
         } finally {
+            // 드라이버를 풀에 반환 (오류가 있어도 풀 서비스가 처리)
             if (driver != null) {
-                try {
-                    driver.quit();
-                } catch (Exception e) {
-                    log.error("WebDriver 종료 중 오류 발생: {}", e.getMessage(), e);
-                }
+                webDriverPoolService.releaseDriver(driver);
             }
         }
-    }
-
-    private WebDriver createWebDriver() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments(
-                "--headless=new",  // 새 headless 모드 사용
-                "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu",
-                "--disable-extensions",
-                "--window-size=1920,1080"
-        );
-        // 원격 WebDriver 시도
-        try {
-            return new RemoteWebDriver(new URL(remoteUrl), options);
-        } catch (MalformedURLException e) {
-            log.error("RemoteWebDriver URL 형식 오류: {}", e.getMessage(), e);
-        } catch (Exception e) {
-            log.error("RemoteWebDriver 초기화 실패: {}", e.getMessage(), e);
-        }
-
-        WebDriverManager.chromedriver().setup();
-        return new ChromeDriver(options);
     }
 
     /**
