@@ -18,6 +18,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
+import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 
 export default function SetInterest() {
   const [searchText, setSearchText] = useState('');
