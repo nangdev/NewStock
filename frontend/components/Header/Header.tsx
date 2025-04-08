@@ -7,13 +7,25 @@ import useUserStore from 'store/user';
 
 import NotificationButton from './NotificationButton';
 
-export default function CustomHeader() {
+type HeaderProps = {
+  title?: string;
+};
+
+export default function CustomHeader({ title }: HeaderProps) {
   const navigation = useNavigation();
   const router = useRouter();
   const userStore = useUserStore();
 
   const nickname = userStore.userInfo?.nickname;
   const displayName = nickname ? nickname.slice(0, 2) : null;
+
+  const onPressMyPage = () => {
+    if (userStore.userInfo?.nickname) {
+      router.push(ROUTE.MYPAGE);
+    } else {
+      router.push(ROUTE.INTRO.INTRO);
+    }
+  };
 
   return (
     <BlurView
@@ -24,11 +36,15 @@ export default function CustomHeader() {
         <Ionicons name="chevron-back" size={26} color="black" />
       </TouchableOpacity>
 
+      <View className="absolute left-0 right-0 flex-row items-center justify-center">
+        <Text className="text-xl font-bold text-text">{title}</Text>
+      </View>
+
       <View className="flex-row items-center gap-3">
         <NotificationButton />
 
         <TouchableOpacity
-          onPress={() => router.navigate(ROUTE.MYPAGE)}
+          onPress={onPressMyPage}
           className="h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-neutral-800">
           {displayName ? (
             <Text className="text-sm font-semibold text-white">{displayName}</Text>

@@ -1,7 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
-import { ROUTE } from 'constants/routes';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { getAllStockNewsList, getNewsDetailInfo, getTopFiveStockNewsList } from '.';
+import {
+  deleteNewsScrap,
+  getAllStockNewsList,
+  getNewsScrapList,
+  getNewsDetailInfo,
+  getTopFiveStockNewsList,
+  postNewsScrap,
+} from '.';
 
 export const useAllStockNewsListQuery = (
   stockId: number,
@@ -19,6 +25,49 @@ export const useTopFiveNewsListQuery = (stockId: number) => {
   return useQuery({
     queryKey: ['topFiveNewsList', stockId],
     queryFn: () => getTopFiveStockNewsList(stockId),
+  });
+};
+
+export const useNewsScrapListQuery = ({
+  stockCode,
+  page,
+  count,
+  sort,
+}: {
+  stockCode: string;
+  page: number;
+  count: number;
+  sort: string;
+}) => {
+  return useQuery({
+    queryKey: ['newsScrapList'],
+    queryFn: () => getNewsScrapList(stockCode, page, count, sort),
+  });
+};
+
+export const useAddNewsScrapMutation = () => {
+  return useMutation({
+    mutationFn: postNewsScrap,
+    onSuccess: () => {
+      console.log('뉴스 스크랩 추가 성공');
+    },
+    onError: (error) => {
+      // Todo: 에러 처리
+      console.error(error);
+    },
+  });
+};
+
+export const useDeleteNewsScrapMutation = () => {
+  return useMutation({
+    mutationFn: deleteNewsScrap,
+    onSuccess: () => {
+      console.log('뉴스 스크랩 삭제 성공');
+    },
+    onError: (error) => {
+      // Todo: 에러 처리
+      console.error(error);
+    },
   });
 };
 

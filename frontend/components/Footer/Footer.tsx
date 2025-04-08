@@ -7,7 +7,7 @@ const menus = [
   { name: '홈', href: ROUTE.HOME, icon: 'home-outline', activeIcon: 'home' },
   {
     name: '뉴스스크랩',
-    href: ROUTE.NEWS.DETAIL,
+    href: ROUTE.NEWS.SCRAP,
     icon: 'newspaper-outline',
     activeIcon: 'newspaper',
   },

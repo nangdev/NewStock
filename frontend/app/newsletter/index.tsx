@@ -45,12 +45,16 @@ LocaleConfig.locales['ko'] = {
 LocaleConfig.defaultLocale = 'ko';
 
 export default function NewsletterCalendar() {
+  const toKSTString = (date: Date) => {
+    const koreaTimeOffset = 9 * 60 * 60 * 1000;
+    return new Date(date.getTime() + koreaTimeOffset).toISOString().split('T')[0];
+  };
   const now = new Date();
-  const todayString = now.toISOString().split('T')[0];
+  const todayString = toKSTString(now);
   const minDateString = '2025-04-01';
   const isBefore6PM = now.getHours() < 18;
   const maxDateString = isBefore6PM
-    ? new Date(now.setDate(now.getDate() - 1)).toISOString().split('T')[0] // 어제
+    ? toKSTString(new Date(now.getTime() - 24 * 60 * 60 * 1000))
     : todayString;
   const [currentDate, setCurrentDate] = useState(todayString);
   const router = useRouter();
@@ -62,18 +66,19 @@ export default function NewsletterCalendar() {
     );
   };
 
+  const onPressDate = (date: any) => {
+    router.navigate(`${ROUTE.NEWSLETTER.INDEX}/${date.dateString.replaceAll('-', '')}`);
+  };
+
   return (
     <>
-      <CustomHeader />
+      <CustomHeader title="뉴스레터" />
       <View className="h-full w-full items-center gap-6 pt-24">
         <Text className="text-lg font-bold text-text">
           날짜를 클릭하면 뉴스레터를 볼 수 있어요!
         </Text>
         <Calendar
-          onDayPress={(date: any) => {
-            router.push(`${ROUTE.NEWSLETTER.INDEX}/${date.dateString.replaceAll('-', '')}`);
-            console.log(date.dateString.replaceAll('-', ''));
-          }}
+          onDayPress={onPressDate}
           style={{
             width: width * 0.9,
             borderWidth: 1,
@@ -86,7 +91,6 @@ export default function NewsletterCalendar() {
             textDayFontSize: 16,
             textMonthFontSize: 18,
             textDayHeaderFontSize: 14,
-            todayTextColor: '#3B82F6',
             selectedDayBackgroundColor: '#3B82F6',
             selectedDayTextColor: 'white',
             arrowColor: '#3B82F6',

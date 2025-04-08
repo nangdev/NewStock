@@ -96,10 +96,18 @@ export const useUserNicknameMutation = () => {
         role: userInfo!.role,
         nickname: data.data.nickname,
       });
+      Toast.show({
+        type: 'success',
+        text1: '닉네임이 성공적으로 변경되었습니다!',
+      });
     },
     onError: (error) => {
       // Todo: 에러 처리
       console.error(error);
+      Toast.show({
+        type: 'error',
+        text1: '닉네임 변경 중 오류가 발생했습니다.',
+      });
     },
   });
 };
