@@ -3,6 +3,7 @@ import CustomFooter from 'components/Footer/Footer';
 import CustomHeader from 'components/Header/Header';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
+import { setParams } from 'expo-router/build/global-state/routing';
 import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import useUserStore from 'store/user';
 
@@ -11,8 +12,11 @@ export default function NewsScrapPage() {
   const route = useRouter();
   const userInfo = useUserStore();
 
-  const onPressStock = (stockCode: string) => {
-    route.push(ROUTE.NEWS.SCRAP_NEWS(stockCode));
+  const onPressStock = (stockCode: string, stockId: number) => {
+    route.push({
+      pathname: ROUTE.NEWS.SCRAP_NEWS(stockCode),
+      params: {stockId},
+    });
   };
 
   const onPressAddStock = () => {
@@ -64,7 +68,7 @@ export default function NewsScrapPage() {
                 <TouchableOpacity
                   key={stock.stockId}
                   className="items-center"
-                  onPress={() => onPressStock(stock.stockCode)}>
+                  onPress={() => onPressStock(stock.stockCode, stock.stockId)}>
                   <Image
                     style={{ width: 150, height: 150, resizeMode: 'contain', borderRadius: 12 }}
                     source={{ uri: `data:image/png;base64,${stock.imgUrl}` }}

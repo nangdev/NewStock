@@ -1,13 +1,15 @@
 import { AntDesign, Fontisto } from '@expo/vector-icons';
-import { useNewsDetailQuery } from 'api/news/query';
+import { useNewsDetailQuery, useAddNewsScrapMutation, useDeleteNewsScrapMutation } from 'api/news/query';
 import { useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image } from 'react-native';
 
 export default function NewsDetailPage() {
   const { newsId } = useLocalSearchParams();
   const id = Number(Array.isArray(newsId) ? newsId[0] : (newsId ?? 1));
-  const { data, isLoading, isError } = useNewsDetailQuery(Number(newsId));
+  const { data, isLoading, isError } = useNewsDetailQuery(id);
+  const { mutate: addNewsScrap } = useAddNewsScrapMutation();
+  const { mutate: deleteNewsScrap } = useDeleteNewsScrapMutation();
 
   // const title = "공개된 삼성전자 2025년형 'AI TV' [포토]";
   // const content = "삼성전자 언박스&디스커버 2025unbox & discover 2025 미디어데이가 7일 오전 서울 서초구 삼성 강남에서 열려 신제품들이 취재진에 공개되고 있다. 사진영상기획부 발로 뛰는 더팩트는 24시간 여러분의 제보를 기다립니다.  카카오톡: 더팩트제보 검색  이메일:   뉴스 홈페이지: http://talk.tf.co.kr/bbs/report/write";
@@ -19,15 +21,23 @@ export default function NewsDetailPage() {
   // const pressLogo = "https://mimgnews.pstatic.net/image/upload/office_logo/629/2025/03/07/logo_629_101_20250307145723.png";
   const [isScraped, setIsScraped] = useState(false);
 
+  useEffect(() => {
+    if (data?.data?.isScraped !== undefined) {
+      setIsScraped(data.data.isScraped);
+    }
+  },[data?.data.isScraped]);
+
   if (isLoading || !data) {
     return <Text>로딩 중...</Text>;
   }
+
   const newsInfo = { ...data?.data.newsInfo };
 
   const isHojae = newsInfo?.score > 0;
 
   const onPressPinIcon = () => {
     setIsScraped(!isScraped);
+    isScraped ? deleteNewsScrap(id) : addNewsScrap(id);
   };
 
   return (
