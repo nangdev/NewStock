@@ -38,7 +38,7 @@ services:
     ports:
       - "4444:4444"
     environment:
-      - GRID_MAX_SESSION=10
+      - GRID_MAX_SESSION=4
       - GRID_BROWSER_TIMEOUT=180000
       - GRID_TIMEOUT=180
 
@@ -52,7 +52,7 @@ services:
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_GRID_URL=http://selenium-hub:4444
-      - SE_NODE_MAX_SESSIONS=5
+      - SE_NODE_MAX_SESSIONS=2
       - SE_OPTS=--log-level INFO
     restart: always
 
@@ -66,7 +66,7 @@ services:
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_GRID_URL=http://selenium-hub:4444
-      - SE_NODE_MAX_SESSIONS=5
+      - SE_NODE_MAX_SESSIONS=2
       - SE_OPTS=--log-level INFO
     restart: always
 

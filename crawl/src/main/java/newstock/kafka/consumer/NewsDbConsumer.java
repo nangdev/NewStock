@@ -27,7 +27,7 @@ public class NewsDbConsumer {
     @Value("${kafka.topic.news-notification}")
     private String notificationTopic;
 
-    @KafkaListener(topics = "${kafka.topic.news-db}", groupId = "${kafka.consumer.group.news-db}")
+    @KafkaListener(topics = "${kafka.topic.news-db}", groupId = "${kafka.consumer.group.news-db}", concurrency = "1")
     public void listen(String message) {
         log.info("Kafka DB 저장 메시지 수신");
         try {

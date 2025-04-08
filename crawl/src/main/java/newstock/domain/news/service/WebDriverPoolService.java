@@ -22,21 +22,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class WebDriverPoolService {
 
-    private final int poolSize = 5;
+    private final int poolSize = 3;
 
     private final BlockingQueue<WebDriver> driverPool;
     private final AtomicInteger createdDrivers = new AtomicInteger(0);
     private volatile boolean shuttingDown = false;
 
     public WebDriverPoolService() {
-        this.driverPool = new ArrayBlockingQueue<>(10); // 기본 풀 크기 10으로 설정
+        this.driverPool = new ArrayBlockingQueue<>(3);
     }
 
     @PostConstruct
     public void initialize() {
         log.info("WebDriver 풀 초기화 시작. 풀 크기: {}", poolSize);
 
-        for (int i = 0; i < 4; i++) { // 처음에는 2개만 생성
+        for (int i = 0; i < 2; i++) {
             try {
                 WebDriver driver = createDriver();
                 if (driver != null) {

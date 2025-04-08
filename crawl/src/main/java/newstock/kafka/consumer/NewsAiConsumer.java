@@ -31,7 +31,7 @@ public class NewsAiConsumer {
     @Value("${kafka.topic.news-db}")
     private String newsDbTopic;
 
-    @KafkaListener(topics = "${kafka.topic.news-ai}", groupId = "${kafka.consumer.group.news-ai}")
+    @KafkaListener(topics = "${kafka.topic.news-ai}", groupId = "${kafka.consumer.group.news-ai}", concurrency = "1")
     public void listen(String message) {
         log.info("Kafka AI 분석 메시지 수신");
         try {

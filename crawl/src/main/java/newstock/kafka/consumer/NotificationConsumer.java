@@ -17,7 +17,7 @@ public class NotificationConsumer {
     private final NotificationService notificationService;
     private final ObjectMapper objectMapper;
 
-    @KafkaListener(topics = "${kafka.topic.news-notification}", groupId = "${kafka.consumer.group.news-notification}")
+    @KafkaListener(topics = "${kafka.topic.news-notification}", groupId = "${kafka.consumer.group.news-notification}", concurrency = "1")
     public void listen(String message) {
         log.info("Kafka 푸쉬 알림 메시지 수신 : {}", message);
         try {
