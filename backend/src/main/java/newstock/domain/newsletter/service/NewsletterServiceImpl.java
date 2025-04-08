@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,18 +48,24 @@ public class NewsletterServiceImpl implements NewsletterService {
 
         List<NewsletterDto> newsletterDtoList = new ArrayList<>();
 
-        for(Integer stockId: newsletterRequest.getStockIdList()){
+        for (Integer stockId : newsletterRequest.getStockIdList()) {
+            Optional<Newsletter> optionalNewsletter = newsletterRepository.findByStockIdAndDate(
+                    stockId, newsletterRequest.getDate());
 
-            Newsletter newsletter = newsletterRepository.findByStockIdAndDate(stockId,newsletterRequest.getDate())
-                    .orElseThrow(()-> new DbException(ExceptionCode.NEWS_LETTER_NOT_FOUND));
-            KeywordResponse keywordList = keywordService.getKeywordsByStockId(KeywordRequest.of(stockId,newsletterRequest.getDate()));
-            List<KeywordItem> keywordItems = keywordList.getKeywords();
-            newsletterDtoList.add(NewsletterDto.of(stockId, newsletter.getContent(), keywordItems));
+            if (optionalNewsletter.isPresent()) {
+                Newsletter newsletter = optionalNewsletter.get();
 
+                KeywordResponse keywordList = keywordService.getKeywordsByStockId(
+                        KeywordRequest.of(stockId, newsletterRequest.getDate()));
+                List<KeywordItem> keywordItems = keywordList.getKeywords();
+
+                newsletterDtoList.add(NewsletterDto.of(stockId, newsletter.getContent(), keywordItems));
+            }
         }
 
         return NewsletterResponse.of(newsletterDtoList);
     }
+
 
     @Override
     public void addNewsletter(Integer stockId) {
