@@ -73,11 +73,12 @@ export default function Main() {
       ) : (
         <>
           {data?.data.stockList.length ? (
-            <View className="gap-4 py-24 pb-28">
-              <Text className="px-6 text-lg font-bold">
-                {userInfo.userInfo?.nickname}님의 종목이에요
+            <View className="py-24 pb-28">
+              <Text className="mb-2 ml-4 items-center px-6 text-lg font-semibold">
+                <Text>{userInfo.userInfo?.nickname}</Text>
+                님의 종목이에요
               </Text>
-              <ScrollView>
+              <ScrollView className="gap-4">
                 {subscribedStocks.map((stock) => (
                   <StockListItem
                     key={`${stock.stockCode}`}
