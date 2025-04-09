@@ -10,7 +10,7 @@ public class ArticleCleaner {
 
     /**
      * 기사 HTML 전체에서 id가 "dic_area"인 article 태그 내부의 모든 텍스트를 추출합니다.
-     * (불필요한 태그(table, script, style, em.img_desc, div[style*='border:1px solid #e6e6e6'],
+     * (불필요한 태그(table, script, style, em, div[style*='border:1px solid #e6e6e6'],
      * strong.media_end_summary 등)는 제거합니다.)
      * 그리고 각 <br> 태그마다 개행 문자를 두 개("\n\n")만 남도록 처리합니다.
      *
@@ -24,8 +24,8 @@ public class ArticleCleaner {
             return "";
         }
 
-        // 불필요한 태그 제거
-        article.select("table, script, style, em.img_desc, div[style*='border:1px solid #e6e6e6'], strong.media_end_summary").remove();
+        // 불필요한 태그 제거 - 모든 em 태그를 포함하도록 수정
+        article.select("table, script, style, em, div[style*='border:1px solid #e6e6e6'], strong.media_end_summary").remove();
 
         // article 내부의 모든 텍스트를 순회하며 추출 (개행 처리는 별도 메서드 사용)
         StringBuilder sb = new StringBuilder();

@@ -89,6 +89,11 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
 
                 enrichNewsItem(driver, wait, item);
 
+                // content가 비어 있으면 저장하지 않습니다.
+                if (isNullOrEmpty(item.getContent())) {
+                    continue;
+                }
+
                 // 필수 추가 정보가 없으면 건너뜁니다.
                 if (!isNewsItemValid(item)) {
                     continue;
@@ -133,14 +138,14 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
                 "--disable-extensions",
                 "--window-size=1920,1080"
         );
-        // 서버용 WebDriver
-//        try {
-//            return new RemoteWebDriver(new URL(remoteUrl), options);
-//        } catch (MalformedURLException e) {
-//            log.error("RemoteWebDriver URL 형식 오류: {}", e.getMessage(), e);
-//        } catch (Exception e) {
-//            log.error("RemoteWebDriver 초기화 실패: {}", e.getMessage(), e);
-//        }
+        // 서버용 WebDriver 사용 예시 (주석 처리된 부분)
+        // try {
+        //     return new RemoteWebDriver(new URL(remoteUrl), options);
+        // } catch (MalformedURLException e) {
+        //     log.error("RemoteWebDriver URL 형식 오류: {}", e.getMessage(), e);
+        // } catch (Exception e) {
+        //     log.error("RemoteWebDriver 초기화 실패: {}", e.getMessage(), e);
+        // }
 
         WebDriverManager.chromedriver().setup();
         return new ChromeDriver(options);
@@ -239,12 +244,13 @@ public class NewsCrawlerServiceImpl implements NewsCrawlerService {
      * 필수 추가 정보(본문, 설명, 대표 이미지, 언론사, 로고, 작성시간)가 모두 존재하는지 검증합니다.
      */
     private boolean isNewsItemValid(NewsItem item) {
-        return !(isNullOrEmpty(item.getContent()) &&
-                isNullOrEmpty(item.getDescription()) &&
-                isNullOrEmpty(item.getNewsImage()) &&
-                isNullOrEmpty(item.getPress()) &&
-                isNullOrEmpty(item.getPressLogo()) &&
-                isNullOrEmpty(item.getPublishedDate()));
+        // content가 반드시 있어야 함.
+        return !isNullOrEmpty(item.getContent()) &&
+                !(isNullOrEmpty(item.getDescription()) &&
+                        isNullOrEmpty(item.getNewsImage()) &&
+                        isNullOrEmpty(item.getPress()) &&
+                        isNullOrEmpty(item.getPressLogo()) &&
+                        isNullOrEmpty(item.getPublishedDate()));
     }
 
     private boolean isNullOrEmpty(String str) {
