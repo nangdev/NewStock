@@ -47,7 +47,7 @@ public class KeywordServiceImpl implements KeywordService {
                         .stockId(keywordList.getStockId())
                         .content(item.getWord())
                         .count(item.getCount())
-                        .date(java.time.LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyyMMdd")))
+                        .date(java.time.LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyMMdd")))
                         .build())
                 .collect(Collectors.toList());
 
