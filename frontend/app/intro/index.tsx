@@ -15,7 +15,7 @@ export default function Intro() {
     <View className="flex-1 items-center justify-center">
       <Image
         source={require('../../assets/splash.png')}
-        style={{ width: 300, height: 300, resizeMode: 'contain' }}
+        style={{ width: 250, height: 250, resizeMode: 'contain' }}
       />
 
       <CustomButton variant="semiRounded" onPress={onPressLogin} className="h-[45px] gap-4 px-10">
