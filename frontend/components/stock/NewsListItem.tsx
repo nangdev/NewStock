@@ -28,9 +28,8 @@ function NewsListItem({ newsId, title, score, publishedDate }: Props) {
     <>
       <TouchableOpacity
         key={newsId}
-        className="flex-row items-center justify-between px-3 py-2"
+        className="flex-row items-center justify-between px-3 py-3"
         onPress={onPressNewsItem}>
-        {/* 아이콘 */}
         <View className="mr-2 self-center">
           {score > 0 ? (
             <PositiveIcon width={20} height={20} fill="#f30606" />
@@ -39,7 +38,6 @@ function NewsListItem({ newsId, title, score, publishedDate }: Props) {
           )}
         </View>
 
-        {/* 제목 + 시간 */}
         <View className="flex-1 flex-row items-center justify-between">
           <Text
             className="flex-1 pr-1 text-sm text-gray-900"
@@ -47,12 +45,12 @@ function NewsListItem({ newsId, title, score, publishedDate }: Props) {
             ellipsizeMode="tail">
             {title}
           </Text>
-          <Text className="w-[45px] text-right text-xs text-gray-500">
+          <Text className="min-w-[50px] text-right text-xs text-gray-500" ellipsizeMode="tail">
             {toFormattedDate(publishedDate)}
           </Text>
         </View>
       </TouchableOpacity>
-      <View className="mx-3 h-px bg-gray-200" />
+      <View className="my-0.4 mx-3 h-px bg-gray-200" />
     </>
   );
 }
