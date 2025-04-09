@@ -141,7 +141,7 @@ async def score_article(input_data: ScoreRequest):
 
         # 평균 점수 계산
         average_scores = {
-            category: round(sum(scores) / len(scores), 3) if scores else 0.0
+            category: round(sum(scores) / len(scores), 2) if scores else 0.0
             for category, scores in aspect_scores.items()
         }
 

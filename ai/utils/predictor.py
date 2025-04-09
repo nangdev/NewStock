@@ -56,6 +56,25 @@ def calculate_sentiment_score(prediction_result, neutral_alpha=0.5, composite_be
 
     return sentiment_score
 
+# def calculate_adjusted_sentiment_score(prediction_result, neutral_alpha=0.6, composite_beta=0.6):
+#     pos = prediction_result['positive']
+#     neg = prediction_result['negative']
+#     neu = prediction_result['neutral']
+#     comp = prediction_result['composite']
+
+#     diff = pos - neg
+
+#     # 🎯 감정 차이 완화 (덜 극단적으로)
+#     if diff >= 0:
+#         diff_scaled = diff ** 1.1
+#     else:
+#         diff_scaled = -((-diff) ** 1.1)
+
+#     # 🎯 조정 계수 강화
+#     adjusted_score = diff_scaled * (1 - neu * neutral_alpha) * (1 - comp * composite_beta)
+
+#     return round(adjusted_score, 2)
+
 
 def calculate_adjusted_sentiment_score(prediction_result, neutral_alpha=0.5, composite_beta=0.8):
     """
