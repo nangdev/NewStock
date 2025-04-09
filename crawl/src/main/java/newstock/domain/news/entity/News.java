@@ -39,7 +39,17 @@ public class News {
     @Lob
     private String newsSummary;
 
-    private int score;
+    private float score;
+
+    private float financeScore;
+
+    private float strategyScore;
+
+    private float governScore;
+
+    private float techScore;
+
+    private float externalScore;
 
     public static News of(NewsItem newsItem) {
         return News.builder()
@@ -54,6 +64,11 @@ public class News {
                 .publishedDate(newsItem.getPublishedDate())
                 .newsSummary(newsItem.getNewsSummary())
                 .score(newsItem.getScore())
+                .financeScore(newsItem.getFinanceScore())
+                .strategyScore(newsItem.getStrategyScore())
+                .governScore(newsItem.getGovernScore())
+                .techScore(newsItem.getTechScore())
+                .externalScore(newsItem.getExternalScore())
                 .build();
     }
 

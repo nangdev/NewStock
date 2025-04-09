@@ -31,6 +31,24 @@ public class NewsItem {
 
     private String newsSummary;
 
-    private int score;
+    private float score;
 
+    private float financeScore;
+
+    private float strategyScore;
+
+    private float governScore;
+
+    private float techScore;
+
+    private float externalScore;
+
+    public void setScores(AnalysisResponse analysisResponse) {
+        this.score = analysisResponse.getScore();
+        this.financeScore = analysisResponse.getAspectScores().getFinance();
+        this.strategyScore = analysisResponse.getAspectScores().getStrategy();
+        this.governScore = analysisResponse.getAspectScores().getGovern();
+        this.techScore = analysisResponse.getAspectScores().getTech();
+        this.externalScore = analysisResponse.getAspectScores().getExternal();
+    }
 }
