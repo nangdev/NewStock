@@ -49,16 +49,14 @@ public class UserServiceImpl implements UserService {
                 throw new ValidationException(ExceptionCode.DUPLICATE_EMAIL);
             }
         }
-        // ⚠️ [임시 주석] 이메일 인증 우회 (테스트용)
-//        if (!Boolean.TRUE.equals(redisUtil.get("email:verified:" + userRequest.getEmail(), Boolean.class))) {
-//            throw new ValidationException(ExceptionCode.EMAIL_NOT_VERIFIED);
-//        }
+        if (!Boolean.TRUE.equals(redisUtil.get("email:verified:" + userRequest.getEmail(), Boolean.class))) {
+            throw new ValidationException(ExceptionCode.EMAIL_NOT_VERIFIED);
+        }
 
         // 신규 가입
         User newUser = User.of(userRequest, encodedPassword);
         userRepository.save(newUser);
-//      ⚠️ [임시 주석]
-//   redisUtil.delete("email:verified:" + userRequest.getEmail());
+        redisUtil.delete("email:verified:" + userRequest.getEmail());
         log.info("회원 가입 완료 - userId: {}, email: {}", newUser.getUserId(), newUser.getEmail());
     }
 
