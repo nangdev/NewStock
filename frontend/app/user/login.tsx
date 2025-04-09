@@ -14,7 +14,7 @@ export default function Login() {
   const { mutate } = useLoginMutation();
 
   const onPressLogo = () => {
-    router.navigate(ROUTE.HOME);
+    router.navigate(ROUTE.INTRO.INTRO);
   };
 
   const onPressLogin = async () => {
@@ -28,9 +28,9 @@ export default function Login() {
   };
 
   return (
-    <View className="flex-1 items-center justify-center gap-12 p-4">
+    <View className="flex-1 items-center justify-center gap-8 p-4">
       <TouchableOpacity onPress={onPressLogo}>
-        <Text className="text-5xl font-bold text-primary">NewStock</Text>
+        <Text className="text-logo text-5xl font-bold">NewStock</Text>
       </TouchableOpacity>
 
       <BlurOverlay className="items-center gap-8">

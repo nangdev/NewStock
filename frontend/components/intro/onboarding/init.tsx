@@ -25,7 +25,9 @@ export default function Init({ onPressNextStep }: InitProps) {
   return (
     <BlurOverlay className="w-full items-center gap-8 p-8 py-24">
       <View className="items-center gap-2">
-        <Text className="text-xl font-bold text-text_gray">{nickname}님, 처음 오셨군요!</Text>
+        <Text className="text-xl font-bold text-text_gray">
+          <Text className="text-xl font-bold text-primary">{nickname}</Text>님, 처음 오셨군요!
+        </Text>
         <Text className="text-xl font-bold text-text_gray">관심 종목을 설정해주시면</Text>
         <Text className="text-xl font-bold text-text_gray">맞춤 알림을 보내드려요!</Text>
       </View>
