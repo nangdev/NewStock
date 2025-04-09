@@ -54,7 +54,10 @@ function StockListItem({ stockId, stockName, stockCode, price, changeRate, imgUr
                 {changeRate.toFixed(2)}%
               </Text>
             </View>
-            <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+            <TouchableOpacity
+              onPress={() => setExpanded(!expanded)}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
               <AntDesign name={expanded ? 'up' : 'down'} size={14} color="#888" className="ml-2" />
             </TouchableOpacity>
           </View>
