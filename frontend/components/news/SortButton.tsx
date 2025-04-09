@@ -20,9 +20,9 @@ export default function SortButton({ sort, setSort }: Props) {
     <View className="relative">
       <Pressable
         onPress={() => setIsOpen(!isOpen)}
-        className="flex-row items-center rounded-full bg-purple-100 px-3 py-1.5">
-        <AntDesign name="down" size={14} color="#6B46C1" className="mr-2" />
-        <Text className="font-medium text-purple-700">{selectedLabel}</Text>
+        className="flex-row items-center rounded-full bg-blue-100 px-2 py-1">
+        <AntDesign name="down" size={12} color="#1d4ed8" className="mr-1" />
+        <Text className="text-sm font-medium text-blue-800">{selectedLabel}</Text>
       </Pressable>
 
       {isOpen && (
