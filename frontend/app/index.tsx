@@ -30,6 +30,8 @@ export default function Main() {
   };
 
   useEffect(() => {
+    stompService.connect();
+
     if (!data?.data.stockList || !isSuccess) {
       return;
     }
@@ -48,8 +50,6 @@ export default function Main() {
         )
       );
     };
-
-    stompService.connect();
 
     if (stompService.isReady()) {
       stompService.unsubscribeAll();

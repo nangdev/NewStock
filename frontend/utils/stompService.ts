@@ -7,14 +7,14 @@ class StompService {
   private isConnected: boolean = false;
   private isConnecting: boolean = false;
   private subscriptions: Map<string, StompSubscription> = new Map();
-  public prefix: string = '/topic/rtp'
+  public prefix: string = '/topic/rtp';
 
   public connect() {
     if (this.client && (this.isConnected || this.isConnecting)) return;
     this.isConnecting = true;
 
     this.client = new Client({
-      webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io:8080/api/ws'),
+      webSocketFactory: () => new WebSocket('ws://j12a304.p.ssafy.io/api/ws'),
       // debug: (msg) => console.log('STOMP:', msg),
       onConnect: (frame) => {
         this.isConnected = true;
@@ -22,7 +22,7 @@ class StompService {
       },
       onStompError: () => {
         this.isConnecting = false;
-        console.log('STOMP ERROR!')
+        console.log('STOMP ERROR!');
       },
       onWebSocketClose: (closeEvent) => {
         console.log('<<< Socket disconnected from server', closeEvent);
@@ -38,11 +38,10 @@ class StompService {
       forceBinaryWSFrames: true,
       appendMissingNULLonIncoming: true,
       reconnectDelay: 10000,
-    })
+    });
 
     this.client.activate();
   }
-
 
   public subscribe(topic: string, onMessage: MessageCallback) {
     if (!this.client || !this.isConnected) return;
@@ -62,14 +61,13 @@ class StompService {
 
   public unsubscribeAll() {
     if (!this.client || !this.isConnected) return;
-  
+
     for (const topic of this.subscriptions.keys()) {
       this.unsubscribe(topic);
     }
     // console.log(`unsubscribe all topics`)
     this.subscriptions.clear();
   }
-  
 
   public disconnect() {
     if (!this.client || !this.isConnected) return;
