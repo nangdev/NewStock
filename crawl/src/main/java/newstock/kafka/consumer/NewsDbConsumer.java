@@ -39,7 +39,7 @@ public class NewsDbConsumer {
             log.info("DB 저장 완료, 종목: {} / 뉴스 개수: {}", stockName, dbRequest.getFilteredNewsItems().size());
 
             List<NotificationDto> scoreFilteredNotificationDtos = newsItems.stream()
-                    .filter(newsItem -> newsItem.getScore() > 8)  // 뉴스 스코어 정해야됌
+                    .filter(newsItem -> newsItem.getScore() > 7.8)
                     .map(NotificationDto::of)
                     .toList();
 

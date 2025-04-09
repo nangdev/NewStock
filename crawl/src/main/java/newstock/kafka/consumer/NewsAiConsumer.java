@@ -26,7 +26,7 @@ public class NewsAiConsumer {
 
     private final NewsAiService newsAiService;
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper; // 생성자 주입 방식
+    private final ObjectMapper objectMapper;
 
     @Value("${kafka.topic.news-db}")
     private String newsDbTopic;
@@ -44,11 +44,10 @@ public class NewsAiConsumer {
                 AnalysisResponse analysisResponse = newsAiService.analysis(
                         AnalysisRequest.of(item.getTitle(), item.getContent())
                 );
-                log.info("점수 채점 완료! 점수: {}", analysisResponse.getScore());
                 if (!(analysisResponse.getScore() > 2 || analysisResponse.getScore() < -2)) {
                     continue;
                 }
-                item.setScore(analysisResponse.getScore());
+                item.setScores(analysisResponse);
                 try {
                     SummarizationResponse summarizationResponse = newsAiService.summarize(
                             SummarizationRequest.of(item.getContent(), 300, 40, false)
