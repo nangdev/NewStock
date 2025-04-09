@@ -53,7 +53,7 @@ api.interceptors.response.use(
         await removeToken('refreshToken');
 
         // Memo: 로그인 화면으로 리다이렉트
-        router.replace(ROUTE.USER.LOGIN);
+        router.navigate(ROUTE.USER.LOGIN);
         return Promise.reject(refreshError);
       }
     }

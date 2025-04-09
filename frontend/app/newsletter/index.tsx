@@ -67,7 +67,8 @@ export default function NewsletterCalendar() {
   };
 
   const onPressDate = (date: any) => {
-    router.navigate(`${ROUTE.NEWSLETTER.INDEX}/${date.dateString.replaceAll('-', '')}`);
+    const newDate = date.dateString.replaceAll('-', '').slice(2);
+    router.navigate(`${ROUTE.NEWSLETTER.INDEX}/${newDate}`);
   };
 
   return (

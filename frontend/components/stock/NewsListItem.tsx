@@ -1,11 +1,10 @@
-import { AntDesign } from '@expo/vector-icons';
+import NegativeIcon from 'assets/icons/negative.svg';
+import PositiveIcon from 'assets/icons/positive.svg';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import Entypo from '@expo/vector-icons/Entypo';
-import PositiveIcon from 'assets/icons/positive.svg';
-import NegativeIcon from 'assets/icons/negative.svg';
+import { getTimeAgo } from 'utils/date';
 
 type Props = {
   newsId: number;

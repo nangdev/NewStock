@@ -47,7 +47,7 @@ export const getNewsScrapList = async (
 };
 
 export const postNewsScrap = async (newsId: number) => {
-  const response = await api.post(API_PATH.NEWS.SCRAP_ADD(newsId),);
+  const response = await api.post(API_PATH.NEWS.SCRAP_ADD(newsId));
   return response.data;
 };
 
