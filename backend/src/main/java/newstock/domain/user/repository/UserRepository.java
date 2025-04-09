@@ -2,7 +2,9 @@ package newstock.domain.user.repository;
 
 import newstock.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer>, UserCustomRepository  {
@@ -21,4 +23,8 @@ public interface UserRepository extends JpaRepository<User, Integer>, UserCustom
 
     // 활성화된 이메일이 존재하는지 여부
     boolean existsByEmailAndActivatedTrue(String email);
+
+    @Query("select u.fcmToken from User u where u.activated = true")
+    List<String> findUserTokens();
+
 }
