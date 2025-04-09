@@ -1,17 +1,29 @@
 import { AntDesign } from '@expo/vector-icons';
-import { useNewsDetailQuery } from 'api/news/query';
+import {
+  useNewsDetailQuery,
+  useAddNewsScrapMutation,
+  useDeleteNewsScrapMutation,
+} from 'api/news/query';
 import CustomFooter from 'components/Footer/Footer';
 import CustomHeader from 'components/Header/Header';
 import { useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image, ActivityIndicator } from 'react-native';
 
 export default function NewsDetailPage() {
   const { newsId } = useLocalSearchParams();
   const id = Number(Array.isArray(newsId) ? newsId[0] : (newsId ?? 1));
-  const { data, isLoading, isError } = useNewsDetailQuery(Number(newsId));
+  const { data, isLoading, isError } = useNewsDetailQuery(id);
+  const { mutate: addNewsScrap } = useAddNewsScrapMutation();
+  const { mutate: deleteNewsScrap } = useDeleteNewsScrapMutation();
 
   const [isScraped, setIsScraped] = useState(false);
+
+  useEffect(() => {
+    if (data?.data?.isScraped !== undefined) {
+      setIsScraped(data.data.isScraped);
+    }
+  }, [data?.data.isScraped]);
 
   if (isLoading) {
     return (
@@ -36,6 +48,7 @@ export default function NewsDetailPage() {
 
   const onPressPinIcon = () => {
     setIsScraped(!isScraped);
+    isScraped ? deleteNewsScrap(id) : addNewsScrap(id);
   };
 
   return (

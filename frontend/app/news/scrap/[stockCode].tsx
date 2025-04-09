@@ -6,26 +6,29 @@ import CustomHeader from 'components/Header/Header';
 import SortButton from 'components/news/SortButton';
 import { ROUTE } from 'constants/routes';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { NewsType } from 'types/api/news';
 import { getTimeAgo } from 'utils/date';
 
 export default function StockNewsScrapPage() {
   const stockCode = useLocalSearchParams().stockCode.toString();
+  const stockId = Number(useLocalSearchParams().stockId);
   const route = useRouter();
   const [page, setPage] = useState(0);
   const [sort, setSort] = useState<'score' | 'time'>('time');
 
   const COUNT_PER_PAGE = 10;
+
+  
   const { data, isLoading, isError } = useNewsScrapListQuery({
-    stockCode,
+    stockId,
     page,
     count: COUNT_PER_PAGE,
     sort,
   });
   const { data: userStockData } = useAllUserStockListQuery();
-
+  
   if (isLoading) {
     return (
       <View className="h-full w-full items-center justify-center">
@@ -34,8 +37,14 @@ export default function StockNewsScrapPage() {
     );
   }
 
+  const stockName = userStockData?.data.stockList.find(
+    (stock) => stock.stockCode === stockCode
+  )?.stockName;
+
   if (isError || !data?.data.newsList.length) {
     return (
+      <>
+      <CustomHeader title={stockName ?? ''}/>
       <View className="h-full w-full items-center justify-center gap-8">
         <Image
           source={require('../../../assets/image/no_data.png')}
@@ -43,6 +52,8 @@ export default function StockNewsScrapPage() {
         />
         <Text style={{ color: '#8A96A3' }}>스크랩한 뉴스가 없어요</Text>
       </View>
+      <CustomFooter/>
+      </>
     );
   }
 
@@ -71,9 +82,6 @@ export default function StockNewsScrapPage() {
     </TouchableOpacity>
   );
 
-  const stockName = userStockData?.data.stockList.find(
-    (stock) => stock.stockCode === stockCode
-  )?.stockName;
 
   return (
     <>

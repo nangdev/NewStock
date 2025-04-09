@@ -41,8 +41,8 @@ export const API_PATH = {
     STOCK_NEWS: `${DOMAIN.NEWS}`,
     DETAIL: (newsId: number) => `${DOMAIN.NEWS}/${newsId}`,
     SCRAP: `${DOMAIN.NEWS}/scrap`,
-    SCRAP_ADD: `${DOMAIN.NEWS}/scrap`,
-    SCRAP_DELETE: `${DOMAIN.NEWS}/scrap`,
+    SCRAP_ADD: (newsId: number) => `${DOMAIN.NEWS}/scrap/${newsId}`,
+    SCRAP_DELETE: (newsId: number) => `${DOMAIN.NEWS}/scrap/${newsId}`,
   },
   NOTIFICATION: {
     ALL: `${DOMAIN.NOTIFICATION}`,
