@@ -10,7 +10,7 @@ public class ArticleCleaner {
 
     /**
      * 기사 HTML 전체에서 id가 "dic_area"인 article 태그 내부의 이미지 이후부터의 내용만 추출합니다.
-     * (불필요한 태그(table, script, style 등)는 제거합니다.)
+     * (불필요한 태그(table, script, style, em.img_desc 등)는 제거합니다.)
      * 그리고 각 <br> 태그마다 개행 문자를 두 개("\n\n")만 남도록 처리합니다.
      *
      * @param html 기사 페이지의 HTML 전체
@@ -23,8 +23,7 @@ public class ArticleCleaner {
             return "";
         }
 
-        // 불필요한 태그 제거 (예: table, script, style)
-        article.select("table, script, style").remove();
+        article.select("table, script, style, em.img_desc, div[style*='border:1px solid #e6e6e6']").remove();
 
         // article 내에서 첫 번째 img 요소를 찾습니다.
         Element firstImg = article.select("img").first();
@@ -65,7 +64,7 @@ public class ArticleCleaner {
 
     private static void appendTextWithLineBreaks(Node node, StringBuilder sb) {
         if (node.nodeName().equalsIgnoreCase("br")) {
-            // <br> 태그를 만나면 바로 두 개의 개행 문자를 추가합니다.
+            // <br> 태그를 만나면 바로 개행 문자를 추가합니다.
             sb.append("\n");
         } else if (node instanceof TextNode) {
             sb.append(((TextNode) node).text());
