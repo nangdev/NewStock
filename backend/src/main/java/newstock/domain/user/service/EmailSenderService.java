@@ -10,8 +10,10 @@ import newstock.exception.type.ValidationException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.UUID;
@@ -32,7 +34,7 @@ public class EmailSenderService {
         String username = email.split("@")[0];
 
         try {
-            String html = loadHtmlTemplate(TEMPLATE_PATH, username, authCode);
+            String html = loadHtmlTemplate(username, authCode);
 
             message.setFrom("NewStock <team.newstock@gmail.com>");
             message.setRecipients(MimeMessage.RecipientType.TO, email);
@@ -53,12 +55,15 @@ public class EmailSenderService {
         }
     }
 
-    private String loadHtmlTemplate(String path, String username, String authCode) {
+    private String loadHtmlTemplate(String username, String authCode) {
         try {
-            ClassPathResource resource = new ClassPathResource(path);
-        String html = Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
-        return html.replace("{{username}}", username)
-                .replace("{{authCode}}", authCode);
+            ClassPathResource resource = new ClassPathResource(TEMPLATE_PATH);
+            InputStream inputStream = resource.getInputStream();
+            String html = new String(StreamUtils.copyToByteArray(inputStream), StandardCharsets.UTF_8);
+            html = html.replace("{{username}}", username)
+                    .replace("{{authCode}}", authCode);
+
+            return html;
         } catch (IOException e) {
             log.error("이메일 템플릿 로드 실패", e);
             throw new ValidationException(ExceptionCode.EMAIL_SEND_FAILED);
