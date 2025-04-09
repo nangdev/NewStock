@@ -61,7 +61,8 @@ deploy:
           echo \"KAKAO_REDIRECT_URL=$KAKAO_REDIRECT_URL\" >> backend/.env &&
           echo \"OPENAI_API_KEY=$OPENAI_API_KEY\" >> backend/.env &&
           echo \"NEWS_AI_URL=$NEWS_AI_URL\" >> backend/.env &&
-          
+          echo \"FCM_PROJECT_ID=$FCM_PROJECT_ID\" >> backend/.env &&
+
           # API 서버와 Nginx 재빌드 및 배포
           echo \"dev/service 브랜치: API 서버와 Nginx 빌드 및 배포 중...\"
           docker-compose down backend nginx
@@ -84,7 +85,6 @@ deploy:
           echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> crawl/.env &&
           echo \"NEWS_AI_URL=$NEWS_AI_URL\" >> crawl/.env &&
           echo \"FCM_PROJECT_ID=$FCM_PROJECT_ID\" >> crawl/.env &&
-          echo \"FCM_SERVICE_ACCOUNT_FILE=$FCM_SERVICE_ACCOUNT_FILE\" >> crawl/.env &&
           
           # 크롤러 재빌드 및 배포
           echo \"dev/crawl 브랜치: 크롤러 서비스 빌드 및 배포 중...\"
@@ -118,6 +118,7 @@ deploy:
           echo \"MAIL_PASSWORD=$MAIL_PASSWORD\" >> backend/.env &&
           echo \"OPENAI_API_KEY=$OPENAI_API_KEY\" >> backend/.env &&
           echo \"NEWS_AI_URL=$NEWS_AI_URL\" >> backend/.env &&
+          echo \"FCM_PROJECT_ID=$FCM_PROJECT_ID\" >> backend/.env &&
 
 
           # 크롤러 환경 변수
@@ -134,7 +135,6 @@ deploy:
           echo \"KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS\" >> crawl/.env &&
           echo \"NEWS_AI_URL=$NEWS_AI_URL\" >> crawl/.env &&
           echo \"FCM_PROJECT_ID=$FCM_PROJECT_ID\" >> crawl/.env &&
-          echo \"FCM_SERVICE_ACCOUNT_FILE=$FCM_SERVICE_ACCOUNT_FILE\" >> crawl/.env &&
           
           # 전체 서비스 재배포
           echo \"dev/be 브랜치: 모든 서비스 배포 중...\"
