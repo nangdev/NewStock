@@ -33,21 +33,17 @@ export default function StockInfoCard({
   return (
     <View className="mx-8 my-2 rounded-2xl bg-white shadow-md">
       <View className="ml-1 mt-1 flex-row items-center p-4">
-        {/* 왼쪽: 로고 */}
         <Image
           source={{ uri: `data:image/png;base64,${imgUrl}` }}
           className="mr-6 h-16 w-16 rounded-xl bg-gray-200"
         />
 
-        {/* 오른쪽: 텍스트 전체 */}
         <View className="mr-2 flex-1">
-          {/* 1줄: 이름 + 주가 */}
           <View className="flex-row items-center justify-between">
             <Text className="text-base font-bold">{stockName ? stockName : 'SSAFY'}</Text>
             <Text className="text-base font-bold">{price.toLocaleString()} 원</Text>
           </View>
 
-          {/* 2줄: 종목코드 + 등락률 */}
           <View className="mt-1 flex-row items-center justify-between">
             <Text className="text-xs text-gray-500">{stockCode}</Text>
             <Text
@@ -62,7 +58,7 @@ export default function StockInfoCard({
 
       <View className="mx-4 border-t border-gray-200" />
 
-      <View className="flex-row  p-4">
+      <View className="mb-1 flex-row  p-4">
         <View className="flex-1">
           <InfoRow label="시가총액" content={totalPrice} />
           <InfoRow label="발행주식수" content={issuedNum} />
@@ -71,7 +67,7 @@ export default function StockInfoCard({
         <View className="flex-1">
           <InfoRow label="자본금" content={capital} />
           <InfoRow label="분류" content={industry} />
-          <View className="h-[24px]" /> {/* 상장일과 같은 높이를 맞추기 위한 빈 공간 */}
+          <View className="h-[24px]" />
         </View>
       </View>
     </View>
@@ -88,9 +84,9 @@ const InfoRow = ({ label, content }: Item) => {
   const [isTruncated, setIsTruncated] = useState(false);
 
   return (
-    <View className="mx-2 min-h-[32px] flex-row justify-between border-b border-gray-200 py-2">
-      <Text className="text-xs font-semibold">{label}</Text>
-      <View className="flex-1 items-end">
+    <View className="relative mx-2 min-h-[32px] border-b border-gray-200 py-2">
+      <View className="flex-row items-start justify-between">
+        <Text className="text-xs font-semibold">{label}</Text>
         <Pressable onPress={() => isTruncated && setShowTooltip(true)}>
           <Text
             className="text-right text-xs"
@@ -103,17 +99,52 @@ const InfoRow = ({ label, content }: Item) => {
             {content}
           </Text>
         </Pressable>
-        {showTooltip && (
-          <View className="absolute bottom-[120%] right-0 z-50 max-w-[180px] rounded-md bg-gray-400/90 px-3 py-2">
+      </View>
+
+      {/* 말풍선 */}
+      {showTooltip && (
+        <View className="absolute left-0.5 top-full z-50 mt-2 w-[160px] items-end">
+          <View className="relative mb-[-6px] items-end">
+            <View
+              className="left-[2.9px]"
+              style={{
+                position: 'absolute',
+                top: 1,
+                zIndex: 1,
+                width: 0,
+                height: 0,
+                borderLeftWidth: 5,
+                borderRightWidth: 5,
+                borderBottomWidth: 5,
+                borderLeftColor: 'transparent',
+                borderRightColor: 'transparent',
+                borderBottomColor: 'white',
+              }}
+            />
+            <View
+              style={{
+                width: 0,
+                height: 0,
+                right: 3,
+                borderLeftWidth: 11,
+                borderRightWidth: 11,
+                borderBottomWidth: 11,
+                borderLeftColor: 'transparent',
+                borderRightColor: 'transparent',
+                borderBottomColor: '#BFDBFE',
+              }}
+            />
+          </View>
+          <View className="w-full rounded-lg border border-blue-200 bg-white px-3 py-2 shadow-md">
             <View className="flex-row items-start justify-between">
-              <Text className="pr-2 text-xs text-white">{content}</Text>
+              <Text className="flex-1 pr-2 text-xs text-gray-800">{content}</Text>
               <Pressable onPress={() => setShowTooltip(false)} hitSlop={10}>
-                <AntDesign name="close" size={12} color="#fff" />
+                <AntDesign name="close" size={12} color="#666" />
               </Pressable>
             </View>
           </View>
-        )}
-      </View>
+        </View>
+      )}
     </View>
   );
 };
