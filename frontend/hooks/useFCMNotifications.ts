@@ -62,8 +62,14 @@ export default function useFCMNotifications() {
   }, []);
 
   // Memo: 알림 데이터에 따라 라우팅 처리
-  // Todo: 백엔드와 소통 후 데이터 타입, content 변경
   const handleNotificationAction = (data: { type?: string; newsId?: number }) => {
+    const today = new Date();
+    today.setHours(today.getHours() + 9);
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const formattedDate = `${yyyy}${mm}${dd}`;
+
     if (!data?.type) return;
 
     switch (data.type) {
@@ -73,7 +79,7 @@ export default function useFCMNotifications() {
         }
         break;
       case 'NEWS_LETTER':
-        router.navigate('/newsletter');
+        router.navigate(`/newsletter/${new Date(formattedDate)}`);
         break;
       default:
         Toast.show({

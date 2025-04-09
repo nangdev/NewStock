@@ -35,7 +35,7 @@ export const useAllUserStockListQuery = () => {
 
 export const useStockDetailInfoQuery = (stockId: number) => {
   return useQuery({
-    queryKey: ['stockDetailInfo'],
+    queryKey: [`stockDetailInfo/${stockId}}`],
     queryFn: () => getStockDetailInfo(stockId),
   });
 };

@@ -59,14 +59,14 @@ export default function NewsLetter() {
   return (
     <>
       <CustomHeader />
-      <View className="px-6 py-20">
+      <View className="px-6 pt-20">
         <Text className="mb-4 mt-2 text-center text-xl font-bold">{stockName} 뉴스레터</Text>
 
-        <View className="mb-8 rounded-lg border bg-white p-4">
+        <View className="mb-8 rounded-lg border p-4">
           <View className="mb-6 items-center">
             <VictoryPie
               data={currentNewsletter.keywordList.map((keyword) => ({
-                x: keyword.keyword,
+                x: keyword.word,
                 y: keyword.count,
               }))}
               theme={VictoryTheme.clean}
@@ -78,15 +78,15 @@ export default function NewsLetter() {
 
           <View className="mb-6 flex-row flex-wrap gap-2">
             {currentNewsletter.keywordList.map((keyword) => (
-              <View key={keyword.keyword} className="rounded-full bg-gray-200 px-2 py-1">
+              <View key={keyword.word} className="rounded-full px-2 py-1">
                 <Text className="text-xs text-gray-600">
-                  #{keyword.keyword} ({keyword.count})
+                  #{keyword.word} ({keyword.count})
                 </Text>
               </View>
             ))}
           </View>
 
-          <View style={{ height: 300 }}>
+          <View style={{ height: 200 }}>
             <ScrollView>
               <Markdown>{currentNewsletter.content}</Markdown>
             </ScrollView>

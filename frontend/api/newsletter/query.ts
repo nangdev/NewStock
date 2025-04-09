@@ -5,7 +5,7 @@ import { getNewsletterList } from '.';
 
 export const useNewsletterListQuery = ({ date }: NewsletterReqType) => {
   return useQuery({
-    queryKey: ['newsletter'],
+    queryKey: [`newsletter/${date}`],
     queryFn: () => getNewsletterList({ date }),
     retry: false,
   });

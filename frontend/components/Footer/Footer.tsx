@@ -27,7 +27,7 @@ export default function CustomFooter() {
           <Pressable
             key={menu.href}
             onPress={() => {
-              if (!isActive) router.navigate(menu.href);
+              if (!isActive) router.push(menu.href);
             }}
             className="flex-1 items-center justify-center py-2">
             <Ionicons

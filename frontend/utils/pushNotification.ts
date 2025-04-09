@@ -19,7 +19,8 @@ export async function registerForPushNotifications() {
   }
 
   try {
-    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    const token = (await Notifications.getDevicePushTokenAsync()).data;
+
     console.log('푸시 토큰:', token);
     return token;
   } catch (error) {

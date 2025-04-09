@@ -62,10 +62,6 @@ export default function Main() {
     };
   }, [data]);
 
-  const onPressSet = () => {
-    router.navigate(ROUTE.INTRO.ONBOARDING);
-  };
-
   return (
     <>
       <CustomHeader title="NewStock" />
