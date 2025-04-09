@@ -16,6 +16,7 @@ module.exports = {
         stroke: '#D3D3D3',
         good: '#FF7D7D',
         bad: '#8484FF',
+        logo: '#704BB9',
       },
     },
   },

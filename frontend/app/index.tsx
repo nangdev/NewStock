@@ -39,6 +39,7 @@ export default function Main() {
 
     const onMessage = (msg: IMessage) => {
       const parsed = JSON.parse(msg.body);
+
       setSubscribedStocks((prev) =>
         prev.map((s) =>
           s.stockCode === parsed.stockCode
