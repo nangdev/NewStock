@@ -40,6 +40,17 @@ public class News {
     @Lob
     private String newsSummary;
 
-    private int score;
+    private float score;
+
+    private float financeScore;
+
+    private float strategyScore;
+
+    private float governScore;
+
+    private float techScore;
+
+    private float externalScore;
+
 
 }

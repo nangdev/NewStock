@@ -14,7 +14,7 @@ public class TopNewsDto {
 
     private String publishedDate;
 
-    private int score;
+    private float score;
 
     public static TopNewsDto of(News news) {
         return TopNewsDto.builder()

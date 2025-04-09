@@ -14,7 +14,7 @@ public class StockNewsDto {
 
     private String description;
 
-    private int score;
+    private float score;
 
     private String publishedDate;
 

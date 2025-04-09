@@ -24,7 +24,18 @@ public class NewsDetailDto {
 
     private String newsSummary;
 
-    private int score;
+    private float score;
+
+    private float financeScore;
+
+    private float strategyScore;
+
+    private float governScore;
+
+    private float techScore;
+
+    private float externalScore;
+
 
     public static NewsDetailDto of(News news) {
         return NewsDetailDto.builder()
@@ -37,6 +48,11 @@ public class NewsDetailDto {
                 .publishedDate(news.getPublishedDate())
                 .newsSummary(news.getNewsSummary())
                 .score(news.getScore())
+                .financeScore(news.getFinanceScore())
+                .strategyScore(news.getStrategyScore())
+                .governScore(news.getGovernScore())
+                .techScore(news.getTechScore())
+                .externalScore(news.getExternalScore())
                 .build();
     }
 }
