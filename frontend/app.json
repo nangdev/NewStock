@@ -37,7 +37,8 @@
         "icon": "./assets/logo.png",
         "color": "#ffffff",
         "channelId": "default"
-      }
+      },
+      "usesCleartextTraffic": true
     },
     "extra": {
       "eas": {
