@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import newstock.domain.stock.entity.Stock;
 
 @Data
 @Builder
@@ -16,5 +17,13 @@ public class StockNotificationDto {
     private String stockCode;
 
     private String stockName;
+
+    public static StockNotificationDto of(Stock stock) {
+        return StockNotificationDto.builder()
+                .stockId(stock.getStockId())
+                .stockCode(stock.getStockCode())
+                .stockName(stock.getStockName())
+                .build();
+    }
 
 }

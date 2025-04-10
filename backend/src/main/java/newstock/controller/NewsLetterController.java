@@ -53,9 +53,9 @@ public class NewsLetterController {
         return ResponseEntity.ok(Api.ok());
     }
 
-    @PostMapping
-    public ResponseEntity<Api<Void>> addNewsletterAndKeywords() {
-        newsletterService.addNewsletterAndKeyword();
+    @PostMapping("/{date}")
+    public ResponseEntity<Api<Void>> addNewsletterAndKeywords(@PathVariable String date) {
+        newsletterService.addNewsletterAndKeyword(date);
         return ResponseEntity.ok(Api.ok());
     }
 }

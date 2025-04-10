@@ -145,12 +145,12 @@ public class NewsletterServiceImpl implements NewsletterService {
     }
 
     @Override
-    public void addNewsletterAndKeyword() {
+    public void addNewsletterAndKeyword(String date) {
 
             List<StockDto> stockDtoList = stockService.getAllStockList();
             for (StockDto stockDto : stockDtoList) {
 
-                List<Article> articles =newsService.getNewsByStockIdAndDate(stockDto.getStockId());
+                List<Article> articles =newsService.getNewsByStockIdAndDate(stockDto.getStockId(),date);
 
                 if(articles.isEmpty())
                     continue;

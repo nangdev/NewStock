@@ -13,6 +13,8 @@ import newstock.domain.stock.service.StockService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
@@ -31,9 +33,12 @@ public class NewsletterScheduler {
     public void scheduleNewsLetter() {
 
         List<StockDto> stockDtoList = stockService.getAllStockList();
+
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
         for (StockDto stockDto : stockDtoList) {
 
-            List<Article> articles =newsService.getNewsByStockIdAndDate(stockDto.getStockId());
+            List<Article> articles =newsService.getNewsByStockIdAndDate(stockDto.getStockId(),todayDate);
 
             if (articles.isEmpty())
                 continue;

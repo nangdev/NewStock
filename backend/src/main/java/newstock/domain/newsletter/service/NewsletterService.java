@@ -12,5 +12,5 @@ public interface NewsletterService {
 
     void addNewsletterByContent(Integer stockId, NewsletterContentRequest content);
 
-    void addNewsletterAndKeyword();
+    void addNewsletterAndKeyword(String date);
 }
