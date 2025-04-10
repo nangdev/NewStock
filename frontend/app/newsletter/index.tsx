@@ -100,7 +100,7 @@ export default function NewsletterCalendar() {
           }}
           current={currentDate}
           minDate={minDateString}
-          maxDate={maxDateString}
+          // maxDate={maxDateString}
           hideExtraDays
           onMonthChange={(date: any) => {
             const newDate = `${date.year}-${String(date.month).padStart(2, '0')}-01`;

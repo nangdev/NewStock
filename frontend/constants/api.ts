@@ -22,6 +22,8 @@ export const API_PATH = {
     WITHDRAW: DOMAIN.USER,
     NEW: `${DOMAIN.USER}/new`,
     NICKNAME: `${DOMAIN.USER}/nickname`,
+    VERIFY_SEND: `${DOMAIN.USER}/send-email`,
+    VERIFY_CHECK: `${DOMAIN.USER}/verify-email`,
   },
   AUTH: {
     SOCIAL: `${DOMAIN.AUTH}/oauth/kakao/login`,
