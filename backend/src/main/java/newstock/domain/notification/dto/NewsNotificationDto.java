@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import newstock.domain.news.entity.News;
 
 @Data
 @Builder
@@ -16,4 +17,12 @@ public class NewsNotificationDto {
     private String title;
 
     private String publishedDate;
+
+    public static NewsNotificationDto of(News news) {
+        return NewsNotificationDto.builder()
+                .newsId(news.getNewsId())
+                .title(news.getTitle())
+                .publishedDate(news.getPublishedDate())
+                .build();
+    }
 }

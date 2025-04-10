@@ -26,5 +26,5 @@ public interface NewsService {
 
     void deleteNewsScrapByNewsId(NewsScrapDto newsScrapDto);
 
-    List<Article> getNewsByStockIdAndDate(Integer stockId);
+    List<Article> getNewsByStockIdAndDate(Integer stockId, String date);
 }

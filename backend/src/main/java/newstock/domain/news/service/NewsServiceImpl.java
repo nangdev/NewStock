@@ -140,11 +140,12 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public List<Article> getNewsByStockIdAndDate(Integer stockId) {
+    public List<Article> getNewsByStockIdAndDate(Integer stockId, String date) {
+        // date 파라미터가 "yyyyMMdd" 형식이라고 가정하고 변환합니다.
+        LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String formattedDate = parsedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-        List<News> newsList = newsRepository.findNewsByStockIdAndDate(stockId, today);
+        List<News> newsList = newsRepository.findNewsByStockIdAndDate(stockId, formattedDate);
 
         return newsList.stream()
                 .map(news -> Article.builder()
@@ -152,4 +153,5 @@ public class NewsServiceImpl implements NewsService {
                         .build())
                 .collect(Collectors.toList());
     }
+
 }

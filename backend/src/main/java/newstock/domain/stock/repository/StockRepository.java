@@ -17,4 +17,5 @@ public interface StockRepository extends JpaRepository<Stock, Integer>, StockRep
     @Query("select new newstock.domain.stock.dto.StockCodeDto(s.stockId, s.stockCode) FROM Stock s")
     List<StockCodeDto> findAllStockCodes();
 
+    Stock findByStockId(Integer stockId);
 }
