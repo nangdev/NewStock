@@ -18,7 +18,7 @@ public class NotificationDto {
 
     public static NotificationDto of(NewsItem newsItem) {
         return NotificationDto.builder()
-                .newsId(newsItem.getId())
+                .newsId(newsItem.getNewsId())
                 .stockId(newsItem.getStockId())
                 .build();
     }

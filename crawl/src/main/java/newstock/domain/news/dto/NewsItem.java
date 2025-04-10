@@ -1,15 +1,16 @@
 package newstock.domain.news.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import newstock.domain.news.entity.News;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class NewsItem {
 
-    private Integer id;
+    private Integer newsId;
 
     private Integer stockId;
 
@@ -42,6 +43,28 @@ public class NewsItem {
     private float techScore;
 
     private float externalScore;
+
+    public static NewsItem of(News news){
+        return NewsItem.builder()
+                .newsId(news.getNewsId())
+                .stockId(news.getNewsId())
+                .title(news.getTitle())
+                .description(news.getDescription())
+                .content(news.getContent())
+                .newsImage(news.getNewsImage())
+                .url(news.getUrl())
+                .press(news.getPress())
+                .pressLogo(news.getPressLogo())
+                .publishedDate(news.getPublishedDate())
+                .newsSummary(news.getNewsSummary())
+                .score(news.getScore())
+                .financeScore(news.getFinanceScore())
+                .strategyScore(news.getStrategyScore())
+                .governScore(news.getGovernScore())
+                .techScore(news.getTechScore())
+                .externalScore(news.getExternalScore())
+                .build();
+    }
 
     public void setScores(AnalysisResponse analysisResponse) {
         this.score = analysisResponse.getScore();

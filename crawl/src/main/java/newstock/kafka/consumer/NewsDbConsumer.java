@@ -35,10 +35,10 @@ public class NewsDbConsumer {
             String stockName = dbRequest.getStockName();
 
             List<NewsItem> newsItems = dbRequest.getFilteredNewsItems();
-            newsService.addNewsItems(newsItems);
+            List<NewsItem> savedNewsItems = newsService.addNewsItems(newsItems);
             log.info("DB 저장 완료, 종목: {} / 뉴스 개수: {}", stockName, dbRequest.getFilteredNewsItems().size());
 
-            List<NotificationDto> scoreFilteredNotificationDtos = newsItems.stream()
+            List<NotificationDto> scoreFilteredNotificationDtos = savedNewsItems.stream()
                     .filter(newsItem -> newsItem.getScore() > 7.8)
                     .map(NotificationDto::of)
                     .toList();
