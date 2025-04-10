@@ -89,23 +89,26 @@ export default function StockDetail() {
         {newsListData && newsListData.data.newsList.length > 0 ? (
           <>
             <ScrollView>
-              {newsListData?.data.newsList.map((news) => (
-                <NewsListItem
-                  key={news.newsId}
-                  newsId={news.newsId}
-                  title={news.title}
-                  description=""
-                  score={news.score}
-                  publishedDate={news.publishedDate}
-                />
-              ))}
+              {newsListData?.data.newsList.map((news, index) => {
+                const isLast = index === newsListData?.data.newsList.length - 1;
+                return (
+                  <NewsListItem
+                    key={news.newsId}
+                    newsId={news.newsId}
+                    title={news.title}
+                    description=""
+                    score={news.score}
+                    publishedDate={news.publishedDate}
+                    isLast={isLast}
+                  />
+                );
+              })}
             </ScrollView>
             <View className="mb-2 mt-4 flex-row items-center justify-center gap-4">
               {page > 0 ? (
                 <TouchableOpacity
                   onPress={onPressLeft}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 2 }}
-                >
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 2 }}>
                   <Entypo name="triangle-left" size={18} />
                 </TouchableOpacity>
               ) : (
@@ -114,9 +117,8 @@ export default function StockDetail() {
 
               {newsListData && page < newsListData?.data.totalPage - 1 ? (
                 <TouchableOpacity
-                onPress={onPressRight}
-                hitSlop={{ top: 10, bottom: 10, left: 2, right: 10 }}
-              >
+                  onPress={onPressRight}
+                  hitSlop={{ top: 10, bottom: 10, left: 2, right: 10 }}>
                   <Entypo name="triangle-right" size={18} />
                 </TouchableOpacity>
               ) : (

@@ -60,9 +60,13 @@ export default function MyPage() {
     },
   ];
 
+  const onGoBack = () => {
+    router.navigate(ROUTE.HOME);
+  };
+
   return (
     <>
-      <CustomHeader title="마이 페이지" />
+      <CustomHeader title="마이 페이지" onGoBack={onGoBack} />
       <View className="flex-1 items-center justify-center">
         <BlurOverlay className="w-[90%] items-center gap-6 px-6 py-10">
           <View className="mt-2 items-center">

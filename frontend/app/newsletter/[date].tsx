@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNewsletterListQuery } from 'api/newsletter/query';
 import { useAllUserStockListQuery } from 'api/stock/query';
-import BlurOverlay from 'components/BlurOverlay';
 import CustomFooter from 'components/Footer/Footer';
 import CustomHeader from 'components/Header/Header';
 import PieGiftedChart from 'components/newsletter/Chart';
-import { useLocalSearchParams } from 'expo-router';
+import { ROUTE } from 'constants/routes';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Text, View, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import Markdown from 'react-native-markdown-display';
@@ -15,17 +15,26 @@ export default function NewsLetter() {
   const { data, isError, isLoading } = useNewsletterListQuery({ date });
   const { data: userStockData } = useAllUserStockListQuery();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const route = useRouter();
+
+  const onGoBack = () => {
+    route.navigate(ROUTE.NEWSLETTER.CALENDAR);
+  };
 
   if (isLoading)
     return (
-      <View className="h-full w-full items-center justify-center">
-        <ActivityIndicator size="large" color="#724EDB" />
-      </View>
+      <>
+        <CustomHeader onGoBack={onGoBack} />
+        <View className="h-full w-full items-center justify-center">
+          <ActivityIndicator size="large" color="#724EDB" />
+        </View>
+        <CustomFooter />
+      </>
     );
   if (isError || !data?.data.newsletterList.length) {
     return (
       <>
-        <CustomHeader />
+        <CustomHeader onGoBack={onGoBack} />
         <View className="h-full w-full items-center justify-center gap-8">
           <View className="items-center">
             <Image
@@ -60,7 +69,7 @@ export default function NewsLetter() {
 
   return (
     <>
-      <CustomHeader title={stockName} />
+      <CustomHeader title={stockName} onGoBack={onGoBack} />
       <View className="gap-4 rounded-lg px-6 pt-24">
         <View
           className="w-full items-center gap-8 rounded-lg border border-stroke bg-white p-8 shadow-lg"

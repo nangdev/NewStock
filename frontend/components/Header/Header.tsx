@@ -9,9 +9,11 @@ import NotificationButton from './NotificationButton';
 
 type HeaderProps = {
   title?: string;
+  onGoBack?: () => void;
+  disabled?: boolean;
 };
 
-export default function CustomHeader({ title }: HeaderProps) {
+export default function CustomHeader({ title, onGoBack, disabled = false }: HeaderProps) {
   const navigation = useNavigation();
   const router = useRouter();
   const userStore = useUserStore();
@@ -32,7 +34,10 @@ export default function CustomHeader({ title }: HeaderProps) {
       intensity={50}
       tint="light"
       className="absolute top-0 z-10 w-full flex-row items-center justify-between border-b border-gray-200 px-4 py-3 backdrop-blur-md">
-      <TouchableOpacity onPress={() => navigation.goBack()} className="p-1">
+      <TouchableOpacity
+        disabled={disabled}
+        onPress={onGoBack ? onGoBack : () => navigation.goBack()}
+        className="p-1 disabled:w-0">
         <Ionicons name="chevron-back" size={26} color="black" />
       </TouchableOpacity>
 

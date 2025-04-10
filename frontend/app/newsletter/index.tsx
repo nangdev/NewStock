@@ -71,9 +71,13 @@ export default function NewsletterCalendar() {
     router.navigate(`${ROUTE.NEWSLETTER.INDEX}/${newDate}`);
   };
 
+  const onGoBack = () => {
+    router.navigate(ROUTE.HOME);
+  };
+
   return (
     <>
-      <CustomHeader title="뉴스레터" />
+      <CustomHeader title="뉴스레터" onGoBack={onGoBack} />
       <View className="h-full w-full items-center gap-6 pt-24">
         <Text className="text-lg font-bold text-text">
           날짜를 클릭하면 뉴스레터를 볼 수 있어요!
