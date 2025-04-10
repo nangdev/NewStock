@@ -56,34 +56,38 @@ export default function NewsDetailPage() {
   return (
     <>
       <CustomHeader title={newsInfo.press} />
-      <View className="mx-8 my-24 h-[680px] rounded-2xl bg-white p-6 shadow-md">
-        <ScrollView>
+      <View className="mx-4 my-24 h-[680px] rounded-2xl bg-white p-6 shadow-md">
+        <ScrollView
+        	showsVerticalScrollIndicator={false}
+        >
           <View>
+          <View className="flex-row justify-between items-center mb-2">
             <Image
               source={{ uri: newsInfo?.pressLogo }}
               className="h-6 w-14"
               resizeMode="contain"
             />
+            <AntDesign
+              name={isScraped ? 'star' : 'staro'}
+              size={16}
+              color="#724EDB"
+              onPress={onPressPinIcon}
+              style={{ transform: [{ scaleX: -1 }] }}
+            />
+          </View>
 
             <View className="flex-row items-center justify-between">
-              <Text className="text-xl font-bold">{newsInfo?.title}</Text>
+              <Text className="flex-1 text-xl font-bold" style={{textAlign: 'justify'}}>{newsInfo?.title}</Text>
             </View>
 
             <View className="flex-row items-center justify-between">
-              <Text className="my-4 text-gray-500">{newsInfo?.publishedDate}</Text>
-              <AntDesign
-                name={isScraped ? 'pushpin' : 'pushpino'}
-                size={24}
-                style={{ transform: [{ scaleX: -1 }] }}
-                color="#724EDB"
-                onPress={onPressPinIcon}
-              />
+              <Text className="my-4 mt-2 text-gray-500">{newsInfo?.publishedDate}</Text>
             </View>
             <View className="border-t border-gray-200 " />
           </View>
           
           <View className='flex-1 mt-2 items-center justify-center'>
-            <Text className="m-2 text-lg">
+            <Text className="mt-2 text-lg">
               <Text className="font-bold">AI</Text>가 이 기사를{' '}
               <Text className={`font-bold ${sentimentColor}`}>
                 {sentimentValue}
@@ -102,10 +106,10 @@ export default function NewsDetailPage() {
             externalScore={newsInfo.externalScore}
           />
 
-          <View className="my-4 ml-2 mr-12">
-            <View className="mb-2 flex-row">
-              <View className="mr-6 w-[2px] rounded-sm bg-black" />
-              <Text className="mt-2 text-base">{newsInfo.newsSummary}</Text>
+          <View className="p-4">
+            <View className="flex-row justify-center">
+              <View className="mr-4 w-[2px] rounded-sm bg-black" />
+              <Text className="text-base">{newsInfo.newsSummary}</Text>
             </View>
           </View>
 
@@ -122,12 +126,12 @@ export default function NewsDetailPage() {
           <View>
             <Text className="text-lg">{newsInfo.content}</Text>
           </View>
-          <View className="mb-2 mt-8 border-t border-gray-200" />
-          <Text className="text-sm text-gray-500">
+          <View className="mb-2 mt-4 border-t border-gray-200" />
+          <Text className="text-sm text-gray-500 mb-2">
             해당 기사의 저작권은 {newsInfo.press}에 있으며, 자세한 내용은 원문 링크를 통해 확인할 수
             있습니다.
           </Text>
-          <Text className="text-sm text-gray-500">{newsInfo.url}</Text>
+          <Text className="text-sm text-gray-500">원문 링크: {newsInfo.url}</Text>
         </ScrollView>
       </View>
       <CustomFooter />
