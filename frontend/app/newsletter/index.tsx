@@ -2,7 +2,7 @@ import CustomFooter from 'components/Footer/Footer';
 import CustomHeader from 'components/Header/Header';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { View, Dimensions, Text } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 
@@ -74,15 +74,49 @@ export default function NewsletterCalendar() {
     router.navigate(`${ROUTE.NEWSLETTER.INDEX}/${newDate}`);
   };
 
+  const markedDates = useMemo(() => {
+    return {
+      [todayString]: {
+        customStyles: {
+          container: {},
+          text: {
+            color: '#724EDB',
+            fontWeight: 'bold', // 👈 여기가 핵심
+            fontSize: 16,
+          },
+        },
+      },
+    };
+  }, [todayString]);
+
   return (
     <>
       <CustomHeader title="뉴스레터" />
-      <View className="h-full w-full items-center gap-6 pt-24">
+      <View className="h-full w-full items-center justify-center gap-6 pb-20">
         <Text className="text-lg font-bold text-text">
           날짜를 클릭하면 뉴스레터를 볼 수 있어요!
         </Text>
         <Calendar
           onDayPress={onPressDate}
+          markingType={'custom'}
+          markedDates={markedDates}
+          renderHeader={(date: Date) => {
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            return (
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: 'bold',
+                  color: '#111827',
+                  textAlign: 'center',
+                  paddingVertical: 10,
+                  marginBottom: 8,
+                }}>
+                {`${year}년 ${month}월`}
+              </Text>
+            );
+          }}
           style={{
             width: width * 0.9,
             borderWidth: 1,
