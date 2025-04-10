@@ -21,7 +21,7 @@ import { getTimeAgo } from 'utils/date';
 type NotificationPopoverProps = {
   visible: boolean;
   onClose: () => void;
-  notifications: NotificationType[];
+  notifications?: NotificationType[];
   refetch: () => void;
 };
 
@@ -39,6 +39,12 @@ export default function NotificationPopover({
   const { data: userStockData, isSuccess: isUserStockSuccess } = useAllUserStockListQuery();
 
   const translateY = useRef(new Animated.Value(-1000)).current;
+
+  useEffect(() => {
+    if (isUserStockSuccess) {
+      setShowModal(true);
+    }
+  });
 
   useEffect(() => {
     if (visible) {
@@ -66,7 +72,7 @@ export default function NotificationPopover({
       { unId },
       {
         onSuccess: () => {
-          const target = notifications.find((item) => item.unId === unId);
+          const target = notifications?.find((item) => item.unId === unId);
           if (!target) return;
           if (target.newsInfo.newsId) {
             router.navigate(ROUTE.NEWS.DETAIL(target.newsInfo.newsId));
@@ -76,14 +82,16 @@ export default function NotificationPopover({
     );
   };
 
+  if (!notifications) return null;
+
+  const reversedNoti = notifications.toReversed();
+
   const handleDelete = (unId: number) => {
     deleteNotification({ unId }, { onSuccess: refetch });
   };
 
-  if (!showModal) return null;
-
   return (
-    <Modal transparent animationType="fade">
+    <Modal transparent animationType="none">
       <Pressable onPress={onClose} className="flex-1 bg-black/30">
         <Animated.View
           style={{ transform: [{ translateY }] }}
@@ -94,18 +102,19 @@ export default function NotificationPopover({
 
           {notifications.length ? (
             <FlatList
-              data={notifications}
+              data={reversedNoti}
               keyExtractor={(item) => item.unId.toString()}
+              showsVerticalScrollIndicator={false}
               renderItem={({ item }) => {
                 const currentStock = userStockData?.data.stockList.find(
                   (stock) => stock.stockId === item.stockInfo.stockId
                 );
 
                 return (
-                  <View className="flex-row items-center justify-center gap-2 border-b border-gray-200 py-3">
+                  <View className="flex-row items-center justify-center gap-2 border-b border-gray-200">
                     <TouchableOpacity
                       onPress={() => handleRead(item.unId)}
-                      className="flex-1 flex-row items-center gap-3 px-2">
+                      className="flex-1 flex-row items-center gap-3 px-2 py-3">
                       {!item.isRead ? (
                         <View className="h-2 w-2 rounded-full bg-red-500" />
                       ) : (

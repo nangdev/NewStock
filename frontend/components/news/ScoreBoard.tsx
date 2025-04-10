@@ -1,7 +1,6 @@
 import { View, Text } from "react-native";
 
 type Props = {
-  
   score: number;
   sentimentColor: string;
   financeScore: number;
@@ -43,8 +42,8 @@ export default function ScoreBoard({
   };
 
   return (
-    <View className="mx-8 my-2 min-h-[240px] px-6 py-4">
-      <View className="items-center mb-4">
+    <View className="mx-8 min-h-[240px] px-4 pt-2">
+      <View className="items-center mb-2">
         <Text
           className={`text-2xl font-bold ${
             score > 0 ? 'text-red-500' : score < 0 ? 'text-blue-500' : 'text-black'
