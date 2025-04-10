@@ -18,6 +18,6 @@ public class UserNotificationDto {
 
     private StockNotificationDto stockInfo;
 
-    private Byte isRead;
+    private Boolean isRead;
 
 }
