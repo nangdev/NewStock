@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class StockPriceServiceImpl implements StockPriceService {
+public class StockPriceInfoServiceImpl implements StockPriceInfoService {
 
     private final StockPriceRepository stockPriceRepository;
 

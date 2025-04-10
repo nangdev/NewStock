@@ -3,7 +3,7 @@ package newstock.controller;
 import lombok.RequiredArgsConstructor;
 import newstock.common.dto.Api;
 import newstock.controller.response.StockPriceResponse;
-import newstock.domain.stockprice.service.StockPriceService;
+import newstock.domain.stockprice.service.StockPriceInfoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class StockPriceController {
 
-    private final StockPriceService stockPriceService;
+    private final StockPriceInfoService stockPriceInfoService;
 
     @GetMapping("/{stockId}")
     public ResponseEntity<Api<StockPriceResponse>> getAllStockPricesByStockId(@PathVariable Integer stockId) {
 
-        StockPriceResponse stockPriceResponse = stockPriceService.getAllStockPrices(stockId);
+        StockPriceResponse stockPriceResponse = stockPriceInfoService.getAllStockPrices(stockId);
         return ResponseEntity.ok(Api.ok(stockPriceResponse));
     }
 

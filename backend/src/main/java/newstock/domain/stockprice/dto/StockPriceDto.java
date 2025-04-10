@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import newstock.domain.stockprice.entity.StockPrice;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data

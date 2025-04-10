@@ -2,22 +2,24 @@ package newstock.domain.stockprice.util;
 
 import lombok.RequiredArgsConstructor;
 import newstock.domain.stock.service.StockService;
-import newstock.domain.stockprice.entity.StockPrice;
+import newstock.domain.stockprice.dto.StockPriceDto;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+@Component
 @RequiredArgsConstructor
 public class NaverFinanceCrawler {
 
     private final StockService stockService;
 
-    public StockPrice getLatestStockPrice(Integer stockId) throws Exception {
+    public StockPriceDto getLatestStockPrice(Integer stockId) throws Exception {
 
         String stockCode = stockService.getStockInfo(stockId).getStockCode();
         String url = "https://finance.naver.com/item/sise_day.nhn?code=" + stockCode + "&page=1";
@@ -37,7 +39,7 @@ public class NaverFinanceCrawler {
                     try {
                         LocalDate date = LocalDate.parse(dateStr, formatter);
                         int price = Integer.parseInt(closeStr);
-                        return StockPrice.builder()
+                        return StockPriceDto.builder()
                                 .stockId(stockId)
                                 .date(date)
                                 .price(price)

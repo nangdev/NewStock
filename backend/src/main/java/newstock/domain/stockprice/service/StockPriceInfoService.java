@@ -3,9 +3,7 @@ package newstock.domain.stockprice.service;
 import newstock.controller.response.StockPriceResponse;
 import newstock.domain.stockprice.dto.StockPriceDto;
 
-import java.util.List;
-
-public interface StockPriceService {
+public interface StockPriceInfoService {
 
     StockPriceResponse getAllStockPrices(Integer stockId);
 
