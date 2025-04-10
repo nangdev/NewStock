@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNotificationListQuery } from 'api/notification/query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
 import NotificationModal from './NotificationModal';

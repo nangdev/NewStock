@@ -1,6 +1,6 @@
 import NegativeIcon from 'assets/icons/negative.svg';
-import PositiveIcon from 'assets/icons/positive.svg';
 import NeutralIcon from 'assets/icons/neutral.svg';
+import PositiveIcon from 'assets/icons/positive.svg';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -37,12 +37,12 @@ function NewsListItem({ newsId, title, score, publishedDate, isLast }: Props) {
         )}
         onPress={onPressNewsItem}>
         <View className="mr-2 self-center">
-        
-          {score >=2.5 ? (
+          {score >= 2.5 ? (
             <PositiveIcon width={20} height={20} fill="#f30606" />
-          ) : ( score <= -2.5 ?
-              <NegativeIcon width={20} height={20} fill="#0658ca" />
-              : <NeutralIcon width={20} height={20} />
+          ) : score <= -2.5 ? (
+            <NegativeIcon width={20} height={20} fill="#0658ca" />
+          ) : (
+            <NeutralIcon width={20} height={20} />
           )}
         </View>
 
