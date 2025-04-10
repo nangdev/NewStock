@@ -26,7 +26,7 @@ export default function SortButton({ sort, setSort }: Props) {
       </Pressable>
 
       {isOpen && (
-        <View className="absolute top-[30px] z-50 mr-1 w-full rounded-lg border border-gray-100 bg-white shadow-md">
+        <View className="absolute top-[30px] z-50 w-full rounded-lg border border-gray-100 bg-white shadow-md">
           {options.map((option) => {
             const isSelected = option.value === sort;
             return (

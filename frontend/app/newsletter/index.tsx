@@ -49,13 +49,16 @@ export default function NewsletterCalendar() {
     const koreaTimeOffset = 9 * 60 * 60 * 1000;
     return new Date(date.getTime() + koreaTimeOffset).toISOString().split('T')[0];
   };
-  const now = new Date();
-  const todayString = toKSTString(now);
-  const minDateString = '2025-04-01';
-  const isBefore6PM = now.getHours() < 18;
+  const nowUTC = new Date();
+  const nowKST = new Date(nowUTC.getTime() + 9 * 60 * 60 * 1000); // 한국시간
+  const todayString = nowKST.toISOString().split('T')[0];
+  const isBefore6PM = nowKST.getHours() < 18;
+
   const maxDateString = isBefore6PM
-    ? toKSTString(new Date(now.getTime() - 24 * 60 * 60 * 1000))
+    ? new Date(nowKST.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     : todayString;
+  const minDateString = '2025-04-01';
+
   const [currentDate, setCurrentDate] = useState(todayString);
   const router = useRouter();
 
@@ -88,23 +91,34 @@ export default function NewsletterCalendar() {
             width: width * 0.9,
             borderWidth: 1,
             borderColor: '#E5E7EB',
-            borderRadius: 12,
-            padding: 10,
-            backgroundColor: 'white',
+            borderRadius: 16,
+            padding: 16,
+            backgroundColor: '#ffffff',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 6,
+            elevation: 4,
           }}
           theme={{
             textDayFontSize: 16,
-            textMonthFontSize: 18,
+            textDayFontWeight: '500',
+            textMonthFontSize: 20,
+            textMonthFontWeight: 'bold',
             textDayHeaderFontSize: 14,
-            selectedDayBackgroundColor: '#3B82F6',
-            selectedDayTextColor: 'white',
-            arrowColor: '#3B82F6',
+            textDayHeaderFontWeight: '600',
+            selectedDayBackgroundColor: '#724EDB',
+            selectedDayTextColor: '#fff',
+            arrowColor: '#724EDB',
+            todayTextColor: '#724EDB',
             monthTextColor: '#111827',
-            textSectionTitleColor: '#6B7280',
+            textSectionTitleColor: '#9CA3AF',
+            dayTextColor: '#374151',
+            textDisabledColor: '#D1D5DB',
           }}
           current={currentDate}
           minDate={minDateString}
-          // maxDate={maxDateString}
+          maxDate={maxDateString}
           hideExtraDays
           onMonthChange={(date: any) => {
             const newDate = `${date.year}-${String(date.month).padStart(2, '0')}-01`;
