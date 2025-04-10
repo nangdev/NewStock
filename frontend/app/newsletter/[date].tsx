@@ -85,7 +85,7 @@ export default function NewsLetter() {
             <Text className="text-primary">{stockName}</Text>에서는 어떤 키워드가 등장했을까요?
           </Text>
           <PieGiftedChart keywords={currentKeywordList} />
-          <View className="h-[385px] w-full items-center justify-center gap-4 border-t border-dashed border-gray-300 pt-6">
+          <View className="h-[360px] w-full items-center justify-center gap-4 border-t border-dashed border-gray-300 pt-6">
             <Text className="font-bold">
               오늘의 <Text className="text-primary">{stockName}</Text>에서는..?
             </Text>

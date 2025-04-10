@@ -100,7 +100,7 @@ export default function StockNewsScrapPage() {
           <SortButton sort={sort} setSort={setSort} />
         </View>
         <View className="mx-2 rounded-2xl bg-white p-2 shadow-lg">
-          <View style={{ height: 600 }}>
+          <View style={{ height: 550 }}>
             <FlatList
               data={data?.data.newsList}
               keyExtractor={(item) => String(item.newsId)}
@@ -109,7 +109,7 @@ export default function StockNewsScrapPage() {
               contentContainerStyle={{ flexGrow: 0 }}
             />
           </View>
-          <View className="mb-2 mt-4 flex-row items-center justify-center gap-4">
+          <View className="mb-2 mt-2 flex-row items-center justify-center gap-4">
             {page > 0 ? (
               <TouchableOpacity
                 onPress={onPressLeft}

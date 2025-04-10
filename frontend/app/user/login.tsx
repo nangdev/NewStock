@@ -9,8 +9,8 @@ import { registerForPushNotifications } from 'utils/pushNotification';
 
 export default function Login() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('gmlgml5023@naver.com');
+  const [password, setPassword] = useState('asd123123!');
   const { mutate } = useLoginMutation();
 
   const onPressLogo = () => {
@@ -30,7 +30,7 @@ export default function Login() {
   return (
     <View className="flex-1 items-center justify-center gap-8 p-4">
       <TouchableOpacity onPress={onPressLogo}>
-        <Text className="text-logo text-5xl font-bold">NewStock</Text>
+        <Text className="text-5xl font-bold text-logo">NewStock</Text>
       </TouchableOpacity>
 
       <BlurOverlay className="items-center gap-8">
