@@ -50,6 +50,11 @@ export type NewsDetailResType = BaseResType & {
       publishedDate: string;
       newsSummary: string;
       score: number;
+      financeScore: number;
+      strategyScore: number;
+      governScore: number;
+      techScore: number;
+      externalScore: number;
     };
     isScraped: boolean;
   };
