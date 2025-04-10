@@ -78,6 +78,7 @@ export default function Main() {
                 <Text className="font-bold text-primary">{userInfo.userInfo?.nickname}</Text>
                 님의 종목이에요
               </Text>
+
               <ScrollView className="gap-4">
                 {subscribedStocks.map((stock) => (
                   <StockListItem

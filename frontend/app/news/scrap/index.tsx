@@ -64,7 +64,7 @@ export default function NewsScrapPage() {
           <Text className="font-bold text-primary">{userInfo.userInfo?.nickname}</Text>님의
           종목이에요
         </Text>
-        <BlurOverlay className="mx-4 mt-2 max-h-[600px] w-[90%] rounded-2xl p-0">
+        <BlurOverlay className="mx-4 max-h-[650px] w-[90%] rounded-2xl p-0">
           <View>
             <FlatList
               data={data?.data.stockList}
@@ -73,7 +73,7 @@ export default function NewsScrapPage() {
               keyExtractor={(item) => item.stockId.toString()}
               contentContainerStyle={{
                 paddingHorizontal: 32,
-                paddingTop: 24,
+                paddingTop: 12,
               }}
               columnWrapperStyle={{ justifyContent: 'flex-start', marginTop: 24, marginBottom: 24 }}
               renderItem={({ item, index }) => {
@@ -86,7 +86,6 @@ export default function NewsScrapPage() {
                     className="w-[140px] items-center"
                     style={{
                       marginRight: index % 2 === 0 && !isLastOdd ? 20 : 0,
-                      marginBottom: 12,
                     }}>
                     <View
                       style={{
