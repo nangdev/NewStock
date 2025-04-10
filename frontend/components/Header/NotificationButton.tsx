@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNotificationListQuery } from 'api/notification/query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
 import NotificationModal from './NotificationModal';
@@ -8,7 +8,7 @@ import NotificationModal from './NotificationModal';
 export default function NotificationButton() {
   const [visible, setVisible] = useState(false);
   // Todo: 풀링 or 소켓통신으로 변경
-  const { isSuccess, data, refetch } = useNotificationListQuery();
+  const { data, refetch } = useNotificationListQuery();
 
   const hasNotification = data?.data.notificationList.some((item) => !item.isRead);
 
@@ -21,7 +21,7 @@ export default function NotificationButton() {
         )}
       </TouchableOpacity>
 
-      {isSuccess && (
+      {visible && (
         <NotificationModal
           visible={visible}
           onClose={() => setVisible(false)}
