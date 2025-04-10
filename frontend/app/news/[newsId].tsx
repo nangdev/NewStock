@@ -46,7 +46,8 @@ export default function NewsDetailPage() {
   const newsInfo = { ...data?.data.newsInfo };
 
   const sentimentValue = newsInfo.score >= 2.5 ? '호재' : newsInfo.score <= -2.5 ? '악재' : '중립';
-  const sentimentColor = newsInfo.score >= 2.5 ? 'text-red-500' : newsInfo.score <= -2.5 ? 'text-blue-500' : '';
+  const sentimentColor =
+    newsInfo.score >= 2.5 ? 'text-red-500' : newsInfo.score <= -2.5 ? 'text-blue-500' : '';
 
   const onPressPinIcon = () => {
     setIsScraped(!isScraped);
@@ -57,27 +58,27 @@ export default function NewsDetailPage() {
     <>
       <CustomHeader title={newsInfo.press} />
       <View className="mx-4 my-24 h-[680px] rounded-2xl bg-white p-6 shadow-md">
-        <ScrollView
-        	showsVerticalScrollIndicator={false}
-        >
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View>
-          <View className="flex-row justify-between items-center mb-2">
-            <Image
-              source={{ uri: newsInfo?.pressLogo }}
-              className="h-6 w-14"
-              resizeMode="contain"
-            />
-            <AntDesign
-              name={isScraped ? 'star' : 'staro'}
-              size={16}
-              color="#724EDB"
-              onPress={onPressPinIcon}
-              style={{ transform: [{ scaleX: -1 }] }}
-            />
-          </View>
+            <View className="mb-2 flex-row items-center justify-between">
+              <Image
+                source={{ uri: newsInfo?.pressLogo }}
+                className="h-6 w-14"
+                resizeMode="contain"
+              />
+              <AntDesign
+                name={isScraped ? 'star' : 'staro'}
+                size={16}
+                color="#724EDB"
+                onPress={onPressPinIcon}
+                style={{ transform: [{ scaleX: -1 }] }}
+              />
+            </View>
 
             <View className="flex-row items-center justify-between">
-              <Text className="flex-1 text-xl font-bold" style={{textAlign: 'justify'}}>{newsInfo?.title}</Text>
+              <Text className="flex-1 text-xl font-bold" style={{ textAlign: 'justify' }}>
+                {newsInfo?.title}
+              </Text>
             </View>
 
             <View className="flex-row items-center justify-between">
@@ -85,14 +86,12 @@ export default function NewsDetailPage() {
             </View>
             <View className="border-t border-gray-200 " />
           </View>
-          
-          <View className='flex-1 mt-2 items-center justify-center'>
+
+          <View className="mt-2 flex-1 items-center justify-center">
             <Text className="mt-2 text-lg">
               <Text className="font-bold">AI</Text>가 이 기사를{' '}
-              <Text className={`font-bold ${sentimentColor}`}>
-                {sentimentValue}
-              </Text>
-              {sentimentValue==='중립' ? '으' : ''}로 분류했어요.
+              <Text className={`font-bold ${sentimentColor}`}>{sentimentValue}</Text>
+              {sentimentValue === '중립' ? '으' : ''}로 분류했어요.
             </Text>
           </View>
 
@@ -127,7 +126,7 @@ export default function NewsDetailPage() {
             <Text className="text-lg">{newsInfo.content}</Text>
           </View>
           <View className="mb-2 mt-4 border-t border-gray-200" />
-          <Text className="text-sm text-gray-500 mb-2">
+          <Text className="mb-2 text-sm text-gray-500">
             해당 기사의 저작권은 {newsInfo.press}에 있으며, 자세한 내용은 원문 링크를 통해 확인할 수
             있습니다.
           </Text>

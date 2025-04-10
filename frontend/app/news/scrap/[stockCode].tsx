@@ -18,9 +18,8 @@ export default function StockNewsScrapPage() {
   const [page, setPage] = useState(0);
   const [sort, setSort] = useState<'score' | 'time'>('time');
 
-  const COUNT_PER_PAGE = 10;
+  const COUNT_PER_PAGE = 9;
 
-  
   const { data, isLoading, isError } = useNewsScrapListQuery({
     stockId,
     page,
@@ -28,7 +27,7 @@ export default function StockNewsScrapPage() {
     sort,
   });
   const { data: userStockData } = useAllUserStockListQuery();
-  
+
   if (isLoading) {
     return (
       <View className="h-full w-full items-center justify-center">
@@ -44,15 +43,15 @@ export default function StockNewsScrapPage() {
   if (isError || !data?.data.newsList.length) {
     return (
       <>
-      <CustomHeader title={stockName ?? ''}/>
-      <View className="h-full w-full items-center justify-center gap-8">
-        <Image
-          source={require('../../../assets/image/no_data.png')}
-          style={{ width: 50, height: 50, resizeMode: 'contain' }}
-        />
-        <Text style={{ color: '#8A96A3' }}>스크랩한 뉴스가 없어요</Text>
-      </View>
-      <CustomFooter/>
+        <CustomHeader title={stockName ?? ''} />
+        <View className="h-full w-full items-center justify-center gap-8">
+          <Image
+            source={require('../../../assets/image/no_data.png')}
+            style={{ width: 50, height: 50, resizeMode: 'contain' }}
+          />
+          <Text style={{ color: '#8A96A3' }}>스크랩한 뉴스가 없어요</Text>
+        </View>
+        <CustomFooter />
       </>
     );
   }
@@ -62,6 +61,7 @@ export default function StockNewsScrapPage() {
       setPage((prev) => prev - 1);
     }
   };
+
   const onPressRight = () => {
     if (page < data.data.totalPage - 1) {
       setPage((prev) => prev + 1);
@@ -72,56 +72,65 @@ export default function StockNewsScrapPage() {
     <TouchableOpacity
       onPress={() => route.navigate(ROUTE.NEWS.DETAIL(item.newsId))}
       className="border-b border-gray-200 px-4 py-3">
-      <Text className="mb-1 text-base font-medium text-black" numberOfLines={1}>
-        {item.title}
-      </Text>
-      <Text className="mb-1 text-sm font-medium text-black" numberOfLines={1}>
-        {item.description}
-      </Text>
-      <Text className="self-end text-xs text-gray-400">{getTimeAgo(item.publishedDate)}</Text>
+      <View className="flex-col gap-1">
+        <Text
+          className="text-base font-semibold text-black"
+          numberOfLines={1}
+          style={{ maxWidth: '85%' }}>
+          {item.title}
+        </Text>
+        <View className="flex-row items-center justify-between">
+          <Text className="mr-2 flex-1 text-sm text-gray-900" numberOfLines={1}>
+            {item.description}
+          </Text>
+          <Text className="self-end whitespace-nowrap text-xs text-gray-400">
+            {getTimeAgo(item.publishedDate)}
+          </Text>
+        </View>
+      </View>
     </TouchableOpacity>
   );
-
 
   return (
     <>
       <CustomHeader title={stockName} />
       <View className="gap-4 px-4 py-24">
-        <View className="flex-row justify-between">
-          <Text className="text-xl font-bold">스크랩한 뉴스예요</Text>
+        <View className="flex-row justify-between pr-4">
+          <Text className="mb-2 items-center px-5 text-lg font-semibold"> 스크랩한 뉴스예요</Text>
           <SortButton sort={sort} setSort={setSort} />
         </View>
-        <View className="h-[600px] w-full rounded-2xl bg-white shadow-lg">
-          <FlatList
-            data={data?.data.newsList}
-            keyExtractor={(item) => String(item.newsId)}
-            renderItem={renderItem}
-          />
-        </View>
-        <View className="mb-2 mt-4 flex-row items-center justify-center gap-4">
-          {page > 0 ? (
-            <TouchableOpacity
-              onPress={onPressLeft}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 2 }}
-              >
-              <Entypo name="triangle-left" size={18} />
-            </TouchableOpacity>
-          ) : (
+        <View className="mx-2 rounded-2xl bg-white p-2 shadow-lg">
+          <View style={{ height: 600 }}>
+            <FlatList
+              data={data?.data.newsList}
+              keyExtractor={(item) => String(item.newsId)}
+              renderItem={renderItem}
+              scrollEnabled={false}
+              contentContainerStyle={{ flexGrow: 0 }}
+            />
+          </View>
+          <View className="mb-2 mt-4 flex-row items-center justify-center gap-4">
+            {page > 0 ? (
+              <TouchableOpacity
+                onPress={onPressLeft}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 2 }}>
+                <Entypo name="triangle-left" size={18} />
+              </TouchableOpacity>
+            ) : (
               <Entypo name="triangle-left" size={18} color="#C7C7C7" />
-          )}
+            )}
 
-          {page < data?.data.totalPage - 1 ? (
-            <TouchableOpacity
-              onPress={onPressRight}
-              hitSlop={{ top: 10, bottom: 10, left: 2, right: 10 }}
-            >
-              <Entypo name="triangle-right" size={18} />
-            </TouchableOpacity>
-          ) : (
-            <Entypo name="triangle-right" size={18} color="#C7C7C7" />
-          )}
+            {page < data?.data.totalPage - 1 ? (
+              <TouchableOpacity
+                onPress={onPressRight}
+                hitSlop={{ top: 10, bottom: 10, left: 2, right: 10 }}>
+                <Entypo name="triangle-right" size={18} />
+              </TouchableOpacity>
+            ) : (
+              <Entypo name="triangle-right" size={18} color="#C7C7C7" />
+            )}
+          </View>
         </View>
-        
       </View>
       <CustomFooter />
     </>

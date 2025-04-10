@@ -1,7 +1,10 @@
 {
   "expo": {
     "scheme": "newstock",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "name": "NewStock",
     "slug": "NewStock",
     "version": "1.0.0",
@@ -11,7 +14,10 @@
     "experiments": {
       "tsconfigPaths": true
     },
-    "plugins": ["expo-secure-store"],
+    "plugins": [
+      "expo-secure-store",
+      "expo-font"
+    ],
     "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/splash.png",
@@ -21,7 +27,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -32,7 +40,9 @@
       },
       "package": "com.b4b4.newstock",
       "googleServicesFile": "./google-services.json",
-      "permissions": ["NOTIFICATIONS"],
+      "permissions": [
+        "NOTIFICATIONS"
+      ],
       "notification": {
         "icon": "./assets/logo.png",
         "color": "#ffffff",

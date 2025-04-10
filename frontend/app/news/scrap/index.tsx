@@ -1,10 +1,19 @@
 import { useAllUserStockListQuery } from 'api/stock/query';
+import BlurOverlay from 'components/BlurOverlay';
 import CustomFooter from 'components/Footer/Footer';
 import CustomHeader from 'components/Header/Header';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
 import { setParams } from 'expo-router/build/global-state/routing';
-import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  FlatList,
+} from 'react-native';
 import useUserStore from 'store/user';
 
 export default function NewsScrapPage() {
@@ -23,10 +32,14 @@ export default function NewsScrapPage() {
     route.navigate(ROUTE.SET_INTEREST);
   };
 
+  const onGoBack = () => {
+    route.navigate(ROUTE.HOME);
+  };
+
   if (isError || !data?.data.stockList.length)
     return (
       <>
-        <CustomHeader title="뉴스 스크랩" />
+        <CustomHeader title="뉴스 스크랩" onGoBack={onGoBack} />
         <View className="h-full w-full items-center justify-center gap-8">
           <View className="items-center">
             <Image
@@ -46,7 +59,7 @@ export default function NewsScrapPage() {
   if (isLoading)
     return (
       <>
-        <CustomHeader title="뉴스 스크랩" />
+        <CustomHeader title="뉴스 스크랩" onGoBack={onGoBack} />
         <View className="h-full w-full items-center justify-center">
           <ActivityIndicator size="large" color="#724EDB" />
         </View>
@@ -56,42 +69,67 @@ export default function NewsScrapPage() {
 
   return (
     <>
-      <CustomHeader title="뉴스 스크랩" />
-      <View className="py-24 pb-28">
-        <Text className="mb-6 ml-4 items-center px-6 text-lg font-semibold">
-          {userInfo.userInfo?.nickname}님의 종목이에요
+      <CustomHeader title="뉴스 스크랩" onGoBack={onGoBack} />
+      <View className="items-center justify-center py-24 pb-28">
+        <Text className="mb-6 ml-4 items-center self-start px-6 text-lg font-semibold">
+          <Text className="font-bold text-primary">{userInfo.userInfo?.nickname}</Text>님의
+          종목이에요
         </Text>
-        <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-          <View className="flex-row flex-wrap justify-start px-6">
-            {data?.data.stockList.map((stock, index) => {
-              const isLastOdd =
-                data.data.stockList.length % 2 === 1 && index === data.data.stockList.length - 1;
-
-              return (
-                <TouchableOpacity
-                  key={stock.stockId}
-                  onPress={() => onPressStock(stock.stockCode, stock.stockId)}
-                  className={`
-            mb-8 ${isLastOdd ? '' : 'mr-4'}
-            w-[140px]
-            items-center
-          `}>
-                  <Image
-                    source={{ uri: `data:image/png;base64,${stock.imgUrl}` }}
+        <BlurOverlay className="mx-4 max-h-[650px] w-[90%] rounded-2xl p-0">
+          <View>
+            <FlatList
+              data={data?.data.stockList}
+              numColumns={2}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(item) => item.stockId.toString()}
+              contentContainerStyle={{
+                paddingHorizontal: 32,
+                paddingTop: 12,
+              }}
+              columnWrapperStyle={{ justifyContent: 'flex-start', marginTop: 24, marginBottom: 24 }}
+              renderItem={({ item, index }) => {
+                const isLastItem = index === data?.data.stockList.length - 1;
+                const isOdd = data?.data.stockList.length % 2 === 1;
+                const isLastOdd = isLastItem && isOdd;
+                return (
+                  <TouchableOpacity
+                    onPress={() => onPressStock(item.stockCode, item.stockId)}
+                    className="w-[140px] items-center"
                     style={{
-                      width: 110,
-                      height: 110,
-                      resizeMode: 'contain',
-                      borderRadius: 12,
-                      marginBottom: 10,
-                    }}
-                  />
-                  <Text className="text-center font-medium text-text">{stock.stockName}</Text>
-                </TouchableOpacity>
-              );
-            })}
+                      marginRight: index % 2 === 0 && !isLastOdd ? 20 : 0,
+                    }}>
+                    <View
+                      style={{
+                        width: 110,
+                        height: 110,
+                        borderRadius: 12,
+                        marginBottom: 6,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 4,
+                        elevation: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <Image
+                        source={{ uri: `data:image/png;base64,${item.imgUrl}` }}
+                        style={{
+                          width: 110,
+                          height: 110,
+                          resizeMode: 'contain',
+                          borderRadius: 12,
+                          marginBottom: 6,
+                        }}
+                      />
+                    </View>
+                    <Text className="text-center font-medium text-text">{item.stockName}</Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
           </View>
-        </ScrollView>
+        </BlurOverlay>
       </View>
       <CustomFooter />
     </>

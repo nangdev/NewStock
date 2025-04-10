@@ -58,7 +58,7 @@ function StockListItem({ stockId, stockName, stockCode, price, changeRate, imgUr
               onPress={() => setExpanded(!expanded)}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               className="ml-2 p-1">
-              <AntDesign name={expanded ? 'up' : 'down'} size={16} color="#888" />{' '}
+              <AntDesign name={expanded ? 'up' : 'down'} size={16} color="#888" />
             </TouchableOpacity>
           </View>
           <View className="mx-4 h-[1px] bg-gray-200" />
