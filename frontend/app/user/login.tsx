@@ -9,8 +9,8 @@ import { registerForPushNotifications } from 'utils/pushNotification';
 
 export default function Login() {
   const router = useRouter();
-  const [email, setEmail] = useState('gmlgml5023@naver.com');
-  const [password, setPassword] = useState('asd123123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const { mutate } = useLoginMutation();
 
   const onPressLogo = () => {
