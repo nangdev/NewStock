@@ -31,7 +31,7 @@ export default function StockInfoCard({
   industry,
 }: Props) {
   return (
-    <View className="mx-8 my-2 rounded-2xl bg-white shadow-md">
+    <View className="mx-8 my-2 rounded-2xl bg-white shadow-md h-[215px]">
       <View className="ml-1 mt-1 flex-row items-center p-4">
         <Image
           source={{ uri: `data:image/png;base64,${imgUrl}` }}

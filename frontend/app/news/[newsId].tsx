@@ -6,6 +6,7 @@ import {
 } from 'api/news/query';
 import CustomFooter from 'components/Footer/Footer';
 import CustomHeader from 'components/Header/Header';
+import ScoreBoard from 'components/news/ScoreBoard';
 import { useLocalSearchParams } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image, ActivityIndicator } from 'react-native';
@@ -44,7 +45,8 @@ export default function NewsDetailPage() {
 
   const newsInfo = { ...data?.data.newsInfo };
 
-  const isHojae = newsInfo?.score > 0;
+  const sentimentValue = newsInfo.score >= 2.5 ? '호재' : newsInfo.score <= -2.5 ? '악재' : '중립';
+  const sentimentColor = newsInfo.score >= 2.5 ? 'text-red-500' : newsInfo.score <= -2.5 ? 'text-blue-500' : '';
 
   const onPressPinIcon = () => {
     setIsScraped(!isScraped);
@@ -79,14 +81,26 @@ export default function NewsDetailPage() {
             </View>
             <View className="border-t border-gray-200 " />
           </View>
-
-          <Text className="m-2 text-lg">
-            <Text className="font-bold">AI</Text>가 이 기사를{' '}
-            <Text className={isHojae ? 'font-bold text-red-500' : 'font-bold text-blue-500'}>
-              {isHojae ? '호재' : '악재'}
+          
+          <View className='flex-1 mt-2 items-center justify-center'>
+            <Text className="m-2 text-lg">
+              <Text className="font-bold">AI</Text>가 이 기사를{' '}
+              <Text className={`font-bold ${sentimentColor}`}>
+                {sentimentValue}
+              </Text>
+              {sentimentValue==='중립' ? '으' : ''}로 분류했어요.
             </Text>
-            로 분류했어요.
-          </Text>
+          </View>
+
+          <ScoreBoard
+            score={newsInfo.score}
+            sentimentColor={sentimentColor}
+            financeScore={newsInfo.financeScore}
+            strategyScore={newsInfo.strategyScore}
+            governScore={newsInfo.governScore}
+            techScore={newsInfo.techScore}
+            externalScore={newsInfo.externalScore}
+          />
 
           <View className="my-4 ml-2 mr-12">
             <View className="mb-2 flex-row">
@@ -96,7 +110,7 @@ export default function NewsDetailPage() {
           </View>
 
           {newsInfo.newsImage ? (
-            <View className="px-2">
+            <View className="mx-2 mb-8 mt-4">
               <Image
                 source={{ uri: newsInfo.newsImage }}
                 className="h-60 w-full rounded-lg"
@@ -110,7 +124,7 @@ export default function NewsDetailPage() {
           </View>
           <View className="mb-2 mt-8 border-t border-gray-200" />
           <Text className="text-sm text-gray-500">
-            해당 기사의 저작권은 {newsInfo.press}에 었으며, 자세한 내용은 원문 링크를 통해 확인할 수
+            해당 기사의 저작권은 {newsInfo.press}에 있으며, 자세한 내용은 원문 링크를 통해 확인할 수
             있습니다.
           </Text>
           <Text className="text-sm text-gray-500">{newsInfo.url}</Text>
