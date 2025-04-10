@@ -57,7 +57,9 @@ export default function NewsDetailPage() {
     <>
       <CustomHeader title={newsInfo.press} />
       <View className="mx-8 my-24 h-[680px] rounded-2xl bg-white p-6 shadow-md">
-        <ScrollView>
+        <ScrollView
+        	showsVerticalScrollIndicator={false}
+        >
           <View>
             <Image
               source={{ uri: newsInfo?.pressLogo }}
@@ -72,7 +74,7 @@ export default function NewsDetailPage() {
             <View className="flex-row items-center justify-between">
               <Text className="my-4 text-gray-500">{newsInfo?.publishedDate}</Text>
               <AntDesign
-                name={isScraped ? 'pushpin' : 'pushpino'}
+                name={isScraped ? 'star' : 'staro'}
                 size={24}
                 style={{ transform: [{ scaleX: -1 }] }}
                 color="#724EDB"
@@ -123,11 +125,11 @@ export default function NewsDetailPage() {
             <Text className="text-lg">{newsInfo.content}</Text>
           </View>
           <View className="mb-2 mt-8 border-t border-gray-200" />
-          <Text className="text-sm text-gray-500">
+          <Text className="text-sm text-gray-500 mb-2">
             해당 기사의 저작권은 {newsInfo.press}에 있으며, 자세한 내용은 원문 링크를 통해 확인할 수
             있습니다.
           </Text>
-          <Text className="text-sm text-gray-500">{newsInfo.url}</Text>
+          <Text className="text-sm text-gray-500">원문 링크: {newsInfo.url}</Text>
         </ScrollView>
       </View>
       <CustomFooter />
