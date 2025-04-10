@@ -33,7 +33,7 @@ public class NotificationService {
         NotificationResultDto result = userStockRepository.findUsersAndNewsById(stockId, newsId);
 
         if (result.getUserDtos().isEmpty()) {
-            log.info("알림을 받을 사용자가 없습니다. stockId: {}", stockId);
+            log.info("알림을 받을 사용자가 없습니다. stockId: {} newsId: {}", stockId, newsId);
             return;
         }
 

@@ -47,7 +47,7 @@ public class NewsItem {
     public static NewsItem of(News news){
         return NewsItem.builder()
                 .newsId(news.getNewsId())
-                .stockId(news.getNewsId())
+                .stockId(news.getStockId())
                 .title(news.getTitle())
                 .description(news.getDescription())
                 .content(news.getContent())
