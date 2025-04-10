@@ -6,6 +6,8 @@ import { useRouter } from 'expo-router';
 import { setParams } from 'expo-router/build/global-state/routing';
 import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import useUserStore from 'store/user';
+import { FlatList } from 'react-native';
+import BlurOverlay from 'components/BlurOverlay';
 
 export default function NewsScrapPage() {
   const { data, isError, isLoading } = useAllUserStockListQuery();
@@ -57,41 +59,67 @@ export default function NewsScrapPage() {
   return (
     <>
       <CustomHeader title="뉴스 스크랩" />
-      <View className="py-24 pb-28">
-        <Text className="mb-6 ml-4 items-center px-6 text-lg font-semibold">
-          {userInfo.userInfo?.nickname}님의 종목이에요
+      <View className="items-center justify-center py-24 pb-28">
+        <Text className="mb-6 ml-4 items-center self-start px-6 text-lg font-semibold">
+          <Text className="font-bold text-primary">{userInfo.userInfo?.nickname}</Text>님의
+          종목이에요
         </Text>
-        <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-          <View className="flex-row flex-wrap justify-start px-6">
-            {data?.data.stockList.map((stock, index) => {
-              const isLastOdd =
-                data.data.stockList.length % 2 === 1 && index === data.data.stockList.length - 1;
-
-              return (
-                <TouchableOpacity
-                  key={stock.stockId}
-                  onPress={() => onPressStock(stock.stockCode, stock.stockId)}
-                  className={`
-            mb-8 ${isLastOdd ? '' : 'mr-4'}
-            w-[140px]
-            items-center
-          `}>
-                  <Image
-                    source={{ uri: `data:image/png;base64,${stock.imgUrl}` }}
+        <BlurOverlay className="mx-4 mt-2 max-h-[600px] w-[90%] rounded-2xl p-0">
+          <View>
+            <FlatList
+              data={data?.data.stockList}
+              numColumns={2}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(item) => item.stockId.toString()}
+              contentContainerStyle={{
+                paddingHorizontal: 32,
+                paddingTop: 24,
+              }}
+              columnWrapperStyle={{ justifyContent: 'flex-start', marginTop: 24, marginBottom: 24 }}
+              renderItem={({ item, index }) => {
+                const isLastItem = index === data?.data.stockList.length - 1;
+                const isOdd = data?.data.stockList.length % 2 === 1;
+                const isLastOdd = isLastItem && isOdd;
+                return (
+                  <TouchableOpacity
+                    onPress={() => onPressStock(item.stockCode, item.stockId)}
+                    className="w-[140px] items-center"
                     style={{
-                      width: 110,
-                      height: 110,
-                      resizeMode: 'contain',
-                      borderRadius: 12,
-                      marginBottom: 10,
-                    }}
-                  />
-                  <Text className="text-center font-medium text-text">{stock.stockName}</Text>
-                </TouchableOpacity>
-              );
-            })}
+                      marginRight: index % 2 === 0 && !isLastOdd ? 20 : 0,
+                      marginBottom: 12,
+                    }}>
+                    <View
+                      style={{
+                        width: 110,
+                        height: 110,
+                        borderRadius: 12,
+                        marginBottom: 6,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 4,
+                        elevation: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <Image
+                        source={{ uri: `data:image/png;base64,${item.imgUrl}` }}
+                        style={{
+                          width: 110,
+                          height: 110,
+                          resizeMode: 'contain',
+                          borderRadius: 12,
+                          marginBottom: 6,
+                        }}
+                      />
+                    </View>
+                    <Text className="text-center font-medium text-text">{item.stockName}</Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
           </View>
-        </ScrollView>
+        </BlurOverlay>
       </View>
       <CustomFooter />
     </>
