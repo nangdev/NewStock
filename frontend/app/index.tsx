@@ -65,7 +65,7 @@ export default function Main() {
 
   return (
     <>
-      <CustomHeader title="NewStock" />
+      <CustomHeader title="NewStock" disabled />
       {isLoading ? (
         <View className="h-full w-full items-center justify-center">
           <ActivityIndicator size="large" color="#724EDB" />
