@@ -18,12 +18,14 @@ public class NewsServiceImpl implements NewsService {
 
     @Transactional
     @Override
-    public void addNewsItems(List<NewsItem> newsItemList) {
+    public List<NewsItem> addNewsItems(List<NewsItem> newsItemList) {
 
         List<News> newsEntities = newsItemList.stream()
                 .map(News::of)
                 .collect(Collectors.toList());
 
-        newsRepository.saveAll(newsEntities);
+        return newsRepository.saveAll(newsEntities).stream()
+                .map(NewsItem::of)
+                .collect(Collectors.toList());
     }
 }
