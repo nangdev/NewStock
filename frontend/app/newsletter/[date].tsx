@@ -1,13 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNewsletterListQuery } from 'api/newsletter/query';
 import { useAllUserStockListQuery } from 'api/stock/query';
+import BlurOverlay from 'components/BlurOverlay';
 import CustomFooter from 'components/Footer/Footer';
 import CustomHeader from 'components/Header/Header';
+import PieGiftedChart from 'components/newsletter/Chart';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Text, View, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import Markdown from 'react-native-markdown-display';
-import { VictoryPie, VictoryTheme } from 'victory-native';
 
 export default function NewsLetter() {
   const { date }: { date: string } = useLocalSearchParams();
@@ -41,6 +42,7 @@ export default function NewsLetter() {
 
   const newsletterList = data.data.newsletterList;
   const currentNewsletter = newsletterList[currentIndex];
+  const currentKeywordList = currentNewsletter.keywordList.slice(0, 6);
 
   const handlePrev = () => {
     if (currentIndex === 0) return;
@@ -58,33 +60,12 @@ export default function NewsLetter() {
 
   return (
     <>
-      <CustomHeader />
+      <CustomHeader title={stockName} />
       <View className="px-6 pt-20">
-        <Text className="mb-4 mt-2 text-center text-xl font-bold">{stockName} 뉴스레터</Text>
-
-        <View className="mb-8 rounded-lg border p-4">
-          <View className="mb-6 items-center">
-            <VictoryPie
-              data={currentNewsletter.keywordList.map((keyword) => ({
-                x: keyword.word,
-                y: keyword.count,
-              }))}
-              theme={VictoryTheme.clean}
-              innerRadius={55}
-              width={200}
-              height={200}
-            />
-          </View>
-
-          <View className="mb-6 flex-row flex-wrap gap-2">
-            {currentNewsletter.keywordList.map((keyword) => (
-              <View key={keyword.word} className="rounded-full px-2 py-1">
-                <Text className="text-xs text-gray-600">
-                  #{keyword.word} ({keyword.count})
-                </Text>
-              </View>
-            ))}
-          </View>
+        <View className="mb-4 rounded-lg p-4">
+          <BlurOverlay className="w-full items-center gap-8 p-8 py-12">
+            <PieGiftedChart keywords={currentKeywordList} />
+          </BlurOverlay>
 
           <View style={{ height: 200 }}>
             <ScrollView>

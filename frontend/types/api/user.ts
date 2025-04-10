@@ -33,3 +33,16 @@ export type UserNicknameResType = BaseResType & {
     nickname: string;
   };
 };
+
+export type VerifySendReqType = {
+  email: string;
+};
+
+export type VerifySendResType = BaseResType;
+
+export type VerifyCheckReqType = {
+  email: string;
+  authCode: string;
+};
+
+export type VerifyCheckResType = BaseResType;

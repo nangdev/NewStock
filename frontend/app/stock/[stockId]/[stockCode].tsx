@@ -9,7 +9,7 @@ import NewsListItem from 'components/stock/NewsListItem';
 import StockInfoCard from 'components/stock/StockInfoCard';
 import { useLocalSearchParams } from 'expo-router';
 import { useState, useEffect } from 'react';
-import { View, ScrollView, Text, Image } from 'react-native';
+import { View, ScrollView, Text, Image, Touchable, TouchableOpacity } from 'react-native';
 import stompService from 'utils/stompService';
 
 export default function StockDetail() {
@@ -102,13 +102,23 @@ export default function StockDetail() {
             </ScrollView>
             <View className="mb-2 mt-4 flex-row items-center justify-center gap-4">
               {page > 0 ? (
-                <Entypo name="triangle-left" onPress={onPressLeft} size={18} />
+                <TouchableOpacity
+                  onPress={onPressLeft}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 2 }}
+                >
+                  <Entypo name="triangle-left" size={18} />
+                </TouchableOpacity>
               ) : (
                 <Entypo name="triangle-left" size={18} color="#C7C7C7" />
               )}
 
               {newsListData && page < newsListData?.data.totalPage - 1 ? (
-                <Entypo name="triangle-right" onPress={onPressRight} size={18} />
+                <TouchableOpacity
+                onPress={onPressRight}
+                hitSlop={{ top: 10, bottom: 10, left: 2, right: 10 }}
+              >
+                  <Entypo name="triangle-right" size={18} />
+                </TouchableOpacity>
               ) : (
                 <Entypo name="triangle-right" size={18} color="#C7C7C7" />
               )}

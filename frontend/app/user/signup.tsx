@@ -1,5 +1,5 @@
 import { AntDesign } from '@expo/vector-icons';
-import { useCheckEmailMutation, useSignUpMutation } from 'api/user/query';
+import { useSignUpMutation, useVerifyCheckMutation, useVerifySendMutation } from 'api/user/query';
 import BlurOverlay from 'components/BlurOverlay';
 import CustomButton from 'components/CustomButton';
 import InputField from 'components/user/InputField';
@@ -7,26 +7,22 @@ import { REGEX } from 'constants/regex';
 import { ROUTE } from 'constants/routes';
 import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
   const [isChecked, setIsChecked] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [nickname, setNickname] = useState('');
+  const [authCode, setAuthCode] = useState('');
   const [errorField, setErrorField] = useState<string | null>(null);
 
   const { mutate: signUpMutate } = useSignUpMutation();
-  const { mutate: checkEmailMutate, isSuccess, data } = useCheckEmailMutation();
-
-  useEffect(() => {
-    if (isSuccess && !data.data.isDuplicated) {
-      setIsChecked(true);
-      setErrorField(null);
-    }
-  }, [isSuccess]);
+  const { mutate: sendVerifyMutate, isPending } = useVerifySendMutation();
+  const { mutate: checkVerifyMutate } = useVerifyCheckMutation();
 
   useEffect(() => {
     setIsChecked(false);
@@ -59,13 +55,41 @@ export default function SignUp() {
     return true;
   };
 
-  const onCheckEmail = (): void => {
+  const onSendVerifyEmail = () => {
     if (!REGEX.SIGN_UP.EMAIL.test(email)) {
       setErrorField('email');
       Toast.show({ type: 'error', text1: '올바른 이메일을 입력해주세요' });
       return;
     }
-    checkEmailMutate({ email });
+    sendVerifyMutate(
+      {
+        email,
+      },
+      {
+        onSuccess: () => {
+          setIsChecking(true);
+        },
+      }
+    );
+  };
+
+  const onCheckVerifyEmail = () => {
+    checkVerifyMutate(
+      {
+        email,
+        authCode,
+      },
+      {
+        onSuccess: () => {
+          setIsChecked(true);
+          setIsChecking(false);
+        },
+        onError: () => {
+          setIsChecked(false);
+          setIsChecking(false);
+        },
+      }
+    );
   };
 
   const onSubmitSignUp = (): void => {
@@ -74,7 +98,7 @@ export default function SignUp() {
   };
 
   return (
-    <View className="flex-1 items-center justify-center gap-12 p-4">
+    <View className="flex-1 items-center justify-center gap-6 p-4">
       <View className="items-center gap-1">
         <Text className="text-4xl font-bold text-primary">환영합니다</Text>
         <Text className="text-xl font-bold text-primary">주식알림과 뉴스레터를 동시에!</Text>
@@ -82,25 +106,48 @@ export default function SignUp() {
       </View>
 
       <BlurOverlay className="items-center gap-4">
-        <View className="w-full flex-row items-center gap-4">
-          <InputField
-            value={email}
-            onChangeText={setEmail}
-            placeholder="이메일을 입력해주세요"
-            keyboardType="email-address"
-            className={`${isChecked ? 'flex-[1.2]' : 'flex-1'} ${errorField === 'email' ? 'border-red-500' : ''}`}
-          />
-          {!isChecked ? (
+        {!isChecked ? (
+          <View className="w-full flex-row items-center gap-4">
+            <InputField
+              value={email}
+              onChangeText={setEmail}
+              placeholder="이메일을 입력해주세요"
+              keyboardType="email-address"
+              className={`flex-1 ${errorField === 'email' ? 'border-red-500' : ''}`}
+            />
             <CustomButton
               variant="semiRounded"
-              onPress={onCheckEmail}
+              onPress={isChecking ? onCheckVerifyEmail : onSendVerifyEmail}
               className="h-[40px] shadow-lg">
-              중복체크
+              {isChecking ? (
+                '인증완료'
+              ) : isPending ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                '인증하기'
+              )}
             </CustomButton>
-          ) : (
+          </View>
+        ) : (
+          <View className="w-full flex-row items-center gap-4">
+            <InputField
+              value={email}
+              onChangeText={setEmail}
+              placeholder="이메일을 입력해주세요"
+              keyboardType="email-address"
+              className="flex-[1.2]"
+            />
             <AntDesign name="check" size={24} color="green" />
-          )}
-        </View>
+          </View>
+        )}
+
+        {isChecking && (
+          <InputField
+            value={authCode}
+            onChangeText={setAuthCode}
+            placeholder="인증번호를 입력해주세요"
+          />
+        )}
 
         <InputField
           value={password}

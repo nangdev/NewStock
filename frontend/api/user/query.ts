@@ -10,6 +10,8 @@ import {
   getCheckEmail,
   getUserInfo,
   postSignUp,
+  postVerifyCheck,
+  postVerifySend,
   putUserNickname,
   putUserRole,
 } from '.';
@@ -25,7 +27,7 @@ export const useSignUpMutation = () => {
       router.navigate(ROUTE.USER.LOGIN);
     },
     onError: (error) => {
-      // Todo: 에러 처리
+      Toast.show({ type: 'error', text1: '회원가입 중 오류가 발생했습니다' });
       console.error(error);
     },
   });
@@ -77,8 +79,11 @@ export const useUserRoleMutation = () => {
       console.log('유저 권한 변경 성공');
     },
     onError: (error) => {
-      // Todo: 에러 처리
       console.error(error);
+      Toast.show({
+        type: 'error',
+        text1: '유저 권한 변경 중 오류가 발생했습니다',
+      });
     },
   });
 };
@@ -106,7 +111,7 @@ export const useUserNicknameMutation = () => {
       console.error(error);
       Toast.show({
         type: 'error',
-        text1: '닉네임 변경 중 오류가 발생했습니다.',
+        text1: '닉네임 변경 중 오류가 발생했습니다',
       });
     },
   });
@@ -122,8 +127,43 @@ export const useUserDeleteMutation = () => {
       mutate();
     },
     onError: (error) => {
-      // Todo: 에러 처리
       console.error(error);
+      Toast.show({
+        type: 'error',
+        text1: '회원 탈퇴 중 오류가 발생했습니다',
+      });
+    },
+  });
+};
+
+export const useVerifySendMutation = () => {
+  return useMutation({
+    mutationFn: postVerifySend,
+    onSuccess: () => {
+      Toast.show({
+        type: 'success',
+        text1: '인증 번호가 전송되었습니다',
+      });
+    },
+    onError: () => {
+      Toast.show({
+        type: 'error',
+        text1: '인증 번호 전송 중 오류가 발생했습니다',
+      });
+    },
+  });
+};
+
+export const useVerifyCheckMutation = () => {
+  return useMutation({
+    mutationFn: postVerifyCheck,
+    onError: (error) => {
+      // Todo: 에러 처리
+      console.log(error);
+      Toast.show({
+        type: 'error',
+        text1: error.message,
+      });
     },
   });
 };

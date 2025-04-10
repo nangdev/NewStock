@@ -41,7 +41,7 @@ function StockListItem({ stockId, stockName, stockCode, price, changeRate, imgUr
               <Text className="text-base font-bold">{stockName}</Text>
               <Text className="text-xs text-gray-500">{stockCode}</Text>
             </View>
-            <View className="mr-6 flex-1 items-end">
+            <View className="ml-auto mr-2 flex items-end">
               <Text className="text-base font-bold">{price.toLocaleString()} 원</Text>
               <Text
                 className={`mt-1 text-sm ${
@@ -54,33 +54,39 @@ function StockListItem({ stockId, stockName, stockCode, price, changeRate, imgUr
                 {changeRate.toFixed(2)}%
               </Text>
             </View>
-            <TouchableOpacity onPress={() => setExpanded(!expanded)}>
-              <AntDesign name={expanded ? 'up' : 'down'} size={14} color="#888" className="ml-2" />
+            <TouchableOpacity
+              onPress={() => setExpanded(!expanded)}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              className="ml-2 p-1">
+              <AntDesign name={expanded ? 'up' : 'down'} size={16} color="#888" />{' '}
             </TouchableOpacity>
           </View>
+          <View className="mx-4 h-[1px] bg-gray-200" />
 
           <Collapsible collapsed={!expanded}>
             <View className="mb-2 items-center bg-white">
-              {data?.data.newsList && data?.data.newsList.length > 0 ? (
-                data?.data.newsList.map((news) => (
-                  <NewsListItem
-                    key={news.newsId}
-                    newsId={news.newsId}
-                    title={news.title}
-                    description="desc"
-                    score={news.score}
-                    publishedDate={news.publishedDate}
-                  />
-                ))
+              {data?.data.newsList && data.data.newsList.length > 0 ? (
+                data.data.newsList.map((news, idx) => {
+                  const isLast = idx === data.data.newsList.length - 1;
+                  return (
+                    <NewsListItem
+                      key={news.newsId}
+                      newsId={news.newsId}
+                      title={news.title}
+                      description="desc"
+                      score={news.score}
+                      publishedDate={news.publishedDate}
+                      isLast={isLast}
+                    />
+                  );
+                })
               ) : (
                 <View className="mb-5 items-center">
                   <Image
                     source={require('assets/image/no_data.png')}
                     style={{ width: 50, height: 50, resizeMode: 'contain' }}
                   />
-                  <Text className="" style={{ color: '#8A96A3' }}>
-                    오늘 관련 뉴스가 없어요
-                  </Text>
+                  <Text className="text-xs text-gray-500">오늘 관련 뉴스가 없어요</Text>
                 </View>
               )}
             </View>

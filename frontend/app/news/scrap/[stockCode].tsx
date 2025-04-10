@@ -100,17 +100,28 @@ export default function StockNewsScrapPage() {
         </View>
         <View className="mb-2 mt-4 flex-row items-center justify-center gap-4">
           {page > 0 ? (
-            <Entypo name="triangle-left" onPress={onPressLeft} size={18} />
+            <TouchableOpacity
+              onPress={onPressLeft}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 2 }}
+              >
+              <Entypo name="triangle-left" size={18} />
+            </TouchableOpacity>
           ) : (
-            <Entypo name="triangle-left" size={18} color="#C7C7C7" />
+              <Entypo name="triangle-left" size={18} color="#C7C7C7" />
           )}
 
           {page < data?.data.totalPage - 1 ? (
-            <Entypo name="triangle-right" onPress={onPressRight} size={18} />
+            <TouchableOpacity
+              onPress={onPressRight}
+              hitSlop={{ top: 10, bottom: 10, left: 2, right: 10 }}
+            >
+              <Entypo name="triangle-right" size={18} />
+            </TouchableOpacity>
           ) : (
             <Entypo name="triangle-right" size={18} color="#C7C7C7" />
           )}
         </View>
+        
       </View>
       <CustomFooter />
     </>

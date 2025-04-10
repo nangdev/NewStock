@@ -15,7 +15,7 @@ export default function NewsScrapPage() {
   const onPressStock = (stockCode: string, stockId: number) => {
     route.push({
       pathname: ROUTE.NEWS.SCRAP_NEWS(stockCode),
-      params: {stockId},
+      params: { stockId },
     });
   };
 
@@ -57,23 +57,36 @@ export default function NewsScrapPage() {
   return (
     <>
       <CustomHeader title="뉴스 스크랩" />
-      <View className="gap-6 px-4 py-24">
-        <Text className="text-lg font-bold text-text">
+      <View className="py-24 pb-28">
+        <Text className="mb-6 ml-4 items-center px-6 text-lg font-semibold">
           {userInfo.userInfo?.nickname}님의 종목이에요
         </Text>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-          <View className="flex-row flex-wrap justify-center gap-8 px-4">
-            {data?.data.stockList.map((stock) => {
+          <View className="flex-row flex-wrap justify-start px-6">
+            {data?.data.stockList.map((stock, index) => {
+              const isLastOdd =
+                data.data.stockList.length % 2 === 1 && index === data.data.stockList.length - 1;
+
               return (
                 <TouchableOpacity
                   key={stock.stockId}
-                  className="items-center"
-                  onPress={() => onPressStock(stock.stockCode, stock.stockId)}>
+                  onPress={() => onPressStock(stock.stockCode, stock.stockId)}
+                  className={`
+            mb-8 ${isLastOdd ? '' : 'mr-4'}
+            w-[140px]
+            items-center
+          `}>
                   <Image
-                    style={{ width: 150, height: 150, resizeMode: 'contain', borderRadius: 12 }}
                     source={{ uri: `data:image/png;base64,${stock.imgUrl}` }}
+                    style={{
+                      width: 110,
+                      height: 110,
+                      resizeMode: 'contain',
+                      borderRadius: 12,
+                      marginBottom: 10,
+                    }}
                   />
-                  <Text className="font-bold text-text">{stock.stockName}</Text>
+                  <Text className="text-center font-medium text-text">{stock.stockName}</Text>
                 </TouchableOpacity>
               );
             })}

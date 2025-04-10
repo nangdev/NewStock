@@ -20,24 +20,34 @@ export default function SortButton({ sort, setSort }: Props) {
     <View className="relative">
       <Pressable
         onPress={() => setIsOpen(!isOpen)}
-        className="flex-row items-center rounded-full bg-blue-100 px-2 py-1">
-        <AntDesign name="down" size={12} color="#1d4ed8" className="mr-1" />
-        <Text className="text-sm font-medium text-blue-800">{selectedLabel}</Text>
+        className="flex-row items-center justify-center rounded-full bg-blue-100 px-3 py-1 pl-4">
+        <Text className="mr-1 text-sm font-medium text-blue-800">{selectedLabel}</Text>
+        <AntDesign name="down" size={12} color="#1d4ed8" />
       </Pressable>
 
       {isOpen && (
-        <View className="absolute -left-4 top-12 z-50 w-28 rounded-lg border border-gray-200 bg-white shadow-lg">
-          {options.map((option) => (
-            <Pressable
-              key={option.value}
-              onPress={() => {
-                setSort(option.value);
-                setIsOpen(false);
-              }}
-              className="px-4 py-2">
-              <Text className="text-gray-800">{option.label}</Text>
-            </Pressable>
-          ))}
+        <View className="bg-whiteke absolute top-full z-50 w-full rounded-lg border border-gray-100  bg-white shadow-md">
+          {options.map((option) => {
+            const isSelected = option.value === sort;
+            return (
+              <Pressable
+                key={option.value}
+                onPress={() => {
+                  setSort(option.value);
+                  setIsOpen(false);
+                }}
+                className={`rounded-md px-3 py-1.5 ${
+                  isSelected ? 'bg-blue-50		 font-semibold text-blue-700' : 'text-gray-800'
+                } hover:bg-blue-100`}>
+                <Text
+                  className={`text-sm ${
+                    isSelected ? 'font-semibold text-blue-700' : 'text-gray-800'
+                  }`}>
+                  {option.label}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
       )}
     </View>

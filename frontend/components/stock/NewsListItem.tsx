@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { getTimeAgo } from 'utils/date';
+import { cn } from 'utils/styles';
 
 type Props = {
   newsId: number;
@@ -13,9 +14,10 @@ type Props = {
   description: string;
   score: number;
   publishedDate: string;
+  isLast: boolean;
 };
 
-function NewsListItem({ newsId, title, score, publishedDate }: Props) {
+function NewsListItem({ newsId, title, score, publishedDate, isLast }: Props) {
   const router = useRouter();
 
   const onPressNewsItem = () => {
@@ -29,7 +31,10 @@ function NewsListItem({ newsId, title, score, publishedDate }: Props) {
     <>
       <TouchableOpacity
         key={newsId}
-        className="flex-row items-center justify-between px-3 py-3"
+        className={cn(
+          'flex-row items-center justify-between px-3 py-3',
+          isLast ? '' : 'border-b border-gray-200'
+        )}
         onPress={onPressNewsItem}>
         <View className="mr-2 self-center">
         
@@ -41,19 +46,18 @@ function NewsListItem({ newsId, title, score, publishedDate }: Props) {
           )}
         </View>
 
-        <View className="flex-1 flex-row items-center justify-between">
+        <View className="flex-1 flex-row items-center">
           <Text
             className="flex-1 pr-1 text-sm text-gray-900"
             numberOfLines={1}
             ellipsizeMode="tail">
             {title}
           </Text>
-          <Text className="min-w-[50px] text-right text-xs text-gray-500" ellipsizeMode="tail">
-            {toFormattedDate(publishedDate)}
+          <Text className="text-gray-5 00 min-w-[50px] text-right text-xs" ellipsizeMode="tail">
+            {getTimeAgo(publishedDate)}
           </Text>
         </View>
       </TouchableOpacity>
-      <View className="my-0.4 mx-3 h-px bg-gray-200" />
     </>
   );
 }
