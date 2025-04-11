@@ -1,48 +1,48 @@
 package newstock.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import newstock.common.dto.ExceptionResponse;
-import newstock.exception.type.BusinessException;
-import newstock.exception.type.DbException;
-import newstock.exception.type.ExternalApiException;
-import newstock.exception.type.ValidationException;
+import newstock.common.dto.Api;
+import newstock.exception.type.InternalException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.validation.ObjectError;
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ExceptionResponse> handleValidationException(ValidationException ex) {
+    @ExceptionHandler(InternalException.class)
+    public ResponseEntity<Api<Integer>> handleInternalException(InternalException ex) {
+        log.error("[{}] 예외 발생: {} (코드: {})",
+                ex.getClass().getSimpleName(), ex.getMessage(),
+                ex.getExceptionCode().getCode());
 
-        return ResponseEntity
-                .status(ex.getExceptionCode().getHttpStatus())
-                .body(ExceptionResponse.of(ex.getExceptionCode()));
+        ExceptionCode ec = ex.getExceptionCode();
+
+        return ResponseEntity.status(ec.getStatus()).body(Api.ERROR(ec.getMessage(), ec.getCode()));
     }
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ExceptionResponse> handleBusinessException(BusinessException ex) {
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Api<Integer>> handleGlobalException(Exception ex) {
+        log.error("예상치 못한 오류 발생:", ex);
 
-        return ResponseEntity
-                .status(ex.getExceptionCode().getHttpStatus())
-                .body(ExceptionResponse.of(ex.getExceptionCode()));
+        ExceptionCode ec = ExceptionCode.INTERNAL_SERVER_ERROR;
+
+        return ResponseEntity.status(ec.getStatus()).body(Api.ERROR(ec.getMessage(), ec.getCode()));
     }
 
-    @ExceptionHandler(DbException.class)
-    public ResponseEntity<ExceptionResponse> handleDbException(DbException ex) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Api<Integer>> handleValidationException(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .findFirst()
+                .map(ObjectError::getDefaultMessage)
+                .orElse("요청값이 유효하지 않습니다.");
 
-        return ResponseEntity
-                .status(ex.getExceptionCode().getHttpStatus())
-                .body(ExceptionResponse.of(ex.getExceptionCode()));
-    }
-
-    @ExceptionHandler(ExternalApiException.class)
-    public ResponseEntity<ExceptionResponse> handleExternalApiException(ExternalApiException ex) {
-
-        return ResponseEntity
-                .status(ex.getExceptionCode().getHttpStatus())
-                .body(ExceptionResponse.of(ex.getExceptionCode()));
+        ExceptionCode ec = ExceptionCode.VALIDATION_ERROR;
+        return ResponseEntity.status(ec.getStatus()).body(Api.ERROR(message, ec.getCode()));
     }
 }

@@ -18,12 +18,15 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
         this.jpaQueryFactory = new JPAQueryFactory(entityManager);
     }
 
+    // 활성화된 유저만 ID 기준으로 조회
     @Override
-    public Optional<User> findById(int id) {
-        return Optional.ofNullable(jpaQueryFactory
-                .selectFrom(user)
-                .where(user.id.eq(id))
-                .fetchOne());
-
+    public Optional<User> findActivatedById(Integer userId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(user)
+                        .where(user.userId.eq(userId),
+                                user.activated.isTrue())
+                        .fetchOne()
+        );
     }
 }

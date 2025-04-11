@@ -6,5 +6,6 @@ import java.util.Optional;
 
 public interface UserCustomRepository {
 
-    Optional<User> findById(int id);
+    // 활성화된 유저만 ID 기준으로 조회
+    Optional<User> findActivatedById(Integer userId);
 }
