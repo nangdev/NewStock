@@ -1,10 +1,11 @@
 package newstock.domain.news.service;
 
 import newstock.domain.news.dto.NewsItem;
+import newstock.domain.news.entity.News;
 
 import java.util.List;
 
 public interface NewsService {
 
-    void saveNewsItems(List<NewsItem> newsItemList);
+    List<NewsItem> addNewsItems(List<NewsItem> newsItemList);
 }

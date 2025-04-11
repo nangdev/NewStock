@@ -1,37 +1,77 @@
 package newstock.domain.news.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import newstock.domain.news.entity.News;
 
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class NewsItem {
 
-    int id;
+    private Integer newsId;
 
-    String stockCode;
+    private Integer stockId;
 
-    String title;
+    private String title;
 
-    String description;
+    private String description;
 
-    String content;
+    private String content;
 
-    String newsImage;
+    private String newsImage;
 
-    String url;
+    private String url;
 
-    String press;
+    private String press;
 
-    String pressLogo;
+    private String pressLogo;
 
-    String publishedDate;
+    private String publishedDate;
 
-    String newsSummary;
+    private String newsSummary;
 
-    String score;
+    private float score;
 
-    String keyword;
+    private float financeScore;
 
+    private float strategyScore;
 
+    private float governScore;
+
+    private float techScore;
+
+    private float externalScore;
+
+    public static NewsItem of(News news){
+        return NewsItem.builder()
+                .newsId(news.getNewsId())
+                .stockId(news.getStockId())
+                .title(news.getTitle())
+                .description(news.getDescription())
+                .content(news.getContent())
+                .newsImage(news.getNewsImage())
+                .url(news.getUrl())
+                .press(news.getPress())
+                .pressLogo(news.getPressLogo())
+                .publishedDate(news.getPublishedDate())
+                .newsSummary(news.getNewsSummary())
+                .score(news.getScore())
+                .financeScore(news.getFinanceScore())
+                .strategyScore(news.getStrategyScore())
+                .governScore(news.getGovernScore())
+                .techScore(news.getTechScore())
+                .externalScore(news.getExternalScore())
+                .build();
+    }
+
+    public void setScores(AnalysisResponse analysisResponse) {
+        this.score = analysisResponse.getScore();
+        this.financeScore = analysisResponse.getAspectScores().getFinance();
+        this.strategyScore = analysisResponse.getAspectScores().getStrategy();
+        this.governScore = analysisResponse.getAspectScores().getGovern();
+        this.techScore = analysisResponse.getAspectScores().getTech();
+        this.externalScore = analysisResponse.getAspectScores().getExternal();
+    }
 }

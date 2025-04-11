@@ -2,7 +2,6 @@ stages:
   - deploy
 
 variables:
-  # Docker 관련 변수 제거 (Runner의 Docker를 사용)
 
 deploy:
   stage: deploy
@@ -136,14 +135,13 @@ deploy:
           echo \"NEWS_AI_URL=$NEWS_AI_URL\" >> crawl/.env &&
           echo \"FCM_PROJECT_ID=$FCM_PROJECT_ID\" >> crawl/.env &&
           
-          # 전체 서비스 재배포
-          echo \"dev/be 브랜치: 모든 서비스 배포 중...\"
-          docker-compose down
-          docker-compose build
-          docker-compose up -d
+        #   # 전체 서비스 재배포
+        #   echo \"dev/be 브랜치: 모든 서비스 배포 중...\"
+        #   docker-compose down
+        #   docker-compose build
+        #   docker-compose up -d
         fi
       "
   rules:
     - if: '$CI_COMMIT_REF_NAME == "dev/service"'
-    - if: '$CI_COMMIT_REF_NAME == "dev/crawl"'
-    - if: '$CI_COMMIT_REF_NAME == "dev/be"'
+    # - if: '$CI_COMMIT_REF_NAME == "dev/be"'

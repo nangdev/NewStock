@@ -5,6 +5,7 @@ import newstock.domain.news.dto.NewsItem;
 import newstock.domain.news.entity.News;
 import newstock.domain.news.repository.NewsRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,13 +16,16 @@ public class NewsServiceImpl implements NewsService {
 
     private final NewsRepository newsRepository;
 
+    @Transactional
     @Override
-    public void saveNewsItems(List<NewsItem> newsItemList) {
+    public List<NewsItem> addNewsItems(List<NewsItem> newsItemList) {
 
         List<News> newsEntities = newsItemList.stream()
                 .map(News::of)
                 .collect(Collectors.toList());
 
-        newsRepository.saveAll(newsEntities);
+        return newsRepository.saveAll(newsEntities).stream()
+                .map(NewsItem::of)
+                .collect(Collectors.toList());
     }
 }

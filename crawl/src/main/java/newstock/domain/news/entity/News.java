@@ -15,36 +15,45 @@ public class News {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private Integer newsId;
 
-    String stockCode;
+    private Integer stockId;
 
-    String title;
+    private String title;
 
-    String description;
+    private String description;
 
     @Lob
-    String content;
+    private String content;
 
-    String newsImage;
+    private String newsImage;
 
-    String url;
+    private String url;
 
-    String press;
+    private String press;
 
-    String pressLogo;
+    private String pressLogo;
 
-    String publishedDate;
+    private String publishedDate;
 
-    String newsSummary;
+    @Lob
+    private String newsSummary;
 
-    String score;
+    private float score;
 
-    String keyword;
+    private float financeScore;
+
+    private float strategyScore;
+
+    private float governScore;
+
+    private float techScore;
+
+    private float externalScore;
 
     public static News of(NewsItem newsItem) {
         return News.builder()
-                .stockCode(newsItem.getStockCode())
+                .stockId(newsItem.getStockId())
                 .title(newsItem.getTitle())
                 .description(newsItem.getDescription())
                 .content(newsItem.getContent())
@@ -53,9 +62,13 @@ public class News {
                 .press(newsItem.getPress())
                 .pressLogo(newsItem.getPressLogo())
                 .publishedDate(newsItem.getPublishedDate())
-                .newsSummary(null)
-                .score(null)
-                .keyword(null)
+                .newsSummary(newsItem.getNewsSummary())
+                .score(newsItem.getScore())
+                .financeScore(newsItem.getFinanceScore())
+                .strategyScore(newsItem.getStrategyScore())
+                .governScore(newsItem.getGovernScore())
+                .techScore(newsItem.getTechScore())
+                .externalScore(newsItem.getExternalScore())
                 .build();
     }
 
