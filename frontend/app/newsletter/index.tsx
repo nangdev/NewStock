@@ -45,10 +45,6 @@ LocaleConfig.locales['ko'] = {
 LocaleConfig.defaultLocale = 'ko';
 
 export default function NewsletterCalendar() {
-  const toKSTString = (date: Date) => {
-    const koreaTimeOffset = 9 * 60 * 60 * 1000;
-    return new Date(date.getTime() + koreaTimeOffset).toISOString().split('T')[0];
-  };
   const nowUTC = new Date();
   const nowKST = new Date(nowUTC.getTime() + 9 * 60 * 60 * 1000); // 한국시간
   const todayString = nowKST.toISOString().split('T')[0];
@@ -81,7 +77,7 @@ export default function NewsletterCalendar() {
           container: {},
           text: {
             color: '#724EDB',
-            fontWeight: 'bold', // 👈 여기가 핵심
+            fontWeight: 'bold',
             fontSize: 16,
           },
         },
@@ -96,13 +92,13 @@ export default function NewsletterCalendar() {
   return (
     <>
       <CustomHeader title="뉴스레터" onGoBack={onGoBack} />
-      <View className="h-full w-full items-center justify-center gap-6 pb-20">
+      <View className="flex-1 items-center justify-center gap-6 pb-20">
         <Text className="text-lg font-bold text-text">
           날짜를 클릭하면 뉴스레터를 볼 수 있어요!
         </Text>
         <Calendar
           onDayPress={onPressDate}
-          markingType={'custom'}
+          markingType="custom"
           markedDates={markedDates}
           renderHeader={(date: Date) => {
             const year = date.getFullYear();

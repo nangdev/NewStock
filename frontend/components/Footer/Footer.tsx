@@ -19,7 +19,7 @@ export default function CustomFooter() {
   const router = useRouter();
 
   return (
-    <View className="absolute bottom-0 z-10 w-full flex-row border-t border-gray-200 bg-white">
+    <View className="z-10 w-full flex-row border-t border-gray-200 bg-white">
       {menus.map((menu) => {
         const isActive = pathname === menu.href || pathname.startsWith(menu.href + '/');
 

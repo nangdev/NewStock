@@ -70,11 +70,10 @@ export default function NewsLetter() {
   return (
     <>
       <CustomHeader title={stockName} onGoBack={onGoBack} />
-      <View className="gap-4 rounded-lg px-6 pt-24">
+      <View className="flex-1 justify-center gap-4 rounded-lg px-6">
         <View
           className="w-full items-center gap-8 rounded-lg border border-stroke bg-white p-8 shadow-lg"
           style={{
-            backgroundColor: 'white',
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
@@ -85,12 +84,12 @@ export default function NewsLetter() {
             <Text className="text-primary">{stockName}</Text>에서는 어떤 키워드가 등장했을까요?
           </Text>
           <PieGiftedChart keywords={currentKeywordList} />
-          <View className="h-[360px] w-full items-center justify-center gap-4 border-t border-dashed border-gray-300 pt-6">
+          <View className="w-full items-center justify-center gap-4 border-t border-dashed border-gray-300 pt-6">
             <Text className="font-bold">
               오늘의 <Text className="text-primary">{stockName}</Text>에서는..?
             </Text>
 
-            <ScrollView className="w-full" showsVerticalScrollIndicator={false}>
+            <ScrollView className="h-[250px] w-full" showsVerticalScrollIndicator={false}>
               <Markdown
                 style={{
                   list_item: {

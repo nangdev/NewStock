@@ -60,7 +60,7 @@ export default function StockDetail() {
   return (
     <>
       <CustomHeader title={data?.data.stockName} />
-      <View className="mt-24">
+      <View className="flex-1 py-6">
         <StockInfoCard
           stockId={id}
           stockName={data?.data.stockName ?? ''}
@@ -76,66 +76,65 @@ export default function StockDetail() {
           industry={data?.data.stdIccn ?? ''}
           priceChanged={data?.data.ctpdPrice ?? 0}
         />
-      </View>
+        <View className="mt-2 flex-row items-center justify-between px-8">
+          <Text className="ml-2 mt-1 text-xl font-semibold">관련 뉴스</Text>
+          <View className="mt-1">
+            <SortButton sort={sort} setSort={setSort} />
+          </View>
+        </View>
+        <View className="mx-8 my-2 h-[350px] rounded-2xl bg-white pt-2 shadow-md">
+          {newsListData && newsListData.data.newsList.length > 0 ? (
+            <>
+              <ScrollView>
+                {newsListData?.data.newsList.map((news, index) => {
+                  const isLast = index === newsListData?.data.newsList.length - 1;
+                  return (
+                    <NewsListItem
+                      key={news.newsId}
+                      newsId={news.newsId}
+                      title={news.title}
+                      description=""
+                      score={news.score}
+                      publishedDate={news.publishedDate}
+                      isLast={isLast}
+                    />
+                  );
+                })}
+              </ScrollView>
+              <View className="mb-2 mt-4 flex-row items-center justify-center gap-4">
+                {page > 0 ? (
+                  <TouchableOpacity
+                    onPress={onPressLeft}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 2 }}>
+                    <Entypo name="triangle-left" size={18} />
+                  </TouchableOpacity>
+                ) : (
+                  <Entypo name="triangle-left" size={18} color="#C7C7C7" />
+                )}
 
-      <View className="my-4 flex-row items-center justify-between px-8">
-        <Text className="ml-2 mt-1 text-xl font-semibold">관련 뉴스</Text>
-        <View className="mt-1">
-          <SortButton sort={sort} setSort={setSort} />
+                {newsListData && page < newsListData?.data.totalPage - 1 ? (
+                  <TouchableOpacity
+                    onPress={onPressRight}
+                    hitSlop={{ top: 10, bottom: 10, left: 2, right: 10 }}>
+                    <Entypo name="triangle-right" size={18} />
+                  </TouchableOpacity>
+                ) : (
+                  <Entypo name="triangle-right" size={18} color="#C7C7C7" />
+                )}
+              </View>
+            </>
+          ) : (
+            <View className="flex-1 items-center justify-center">
+              <Image
+                source={require('../../../assets/image/no_data.png')}
+                style={{ width: 50, height: 50, resizeMode: 'contain' }}
+              />
+              <Text style={{ color: '#8A96A3' }}>관련 뉴스가 없어요</Text>
+            </View>
+          )}
         </View>
       </View>
 
-      <View className="mx-8 my-2 h-[405px] rounded-2xl bg-white pt-2 shadow-md">
-        {newsListData && newsListData.data.newsList.length > 0 ? (
-          <>
-            <ScrollView>
-              {newsListData?.data.newsList.map((news, index) => {
-                const isLast = index === newsListData?.data.newsList.length - 1;
-                return (
-                  <NewsListItem
-                    key={news.newsId}
-                    newsId={news.newsId}
-                    title={news.title}
-                    description=""
-                    score={news.score}
-                    publishedDate={news.publishedDate}
-                    isLast={isLast}
-                  />
-                );
-              })}
-            </ScrollView>
-            <View className="mb-2 mt-4 flex-row items-center justify-center gap-4">
-              {page > 0 ? (
-                <TouchableOpacity
-                  onPress={onPressLeft}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 2 }}>
-                  <Entypo name="triangle-left" size={18} />
-                </TouchableOpacity>
-              ) : (
-                <Entypo name="triangle-left" size={18} color="#C7C7C7" />
-              )}
-
-              {newsListData && page < newsListData?.data.totalPage - 1 ? (
-                <TouchableOpacity
-                  onPress={onPressRight}
-                  hitSlop={{ top: 10, bottom: 10, left: 2, right: 10 }}>
-                  <Entypo name="triangle-right" size={18} />
-                </TouchableOpacity>
-              ) : (
-                <Entypo name="triangle-right" size={18} color="#C7C7C7" />
-              )}
-            </View>
-          </>
-        ) : (
-          <View className="flex-1 items-center justify-center">
-            <Image
-              source={require('../../../assets/image/no_data.png')}
-              style={{ width: 50, height: 50, resizeMode: 'contain' }}
-            />
-            <Text style={{ color: '#8A96A3' }}>관련 뉴스가 없어요</Text>
-          </View>
-        )}
-      </View>
       <CustomFooter />
     </>
   );

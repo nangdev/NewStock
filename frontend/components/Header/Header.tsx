@@ -33,7 +33,7 @@ export default function CustomHeader({ title, onGoBack, disabled = false }: Head
     <BlurView
       intensity={50}
       tint="light"
-      className="absolute top-0 z-10 w-full flex-row items-center justify-between border-b border-gray-200 px-4 py-3 backdrop-blur-md">
+      className="z-10 w-full flex-row items-center justify-between border-b border-gray-200 px-4 py-3 backdrop-blur-md">
       <TouchableOpacity
         disabled={disabled}
         onPress={onGoBack ? onGoBack : () => navigation.goBack()}

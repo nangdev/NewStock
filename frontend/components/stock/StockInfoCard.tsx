@@ -1,6 +1,6 @@
-import { View, Text, Image, Pressable, Modal } from 'react-native';
-import { useState } from 'react';
 import { AntDesign } from '@expo/vector-icons';
+import { useState } from 'react';
+import { View, Text, Image, Pressable, Modal } from 'react-native';
 
 type Props = {
   stockId: number;
@@ -31,8 +31,8 @@ export default function StockInfoCard({
   industry,
 }: Props) {
   return (
-    <View className="mx-8 my-2 rounded-2xl bg-white shadow-md h-[215px]">
-      <View className="ml-1 mt-1 flex-row items-center p-4">
+    <View className="mx-8 rounded-2xl bg-white shadow-md">
+      <View className="flex-row items-center justify-center p-4">
         <Image
           source={{ uri: `data:image/png;base64,${imgUrl}` }}
           className="mr-6 h-16 w-16 rounded-xl bg-gray-200"
@@ -44,7 +44,7 @@ export default function StockInfoCard({
             <Text className="text-base font-bold">{price.toLocaleString()} 원</Text>
           </View>
 
-          <View className="mt-1 flex-row items-center justify-between">
+          <View className="flex-row items-center justify-between">
             <Text className="text-xs text-gray-500">{stockCode}</Text>
             <Text
               className={`text-sm ${
@@ -58,7 +58,7 @@ export default function StockInfoCard({
 
       <View className="mx-4 border-t border-gray-200" />
 
-      <View className="mb-1 flex-row  p-4">
+      <View className="mb-1 flex-row p-4">
         <View className="flex-1">
           <InfoRow label="시가총액" content={totalPrice} />
           <InfoRow label="발행주식수" content={issuedNum} />
@@ -67,7 +67,6 @@ export default function StockInfoCard({
         <View className="flex-1">
           <InfoRow label="자본금" content={capital} />
           <InfoRow label="분류" content={industry} />
-          <View className="h-[24px]" />
         </View>
       </View>
     </View>
