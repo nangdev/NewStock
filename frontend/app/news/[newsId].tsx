@@ -57,7 +57,7 @@ export default function NewsDetailPage() {
   return (
     <>
       <CustomHeader title={newsInfo.press} />
-      <View className="mx-4 my-24 h-[650px] rounded-2xl bg-white p-6 shadow-md">
+      <View className="m-4 flex-1 rounded-2xl bg-white p-6 shadow-md">
         <ScrollView showsVerticalScrollIndicator={false}>
           <View>
             <View className="mb-2 flex-row items-center justify-between">
@@ -75,20 +75,17 @@ export default function NewsDetailPage() {
               />
             </View>
 
-            <View className="flex-row items-center justify-between">
-              <Text className="flex-1 text-xl font-bold" style={{ textAlign: 'justify' }}>
-                {newsInfo?.title}
-              </Text>
+            <View className="mb-2 flex-row items-center justify-between">
+              <Text className="flex-1 text-xl font-bold">{newsInfo?.title}</Text>
             </View>
 
-            <View className="flex-row items-center justify-between">
-              <Text className="my-4 mt-2 text-gray-500">{newsInfo?.publishedDate}</Text>
-            </View>
+            <Text className="my-4 mt-2 text-right text-gray-500">{newsInfo?.publishedDate}</Text>
+
             <View className="border-t border-gray-200 " />
           </View>
 
           <View className="mt-2 flex-1 items-center justify-center">
-            <Text className="mt-2 text-lg">
+            <Text className="mt-5 text-lg">
               <Text className="font-bold">AI</Text>가 이 기사를{' '}
               <Text className={`font-bold ${sentimentColor}`}>{sentimentValue}</Text>
               {sentimentValue === '중립' ? '으' : ''}로 분류했어요.
@@ -125,7 +122,7 @@ export default function NewsDetailPage() {
           <View>
             <Text className="text-lg">{newsInfo.content}</Text>
           </View>
-          <View className="mb-2 mt-4 border-t border-gray-200" />
+          <View className="mb-4 mt-4 border-t border-gray-200" />
           <Text className="mb-2 text-sm text-gray-500">
             해당 기사의 저작권은 {newsInfo.press}에 있으며, 자세한 내용은 원문 링크를 통해 확인할 수
             있습니다.

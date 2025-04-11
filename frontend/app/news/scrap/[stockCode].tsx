@@ -6,7 +6,7 @@ import CustomHeader from 'components/Header/Header';
 import SortButton from 'components/news/SortButton';
 import { ROUTE } from 'constants/routes';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { NewsType } from 'types/api/news';
 import { getTimeAgo } from 'utils/date';
@@ -18,7 +18,7 @@ export default function StockNewsScrapPage() {
   const [page, setPage] = useState(0);
   const [sort, setSort] = useState<'score' | 'time'>('time');
 
-  const COUNT_PER_PAGE = 9;
+  const COUNT_PER_PAGE = 10;
 
   const { data, isLoading, isError } = useNewsScrapListQuery({
     stockId,
@@ -94,18 +94,18 @@ export default function StockNewsScrapPage() {
   return (
     <>
       <CustomHeader title={stockName} />
-      <View className="gap-4 px-4 py-24">
+      <View className="flex-1 gap-4 px-4 py-6">
         <View className="flex-row justify-between pr-4">
           <Text className="mb-2 items-center px-5 text-lg font-semibold"> 스크랩한 뉴스예요</Text>
           <SortButton sort={sort} setSort={setSort} />
         </View>
-        <View className="mx-2 rounded-2xl bg-white p-2 shadow-lg">
-          <View style={{ height: 550 }}>
+        <View className="mx-2 flex-1 rounded-2xl bg-white p-2 shadow-lg">
+          <View className="flex-1">
             <FlatList
               data={data?.data.newsList}
               keyExtractor={(item) => String(item.newsId)}
               renderItem={renderItem}
-              scrollEnabled={false}
+              showsVerticalScrollIndicator={false}
               contentContainerStyle={{ flexGrow: 0 }}
             />
           </View>

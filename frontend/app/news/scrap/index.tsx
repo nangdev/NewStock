@@ -4,16 +4,7 @@ import CustomFooter from 'components/Footer/Footer';
 import CustomHeader from 'components/Header/Header';
 import { ROUTE } from 'constants/routes';
 import { useRouter } from 'expo-router';
-import { setParams } from 'expo-router/build/global-state/routing';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  FlatList,
-} from 'react-native';
+import { View, Text, Image, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
 import useUserStore from 'store/user';
 
 export default function NewsScrapPage() {
@@ -70,7 +61,7 @@ export default function NewsScrapPage() {
   return (
     <>
       <CustomHeader title="뉴스 스크랩" onGoBack={onGoBack} />
-      <View className="items-center justify-center py-24 pb-28">
+      <View className="flex-1 items-center py-6">
         <Text className="mb-6 ml-4 items-center self-start px-6 text-lg font-semibold">
           <Text className="font-bold text-primary">{userInfo.userInfo?.nickname}</Text>님의
           종목이에요
