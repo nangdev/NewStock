@@ -57,7 +57,7 @@ export default function NewsDetailPage() {
   return (
     <>
       <CustomHeader title={newsInfo.press} />
-      <View className="mx-4 my-24 h-[680px] rounded-2xl bg-white p-6 shadow-md">
+      <View className="mx-4 my-24 h-[650px] rounded-2xl bg-white p-6 shadow-md">
         <ScrollView showsVerticalScrollIndicator={false}>
           <View>
             <View className="mb-2 flex-row items-center justify-between">
